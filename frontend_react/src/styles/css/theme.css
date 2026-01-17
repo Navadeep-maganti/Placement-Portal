@@ -1,0 +1,36 @@
+:root {
+  /* ================= PRIMARY ================= */
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-soft: #eaf0ff;
+
+  /* ================= BACKGROUND ================= */
+  --bg-page: #f9fafb;
+  --bg-card: #ffffff;
+  --bg-hover: #f3f4f6;
+
+  /* ================= NAVBAR ================= */
+  --navbar-bg: #ffffff;
+  --navbar-div-bg: rgba(255, 255, 255, 1);
+  --navbar-border: #e5e7eb;
+  --navbar-text: #374151;
+  --navbar-text-active: #2563eb;
+  --navbar-hover-bg: #ffffff;
+
+  /* ================= TEXT ================= */
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --text-placeholder: #9ca3af;
+
+  /* ================= BORDERS ================= */
+  --border: #e5e7eb;
+  --border-light: #f1f5f9;
+
+  /* ================= STATUS ================= */
+  --success: #16a34a;
+  --warning: #d97706;
+  --error: #dc2626;
+
+  /* ================= FOCUS ================= */
+  --focus-ring: rgba(37, 99, 235, 0.15);
+}

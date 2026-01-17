@@ -1,29 +1,21 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../../utils/api";
-
+import StudentNavbar from "../../components/Navbar/StudentNavbar";
+import { useAuth } from "../../contexts/AuthContext";
+import "../../styles/css/StudentDashboard.css";
 function StudentDashboard() {
-  const [student, setStudent] = useState(null);
-  const navigate = useNavigate();
+  const { auth, loading } = useAuth();
 
-  useEffect(() => {
-    api.get("/students/me/")
-      .then(res => setStudent(res.data))
-      .catch((err) => {
-        console.error("ME API ERROR:", err.response?.status, err.response?.data);
-      });
-
-  }, [navigate]);
-
-  if (!student) return <p>Loading...</p>;
+  if (loading) return <p>Loading...</p>;
+  if (!auth.user) return <p>No user data</p>;
 
   return (
-    <div>
-      <h1>Welcome {student.first_name}</h1>
-      <p>Email: {student.email}</p>
-      <p>Department: {student.department}</p>
-      <p>Graduation Year: {student.graduation_year}</p>
-      <p>CGPA: {student.cgpa}</p>
+    <div className="student-dashboard">
+      <StudentNavbar student={auth.user} />
+
+      <h1>Welcome {auth.user.first_name}</h1>
+      <p>Email: {auth.user.email}</p>
+      <p>Department: {auth.user.department}</p>
+      <p>Graduation Year: {auth.user.graduation_year}</p>
+      <p>CGPA: {auth.user.cgpa}</p>
     </div>
   );
 }

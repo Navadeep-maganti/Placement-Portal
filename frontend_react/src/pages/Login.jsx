@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../utils/api";
-import "../assets/css/login.css";
+import "../styles/css/login.css";
 
 function Login() {
   const navigate = useNavigate();
@@ -44,8 +44,14 @@ function Login() {
     e.preventDefault();
     setError("");
 
+    // Validate inputs
+    if (!email.trim() || !password.trim()) {
+      setError("Please enter both username and password");
+      return;
+    }
+
     try {
-      const res = await api.post("login/", {
+      const res = await api.post("token/", {
         username: email,
         password: password,
       });
@@ -54,12 +60,12 @@ function Login() {
 
       // ❌ Role mismatch protection
       if (loginType === "student" && role !== "student") {
-        setError("This is not a student account");
+        setError("This is not a student account. Please use the recruiter login.");
         return;
       }
 
       if (loginType === "company" && role !== "company") {
-        setError("This is not a recruiter account");
+        setError("This is not a recruiter account. Please use the student login.");
         return;
       }
 
@@ -76,41 +82,52 @@ function Login() {
       }
 
     } catch (err) {
-      setError("Invalid username or password");
+      // Detailed error messages
+      if (err.response?.status === 400) {
+        setError(err.response?.data?.detail || "Invalid credentials. Please check your username and password.");
+      } else if (err.response?.status === 401) {
+        setError("Invalid username or password");
+      } else if (err.response?.status === 404) {
+        setError("User not found. Please check your username.");
+      } else if (err.message === "Network Error") {
+        setError("Network error. Please check your connection and try again.");
+      } else {
+        setError("Login failed. Please try again later.");
+      }
+      console.error("Login error:", err.response?.data || err.message);
     }
   };
 
   return (
-    <div className="auth-wrapper" id="authWrapper">
+    <div className="login-page">
+      <div className="login-card">
 
-      {/* ================= LOGIN FORM ================= */}
-      <div className="auth-form-box login-form-box">
-        <form onSubmit={handleLogin}>
-          <h1>
-            {loginType === "student" ? "Student Login" : "Recruiter Login"}
-          </h1>
+        <h1 className="login-title">
+          {loginType === "student" ? "Student Login" : "Recruiter Login"}
+        </h1>
 
-          {/* 🔘 ROLE TOGGLE (UI ONLY) */}
-          <div className="role-toggle">
-            <button
-              type="button"
-              className={loginType === "student" ? "active" : ""}
-              onClick={() => setLoginType("student")}
-            >
-              Student
-            </button>
-            <button
-              type="button"
-              className={loginType === "company" ? "active" : ""}
-              onClick={() => setLoginType("company")}
-            >
-              Recruiter
-            </button>
-          </div>
+        {/* Role Toggle */}
+        <div className="role-toggle">
+          <button
+            type="button"
+            className={loginType === "student" ? "active" : ""}
+            onClick={() => setLoginType("student")}
+          >
+            Student
+          </button>
+          <button
+            type="button"
+            className={loginType === "company" ? "active" : ""}
+            onClick={() => setLoginType("company")}
+          >
+            Recruiter
+          </button>
+        </div>
 
+        <form onSubmit={handleLogin} className="login-form">
           <input
             type="text"
-            placeholder="Username / Email"
+            placeholder="Username or Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -124,37 +141,17 @@ function Login() {
             required
           />
 
-          {error && <p className="error-text">{error}</p>}
+          {error && (
+            <div className="error-container">
+              <p className="error-text">{error}</p>
+            </div>
+          )}
 
-          <button type="submit">Sign In</button>
+          <button type="submit" className="login-btn">
+            Sign In
+          </button>
         </form>
-      </div>
 
-      {/* ================= SLIDING PANEL ================= */}
-      <div className="slide-panel-wrapper">
-        <div className="slide-panel">
-
-          <div className="panel-content panel-content-left">
-            <h1>Welcome Back!</h1>
-            <p>
-              Login to continue your placement journey
-            </p>
-            <button className="transparent-btn" id="loginBtn">
-              Sign In
-            </button>
-          </div>
-
-          <div className="panel-content panel-content-right">
-            <h1>Hey There!</h1>
-            <p>
-              Register and explore opportunities
-            </p>
-            <button className="transparent-btn" id="registerBtn">
-              Sign Up
-            </button>
-          </div>
-
-        </div>
       </div>
     </div>
   );
