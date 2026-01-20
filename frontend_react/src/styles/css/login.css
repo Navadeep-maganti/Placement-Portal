@@ -17,7 +17,7 @@
   width: 100%;
   max-width: 420px;
   padding: 40px 36px;
-  border-radius: 10px;
+  border-radius: 25px;
   border: 1px solid #e5e7eb;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
@@ -40,12 +40,12 @@
 }
 
 .role-toggle button {
-  padding: 7px 16px;
-  border-radius: 6px;
+  padding: 15px 26px;
+  border-radius: 25px;
   border: 1px solid #d1d5db;
   background: #ffffff;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 500;
   color: #374151;
   transition: background 0.2s ease, border 0.2s ease;
@@ -68,9 +68,9 @@
 }
 
 .login-form input {
-  padding: 12px 14px;
+  padding: 15px 25px;
   margin-bottom: 14px;
-  border-radius: 6px;
+  border-radius: 25px;
   border: 1px solid #d1d5db;
   font-size: 14px;
   color: #111827;
@@ -90,13 +90,13 @@
 
 /* ================= BUTTON ================= */
 .login-btn {
-  margin-top: 10px;
+  margin-top: 15px;
   padding: 12px;
-  border-radius: 6px;
+  border-radius: 25px;
   border: none;
   background: #2563eb;
   color: #ffffff;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.15s ease;
@@ -118,9 +118,10 @@
 
 .error-text {
   color: #b91c1c;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   margin: 0;
+  text-align: center;
 }
 
 /* ================= RESPONSIVE ================= */

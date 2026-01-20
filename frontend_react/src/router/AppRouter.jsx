@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-
+import { useAuth } from "../contexts/AuthContext";
 /* Public Pages */
 import LandingPage from "../pages/Landing/LandingPage";
 import Login from "../pages/Login";
@@ -21,11 +21,18 @@ import EditJob from "../pages/Admin/EditJob";
 import PrivateRoute from "./PrivateRoute";
 
 export default function AppRouter() {
+  const { auth } = useAuth();
   return (
     <Routes>
 
       {/* ================= PUBLIC ROUTES ================= */}
-      <Route path="/" element={<LandingPage />} />
+      if (!auth.access) {
+        <Route path="/" element={<LandingPage />} />
+      }
+      else if (auth.role=="student") {
+        <Route path="/" element={<StudentDashboard />} />
+      }
+      
       <Route path="/login" element={<Login />} />
 
       {/* ================= STUDENT ROUTES ================= */}

@@ -1,5 +1,42 @@
+:root {
+  /* ================= PRIMARY ================= */
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-soft: #eaf0ff;
+
+  /* ================= BACKGROUND ================= */
+  --bg-page: #f9fafb;
+  --bg-card: #ffffff;
+  --bg-hover: #f3f4f6;
+
+  /* ================= NAVBAR ================= */
+  --navbar-bg: #ffffff;
+  --navbar-div-bg: rgba(255, 255, 255, 1);
+  --navbar-border: #c4c4c6;
+  --navbar-text: #272a30;
+  --navbar-text-active: #1646ae;
+  --navbar-hover-bg: #ffffff;
+
+  /* ================= TEXT ================= */
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --text-placeholder: #9ca3af;
+
+  /* ================= BORDERS ================= */
+  --border: #e5e7eb;
+  --border-light: #f1f5f9;
+
+  /* ================= STATUS ================= */
+  --success: #16a34a;
+  --warning: #d97706;
+  --error: #dc2626;
+
+  /* ================= FOCUS ================= */
+  --focus-ring: rgba(37, 99, 235, 0.15);
+}
+
 .student-navbar {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: var(--navbar-bg);
     padding: 10px 20px;
 
     display: flex;
@@ -67,16 +104,17 @@
 /* Hover: white pill */
 .nav-link:hover {
     background-color: var(--navbar-hover-bg);
-    color: var(--primary);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* color: var(--primary); */
+    box-shadow: 0 0.6px 0.6px rgba(0, 0, 0, 0.08);
+
 }
 
 /* Active / Selected */
 .nav-link.active {
-    background-color: var(--navbar-hover-bg);
+    background-color: #ffffff;
     color: var(--navbar-text-active);
     font-weight: 600;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Pressed */
