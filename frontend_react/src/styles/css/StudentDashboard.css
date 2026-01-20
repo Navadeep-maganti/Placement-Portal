@@ -1,4 +1,8 @@
-.student-dashboard{
+* {
+    margin: none;
+}
+
+.student-dashboard-body {
     margin-top: 65px;
     padding: 20px;
     font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -6,4 +10,145 @@
     min-height: 100vh;
     box-sizing: border-box;
 
+}
+
+.sd-main-div {
+    background-color: var(--color-bg-section);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.current-drive {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    gap: 15px;
+    margin-bottom: 20px;
+    width: 95%;
+    background: linear-gradient(90deg, #7b70f9, #315cf8 );
+    border-radius: 25px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-height: 200px;
+}
+.live-drive {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(90deg, #ada6f8, #5679f8);
+}
+.live-drive span {
+    width: 12px;
+    height: 12px;
+    background-color: #34d399; /* green color */
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 2s infinite;
+}
+.overview-div {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-around;
+}
+
+.appliedRoles {
+    margin-top: 20px;
+    background-color: rgb(243, 231, 255);
+    padding: 10px 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 24px rgba(96, 22, 186, 0.06);
+    border: 1px solid rgba(96, 22, 186, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.appliedRoles h4,
+.bookmarkedRoles h4,
+.shortlisted h4,
+.offersRecieved h4 {
+    color: #4b0082;
+}
+
+.bookmarkedRoles {
+    margin-top: 20px;
+    background-color: rgb(255, 244, 229);
+    padding: 10px 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 24px rgba(255, 140, 0, 0.06);
+    border: 1px solid rgba(255, 140, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.shortlisted {
+    margin-top: 20px;
+    background-color: rgb(229, 240, 255);
+    padding: 10px 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 24px rgba(0, 112, 255, 0.06);
+    border: 1px solid rgba(0, 112, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.offersRecieved {
+    margin-top: 20px;
+    background-color: rgb(229, 255, 244);
+    padding: 10px 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 24px rgba(0, 186, 96, 0.06);
+    border: 1px solid rgba(0, 186, 96, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.overview-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.overview-count {
+    font-size: 25px;
+    font-weight: 700;
+    color: #4b0082;
+}
+
+.congratulations {
+    font-size: 16px;
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bold;
+    color: #22c55e;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.check-badge {
+    width: 32px;
+    height: 32px;
+    background-color: #22c55e;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    max-width: 18px;
+    max-height: 18px;
 }

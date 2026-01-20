@@ -1,6 +1,7 @@
 import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import { useAuth } from "../../contexts/AuthContext";
 import "../../styles/css/StudentDashboard.css";
+
 function StudentDashboard() {
   const { auth, loading } = useAuth();
 
@@ -8,15 +9,46 @@ function StudentDashboard() {
   if (!auth.user) return <p>No user data</p>;
 
   return (
-    <div className="student-dashboard">
+    <>
       <StudentNavbar student={auth.user} />
-
-      <h1>Welcome {auth.user.first_name}</h1>
-      <p>Email: {auth.user.email}</p>
-      <p>Department: {auth.user.department}</p>
-      <p>Graduation Year: {auth.user.graduation_year}</p>
-      <p>CGPA: {auth.user.cgpa}</p>
-    </div>
+      <div className="student-dashboard-body">
+        <h2>Welcome, {auth.user.first_name}! &#128075;</h2>
+        <div className="current-drive">
+          <div className="live-drive"><span>.</span>LIVE DRIVE</div>
+          <div className="drive-details">
+            <h3>Placement Drive 2024</h3>
+            <p>Unlock your potential with our latest placement drive!</p>
+          </div>
+        </div>
+        <div className="sd-main-div">
+          <h3>Placement Overview</h3>
+          <div className="overview-div">
+            <div className="appliedRoles">
+              <h4 className="overview-title">Applied Roles</h4>
+              <p className="overview-count">5</p>
+            </div>
+            <div className="bookmarkedRoles">
+              <h4 className="overview-title">Bookmarked Roles</h4>
+              <p className="overview-count">3</p>
+            </div>
+            <div className="shortlisted">
+              <h4 className="overview-title">Shortlisted</h4>
+              <p className="overview-count">2</p>
+              <div className="shortlist-comment">
+                <i class="fa-regular fa-calendar"></i>
+                <i class="fa-regular fa-clock"></i>
+                <span>Interviews scheduled!</span>
+              </div>
+            </div>
+            <div className="offersRecieved">
+              <h4 className="overview-title">Offers Received</h4>
+              <p className="overview-count">1</p>
+              <p className="congratulations"><div className="check-badge">✓</div>Congratulations!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
