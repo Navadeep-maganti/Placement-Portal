@@ -26,14 +26,3 @@ def auth_me(request):
         "role": request.user.role,
         "is_authenticated": True,
     })
-
-
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def logout_view(request):
-    """Logout endpoint"""
-    logger.info(f"[LOGOUT] User {request.user.username} logging out")
-    return Response(
-        {"message": "Logout successful"},
-        status=status.HTTP_200_OK
-    )

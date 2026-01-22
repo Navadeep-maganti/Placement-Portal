@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import api from "../utils/api";
+import { Navigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -13,7 +14,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Check if user is already logged in on mount
   useEffect(() => {
     const initAuth = async () => {
       try {
@@ -91,6 +91,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.clear();
     setAuth({ access: null, refresh: null, role: null, user: null });
+    Navigate("/login");
   };
 
   return (

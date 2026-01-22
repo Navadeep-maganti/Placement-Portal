@@ -1,7 +1,6 @@
 import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import { useAuth } from "../../contexts/AuthContext";
 import "../../styles/css/StudentDashboard.css";
-
 function StudentDashboard() {
   const { auth, loading } = useAuth();
 
@@ -16,7 +15,7 @@ function StudentDashboard() {
         <div className="current-drive">
           <div className="live-drive"><span>.</span>LIVE DRIVE</div>
           <div className="drive-details">
-            <h3>Placement Drive 2024</h3>
+            <h3>Placement Drive 2025 - 26</h3>
             <p>Unlock your potential with our latest placement drive!</p>
           </div>
         </div>

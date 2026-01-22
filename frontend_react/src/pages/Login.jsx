@@ -16,7 +16,10 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
+  const auth = useAuth();
+  if (auth.auth.access) {
+    navigate("/");
+  }
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");

@@ -1,7 +1,11 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, Navigate, NavLink } from "react-router-dom";
 import "../../styles/css/StudentNavbar.css";
-
+import { FaUserCircle } from "react-icons/fa";
+import { FiLogOut } from "react-icons/fi";
+import api from "../../utils/api";
+import { useAuth } from "../../contexts/AuthContext";
 function StudentNavbar({ student }) {
+  const { logout } = useAuth();
   return (
     <nav className="student-navbar">
       {/* LEFT */}
@@ -45,9 +49,18 @@ function StudentNavbar({ student }) {
 
       {/* RIGHT */}
       <div className="right-nav nav-surface">
-        <span className="nav-username">
-          Hello, {student?.first_name}
-        </span>
+        <Link to="/student/profile" className="profile">
+          <FaUserCircle size={26} />
+          <span className="profile-name">{student?.first_name}</span>
+        </Link>
+        <button
+          onClick={logout}
+          className="logout-button"
+          title="Logout"
+        >
+          <FiLogOut size={20} />
+        </button>
+
       </div>
     </nav>
   );

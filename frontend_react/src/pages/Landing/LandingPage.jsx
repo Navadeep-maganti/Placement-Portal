@@ -4,8 +4,10 @@ import { Link } from 'react-router-dom'
 function LandingPage() {
   return (
     <div>
+
       Landing Page
       <Link to="/login">Login</Link>
+      
     </div>
   )
 }
