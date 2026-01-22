@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../utils/api";
@@ -9,42 +9,18 @@ function Login() {
   const { login } = useAuth();
   const [searchParams] = useSearchParams();
 
-  // UI state
   const [loginType, setLoginType] = useState(
     searchParams.get("type") || "student"
   );
 
-  // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  // Template animation logic (unchanged)
-  useEffect(() => {
-    const registerBtn = document.getElementById("registerBtn");
-    const loginBtn = document.getElementById("loginBtn");
-    const authWrapper = document.getElementById("authWrapper");
-
-    registerBtn?.addEventListener("click", () =>
-      authWrapper.classList.add("panel-active")
-    );
-
-    loginBtn?.addEventListener("click", () =>
-      authWrapper.classList.remove("panel-active")
-    );
-
-    return () => {
-      registerBtn?.replaceWith(registerBtn.cloneNode(true));
-      loginBtn?.replaceWith(loginBtn.cloneNode(true));
-    };
-  }, []);
-
-  // 🔐 LOGIN HANDLER
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
-    // Validate inputs
     if (!email.trim() || !password.trim()) {
       setError("Please enter both username and password");
       return;
@@ -58,7 +34,6 @@ function Login() {
 
       const { role } = res.data;
 
-      // ❌ Role mismatch protection
       if (loginType === "student" && role !== "student") {
         setError("This is not a student account. Please use the recruiter login.");
         return;
@@ -69,10 +44,8 @@ function Login() {
         return;
       }
 
-      // ✅ Save auth
       login(res.data);
 
-      // ✅ Redirect
       if (role === "student") {
         navigate(`/student/dashboard`);
       } else if (role === "company") {
@@ -82,7 +55,6 @@ function Login() {
       }
 
     } catch (err) {
-      // Detailed error messages
       if (err.response?.status === 400) {
         setError(err.response?.data?.detail || "Invalid credentials. Please check your username and password.");
       } else if (err.response?.status === 401) {
@@ -106,7 +78,6 @@ function Login() {
           {loginType === "student" ? "Student Login" : "Recruiter Login"}
         </h1>
 
-        {/* Role Toggle */}
         <div className="role-toggle">
           <button
             type="button"
