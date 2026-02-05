@@ -1,4 +1,5 @@
 import React from 'react'
+import '../../styles/css/JobsList.css'
 import StudentNavbar from '../../components/Navbar/StudentNavbar'
 import { useAuth } from '../../contexts/AuthContext'
 const JobsList = () => {
@@ -10,7 +11,7 @@ const JobsList = () => {
   return (
     <div>
       <StudentNavbar student={student} />
-      <h2 style={{ textAlign: "center" }}>All Jobs</h2>
+      <h2 className="jobs-list-title">All Jobs</h2>
     </div>
   )
 }
