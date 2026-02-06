@@ -3,8 +3,7 @@ import "../../styles/css/LandingFooter.css";
 
 function LandingFooter() {
     return (
-        <>
-            <footer className="landingfooter">
+        <footer className="landingfooter">
                 <div className="footer-content">
                     <div className="left">
                     <h3>Placement Cell</h3>
@@ -23,7 +22,6 @@ function LandingFooter() {
                     <p>&copy; 2026 NIT AP Placement Portal. All rights reserved.</p>
                 </div>
             </footer>
-        </>
     );
 }
 

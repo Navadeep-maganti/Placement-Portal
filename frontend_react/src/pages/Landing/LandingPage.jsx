@@ -1,14 +1,13 @@
 import { useAuth } from "../../contexts/AuthContext";
-import LandingNavbar from "../../components/Navbar/landingNavbar";
+import LandingNavbar from "../../components/Navbar/LandingNavbar";
 import LandingFooter from "../../components/Footer/LandingFooter";
 import "../../styles/css/LandingPage.css";
 import { Link } from "react-router-dom";
 
 function LandingPage() {
-  const { auth, loading } = useAuth();
+  const { loading } = useAuth();
 
   if (loading) return <p>Loading...</p>;
-  if (!auth.user) return <p>No user data</p>;
 
   return (
     <>

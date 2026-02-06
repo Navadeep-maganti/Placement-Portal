@@ -19,26 +19,26 @@ import EditJob from "../pages/Admin/EditJob";
 
 /* Route Protection */
 import PrivateRoute from "./PrivateRoute";
-function homeRedirect() {
+
+function HomeRedirect() {
   const { auth } = useAuth();
-  if (!auth.access) {
-    return <Navigate to="/" />;
+  if (auth.access) {
+    if (auth.role === "student") {
+      return <Navigate to="/student/dashboard" />;
+    }
+    else if (auth.role === "admin") {
+      return <Navigate to="/admin/dashboard" />;
+    }
   }
-  else if (auth.role === "student") {
-    return <Navigate to="/student/dashboard" />;
-  }
-  else if (auth.role === "admin") {
-    return <Navigate to="/admin/dashboard" />;
-  }
-  return <Navigate to="/" />;
+  return <LandingPage />;
 }
+
 export default function AppRouter() {
-  const { auth } = useAuth();
   return (
     <Routes>
 
       {/* ================= PUBLIC ROUTES ================= */}
-      <Route path="/" element={homeRedirect()} />
+      <Route path="/" element={<HomeRedirect />} />
       
       <Route path="/login" element={<Login />} />
 
