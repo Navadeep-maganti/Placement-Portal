@@ -30,6 +30,12 @@ function Login() {
     }
 
     try {
+      const loginbtn=document.querySelector(".login-btn");
+      loginbtn.disabled=true;
+      loginbtn.textContent="Signing in...";
+      loginbtn.style.cursor="not-allowed";
+      loginbtn.style.backgroundColor="#ccc";
+      loginbtn.style.borderColor="#999";
       const res = await api.post("token/", {
         username: email,
         password: password,
@@ -70,6 +76,15 @@ function Login() {
         setError("Login failed. Please try again later.");
       }
       console.error("Login error:", err.response?.data || err.message);
+    }
+    finally {
+      const loginbtn=document.querySelector(".login-btn");
+      loginbtn.disabled=false;
+      loginbtn.textContent="Sign In";
+      loginbtn.style.cursor="pointer";
+      loginbtn.style.backgroundColor="#007bff";
+      loginbtn.style.borderColor="#007bff";
+
     }
   };
 
