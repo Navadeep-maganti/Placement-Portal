@@ -1,12 +1,28 @@
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework import serializers
+from django.contrib.auth import authenticate
+from .models import User
 
-class LoginSerializer(TokenObtainPairSerializer):
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        data['role'] = self.user.role
-        data['user_id'] = self.user.id
-        data['username'] = self.user.username
-        data['email'] = self.user.email
-        data['first_name'] = self.user.first_name
-        data['last_name'] = self.user.last_name
-        return data
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'email',
+            'first_name',
+            'last_name',
+            'role'
+        ]
+
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        user = authenticate(
+            email=data.get('email'),
+            password=data.get('password')
+        )
+        if not user:
+            raise serializers.ValidationError("Invalid email or password")
+        return user

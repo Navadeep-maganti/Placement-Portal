@@ -2,70 +2,35 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import User
 
-
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    """
-    Admin configuration for custom User model
-    """
+    model = User
 
-    # Fields shown in admin list view
-    list_display = (
-        "username",
-        "email",
-        "first_name",
-        "last_name",
-        "role",
-        "is_staff",
-        "is_active",
-    )
+    list_display = ('email', 'first_name', 'last_name', 'role', 'is_active')
+    list_filter = ('role', 'is_active')
+    search_fields = ('email', 'first_name', 'last_name')
 
-    # Filters on right sidebar
-    list_filter = (
-        "role",
-        "is_staff",
-        "is_active",
-    )
+    ordering = ('email',)  # ✅ MUST BE email
 
-    # Search bar fields
-    search_fields = (
-        "username",
-        "email",
-        "first_name",
-        "last_name",
-    )
-
-    ordering = ("username",)
-
-    # Fields shown while editing a user
     fieldsets = (
-        (None, {"fields": ("username", "password")}),
-        ("Personal Info", {"fields": ("first_name", "last_name", "email")}),
-        ("Role & Permissions", {
-            "fields": (
-                "role",
-                "is_active",
-                "is_staff",
-                "is_superuser",
-                "groups",
-                "user_permissions",
+        (None, {'fields': ('email', 'password')}),
+        ('Personal Info', {'fields': ('first_name', 'last_name')}),
+        ('Permissions', {
+            'fields': (
+                'role',
+                'is_active',
+                'is_staff',
+                'is_superuser',
+                'groups',
+                'user_permissions'
             )
         }),
-        ("Important Dates", {"fields": ("last_login", "date_joined")}),
+        ('Important dates', {'fields': ('last_login',)}),
     )
 
-    # Fields shown while creating a user
     add_fieldsets = (
         (None, {
-            "classes": ("wide",),
-            "fields": (
-                "username",
-                "email",
-                "password1",
-                "password2",
-                "role",
-                "is_staff",
-                "is_active",
-            ),
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2', 'role'),
         }),
     )
