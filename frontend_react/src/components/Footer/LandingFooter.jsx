@@ -22,9 +22,39 @@ function LandingFooter() {
 
         <div className="lf-links">
           <h4>Resources</h4>
-          <a href="#PlacementStats">Outcomes</a>
-          <a href="#recruitment">Process</a>
-          <a href="#PlacementStats">Placement Stats</a>
+          <a
+          to="/landingPage#PlacementStats"
+          onClick={(e) => {
+            e.preventDefault();
+            document
+              .getElementById("PlacementStats")
+              .scrollIntoView({ behavior: "smooth" });
+          }}
+        >
+          Outcomes
+        </a>
+        <a
+          to="/landingPage#recruitment"
+          onClick={(e) => {
+            e.preventDefault();
+            document
+              .getElementById("recruitment")
+              .scrollIntoView({ behavior: "smooth" });
+          }}
+        >
+          Process
+        </a>
+        <a
+          href="#contact"
+          onClick={(e) => {
+            e.preventDefault();
+            document.getElementById("contact").scrollIntoView({
+              behavior: "smooth",
+            });
+          }}
+        >
+          Contact
+        </a>
         </div>
 
         <div className="lf-contact">

@@ -73,36 +73,36 @@ const MyApplications = () => {
   });
 
   return (
-    <div className="my-applications-page">
+    <div className="ma-my-applications-page">
       <StudentNavbar student={auth.user} />
       
-      <div className="applications-container">
-        <div className="applications-header">
+      <div className="ma-applications-container">
+        <div className="ma-applications-header">
           <h1>My Applications</h1>
           <p>Track your job applications and interview status</p>
         </div>
 
-        <div className="stats-cards">
-          <div className="stat-card">
-            <div className="stat-number">{applications.length}</div>
-            <div className="stat-label">Total Applied</div>
+        <div className="ma-stats-cards">
+          <div className="ma-stat-card">
+            <div className="ma-stat-number">{applications.length}</div>
+            <div className="ma-stat-label">Total Applied</div>
           </div>
-          <div className="stat-card">
-            <div className="stat-number">{applications.filter(a => a.status === 'shortlisted').length}</div>
-            <div className="stat-label">Shortlisted</div>
+          <div className="ma-stat-card">
+            <div className="ma-stat-number">{applications.filter(a => a.status === 'shortlisted').length}</div>
+            <div className="ma-stat-label">Shortlisted</div>
           </div>
-          <div className="stat-card">
-            <div className="stat-number">{applications.filter(a => a.status === 'selected').length}</div>
-            <div className="stat-label">Selected</div>
+          <div className="ma-stat-card">
+            <div className="ma-stat-number">{applications.filter(a => a.status === 'selected').length}</div>
+            <div className="ma-stat-label">Selected</div>
           </div>
-          <div className="stat-card">
-            <div className="stat-number">{applications.filter(a => a.status === 'pending').length}</div>
-            <div className="stat-label">Pending</div>
+          <div className="ma-stat-card">
+            <div className="ma-stat-number">{applications.filter(a => a.status === 'pending').length}</div>
+            <div className="ma-stat-label">Pending</div>
           </div>
         </div>
 
-        <div className="filters-section">
-          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="filter-select">
+        <div className="ma-filters-section">
+          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="ma-filter-select">
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
             <option value="shortlisted">Shortlisted</option>
@@ -110,44 +110,44 @@ const MyApplications = () => {
             <option value="rejected">Rejected</option>
           </select>
 
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="filter-select">
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="ma-filter-select">
             <option value="recent">Most Recent</option>
             <option value="oldest">Oldest First</option>
           </select>
         </div>
 
-        <div className="applications-list">
+        <div className="ma-applications-list">
           {filteredApplications.length > 0 ? (
             filteredApplications.map((app) => (
-              <div key={app.id} className="application-card">
-                <div className="app-header">
-                  <div className="app-title-section">
+              <div key={app.id} className="ma-application-card">
+                <div className="ma-app-header">
+                  <div className="ma-app-title-section">
                     <h3>{app.jobTitle}</h3>
-                    <p className="company-name">{app.company}</p>
+                    <p className="ma-company-name">{app.company}</p>
                   </div>
-                  <span className="status-badge" style={{ backgroundColor: getStatusColor(app.status) }}>
+                  <span className="ma-status-badge" style={{ backgroundColor: getStatusColor(app.status) }}>
                     {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                   </span>
                 </div>
 
-                <div className="app-details">
+                <div className="ma-app-details">
                   <span>{app.location}</span>
                   <span>{app.salary}</span>
                   <span>{new Date(app.appliedDate).toLocaleDateString()}</span>
                 </div>
 
-                <div className="app-next-step">
+                <div className="ma-app-next-step">
                   <strong>Next Step:</strong> {app.nextStep}
                 </div>
 
-                <div className="app-actions">
-                  <button className="view-btn">View Details</button>
-                  <button className="withdraw-btn">Withdraw</button>
+                <div className="ma-app-actions">
+                  <button className="ma-view-btn">View Details</button>
+                  <button className="ma-withdraw-btn">Withdraw</button>
                 </div>
               </div>
             ))
           ) : (
-            <div className="no-applications">
+            <div className="ma-no-applications">
               <p>No applications found</p>
             </div>
           )}

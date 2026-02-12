@@ -61,38 +61,38 @@ const Bookmarks = () => {
   });
 
   return (
-    <div className="bookmarks-page">
+    <div className="bm-bookmarks-page">
       <StudentNavbar student={auth.user} />
 
-      <div className="bookmarks-container">
-        <div className="bookmarks-header">
+      <div className="bm-bookmarks-container">
+        <div className="bm-bookmarks-header">
           <h1>Saved Jobs</h1>
           <p>Jobs you have bookmarked for later review</p>
         </div>
 
-        <div className="bookmarks-controls">
-          <div className="controls-left">
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="sort-select">
+        <div className="bm-bookmarks-controls">
+          <div className="bm-controls-left">
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="bm-sort-select">
               <option value="recent">Recently Saved</option>
               <option value="deadline">Deadline Approaching</option>
             </select>
           </div>
-          <div className="controls-right">
-            <div className="view-toggle">
-              <button className={`toggle-btn ${viewType === 'grid' ? 'active' : ''}`} onClick={() => setViewType('grid')}>Grid</button>
-              <button className={`toggle-btn ${viewType === 'list' ? 'active' : ''}`} onClick={() => setViewType('list')}>List</button>
+          <div className="bm-controls-right">
+            <div className="bm-view-toggle">
+              <button className={`bm-toggle-btn ${viewType === 'grid' ? 'bm-active' : ''}`} onClick={() => setViewType('grid')}>Grid</button>
+              <button className={`bm-toggle-btn ${viewType === 'list' ? 'bm-active' : ''}`} onClick={() => setViewType('list')}>List</button>
             </div>
           </div>
         </div>
 
         {sortedBookmarks.length > 0 ? (
-          <div className={`bookmarks-${viewType}`}>
+          <div className={`bm-bookmarks-${viewType}`}>
             {sortedBookmarks.map((bookmark) => (
-              <div key={bookmark.id} className="bookmark-card">
-                <div className="bookmark-header">
+              <div key={bookmark.id} className="bm-bookmark-card">
+                <div className="bm-bookmark-header">
                   <h3>{bookmark.jobTitle}</h3>
                   <button 
-                    className="remove-bookmark-btn"
+                    className="bm-remove-bookmark-btn"
                     onClick={() => handleRemoveBookmark(bookmark.id)}
                     title="Remove bookmark"
                   >
@@ -100,39 +100,39 @@ const Bookmarks = () => {
                   </button>
                 </div>
 
-                <p className="company-name">{bookmark.company}</p>
+                <p className="bm-company-name">{bookmark.company}</p>
 
-                <div className="bookmark-meta">
+                <div className="bm-bookmark-meta">
                   <span>{bookmark.location}</span>
                   <span>{bookmark.salary}</span>
                   <span>{bookmark.type}</span>
                 </div>
 
-                <div className="bookmark-skills">
+                <div className="bm-bookmark-skills">
                   {bookmark.skills.map((skill, idx) => (
-                    <span key={idx} className="skill-tag">{skill}</span>
+                    <span key={idx} className="bm-skill-tag">{skill}</span>
                   ))}
                 </div>
 
-                <div className="bookmark-footer">
-                  <span className="saved-date">Saved: {new Date(bookmark.savedDate).toLocaleDateString()}</span>
-                  <span className="deadline">Deadline: {bookmark.deadline}</span>
+                <div className="bm-bookmark-footer">
+                  <span className="bm-saved-date">Saved: {new Date(bookmark.savedDate).toLocaleDateString()}</span>
+                  <span className="bm-deadline">Deadline: {bookmark.deadline}</span>
                 </div>
 
-                <div className="bookmark-actions">
-                  <button className="view-job-btn">View Job</button>
-                  <button className="apply-btn">Apply Now</button>
+                <div className="bm-bookmark-actions">
+                  <button className="bm-view-job-btn">View Job</button>
+                  <button className="bm-apply-btn">Apply Now</button>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="no-bookmarks">
-            <div className="empty-state">
-              <p className="empty-icon">FILE</p>
-              <p className="empty-title">No Bookmarks Yet</p>
-              <p className="empty-message">Start bookmarking jobs to save them for later!</p>
-              <button className="explore-btn">Explore Jobs</button>
+          <div className="bm-no-bookmarks">
+            <div className="bm-empty-state">
+              <p className="bm-empty-icon">FILE</p>
+              <p className="bm-empty-title">No Bookmarks Yet</p>
+              <p className="bm-empty-message">Start bookmarking jobs to save them for later!</p>
+              <button className="bm-explore-btn">Explore Jobs</button>
             </div>
           </div>
         )}

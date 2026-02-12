@@ -35,17 +35,17 @@ const JobsList = () => {
   });
 
   return (
-    <div className="jobs-list-page">
+    <div className="jl-page">
       <StudentNavbar student={auth.user} />
       
-      <div className="jobs-container">
-        <div className="jobs-header">
+      <div className="jl-container">
+        <div className="jl-header">
           <h1>Explore Opportunities</h1>
           <p>Discover amazing job openings and apply now</p>
         </div>
 
-        <div className="search-filters-section">
-          <div className="search-box">
+        <div className="jl-filters">
+          <div className="jl-search">
             <input
               type="text"
               placeholder="Search by job title, company, or skills..."
@@ -54,8 +54,8 @@ const JobsList = () => {
             />
           </div>
 
-          <div className="filters">
-            <select value={filterLocation} onChange={(e) => setFilterLocation(e.target.value)} className="filter-select">
+          <div className="jl-filter-row">
+            <select value={filterLocation} onChange={(e) => setFilterLocation(e.target.value)} className="jl-select">
               <option value="all">All Locations</option>
               <option value="Bangalore">Bangalore</option>
               <option value="Pune">Pune</option>
@@ -63,53 +63,53 @@ const JobsList = () => {
               <option value="Hyderabad">Hyderabad</option>
             </select>
 
-            <select value={filterSalary} onChange={(e) => setFilterSalary(e.target.value)} className="filter-select">
+            <select value={filterSalary} onChange={(e) => setFilterSalary(e.target.value)} className="jl-select">
               <option value="all">All Salaries</option>
               <option value="5-7">5-7 LPA</option>
               <option value="7-9">7-9 LPA</option>
               <option value="9+">9+ LPA</option>
             </select>
 
-            <div className="view-toggle">
-              <button className={`toggle-btn ${viewType === 'grid' ? 'active' : ''}`} onClick={() => setViewType('grid')}>Grid</button>
-              <button className={`toggle-btn ${viewType === 'list' ? 'active' : ''}`} onClick={() => setViewType('list')}>List</button>
+            <div className="jl-view-toggle">
+              <button className={`jl-toggle-btn ${viewType === 'grid' ? 'active' : ''}`} onClick={() => setViewType('grid')}>Grid</button>
+              <button className={`jl-toggle-btn ${viewType === 'list' ? 'active' : ''}`} onClick={() => setViewType('list')}>List</button>
             </div>
           </div>
         </div>
 
-        <div className="results-info">
+        <div className="jl-results">
           <p>Showing <strong>{filteredJobs.length}</strong> opportunities</p>
         </div>
 
-        <div className={`jobs-${viewType}`}>
+        <div className={`jl-cards ${viewType === 'grid' ? 'jl-grid' : 'jl-list'}`}>
           {filteredJobs.map((job) => (
-            <div key={job.id} className="job-card">
-              <div className="job-card-header">
+            <div key={job.id} className="jl-card">
+              <div className="jl-card-header">
                 <h3>{job.title}</h3>
-                <button className="bookmark-btn">BOOKMARK</button>
+                <button className="jl-bookmark">BOOKMARK</button>
               </div>
-              <p className="job-company">{job.company}</p>
-              <div className="job-meta">
-                <span className="meta-item">{job.location}</span>
-                <span className="meta-item">{job.salary}</span>
-                <span className="meta-item">{job.type}</span>
+              <p className="jl-company">{job.company}</p>
+              <div className="jl-meta">
+                <span className="jl-meta-item">{job.location}</span>
+                <span className="jl-meta-item">{job.salary}</span>
+                <span className="jl-meta-item">{job.type}</span>
               </div>
-              <div className="job-skills">
+              <div className="jl-skills">
                 {job.skills.split(', ').map((skill, idx) => (
-                  <span key={idx} className="skill-tag">{skill}</span>
+                  <span key={idx} className="jl-skill">{skill}</span>
                 ))}
               </div>
-              <div className="job-footer">
-                <span className="applicants">{job.applications} applied</span>
-                <span className="deadline">{job.deadline}</span>
+              <div className="jl-footer">
+                <span className="jl-applicants">{job.applications} applied</span>
+                <span className="jl-deadline">{job.deadline}</span>
               </div>
-              <button className="apply-btn">Apply Now</button>
+              <button className="jl-apply">Apply Now</button>
             </div>
           ))}
         </div>
 
         {filteredJobs.length === 0 && (
-          <div className="no-results">
+          <div className="jl-empty">
             <p>No jobs found matching your criteria</p>
             <p>Try adjusting your filters or search terms</p>
           </div>
