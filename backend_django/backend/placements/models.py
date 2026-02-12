@@ -9,11 +9,12 @@ class Placement(models.Model):
     is_active = models.BooleanField(default=True)
     no_of_positions = models.IntegerField(default=1)
     no_of_applicants = models.IntegerField(default=0)
-    required_skills = models.ManyToManyField('skills.Skill', related_name='placements')
+    required_skills = models.ManyToManyField('Skill', related_name='placements')
     def __str__(self):
         return f"{self.job_title} at {self.company.company_name}"
 
-class skills(models.Model):
+class Skill(models.Model):
     name = models.CharField(max_length=50)
+
     def __str__(self):
         return self.name

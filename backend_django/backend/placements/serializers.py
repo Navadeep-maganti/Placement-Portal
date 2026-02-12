@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Placement, skills
+from .models import Placement, Skill
 
 class PlacementSerializer(serializers.ModelSerializer):
     company_name = serializers.CharField(
@@ -37,7 +37,7 @@ class PlacementCreateSerializer(serializers.ModelSerializer):
             'no_of_positions',
             'required_skills',
         ]
-class skillsSerializer(serializers.ModelSerializer):
+class SkillsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = skills
+        model = Skill
         fields = ['id', 'name']
