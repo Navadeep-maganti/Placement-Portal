@@ -5,7 +5,11 @@
 *.log
 *.pot
 *.pyc
+*.pyo
+*.pyd
 __pycache__/
+**/__pycache__/
+**/*.pyc
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -139,6 +143,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+backend_django/venv/
 
 # Spyder project settings
 .spyderproject
