@@ -11,6 +11,9 @@ import JobsList from "../pages/Student/JobsList";
 import JobDetails from "../pages/Student/JobDetails";
 import Bookmarks from "../pages/Student/Bookmarks";
 
+/* Company Pages */
+import CompanyDashboard from "../pages/Company/CompanyDashboard";
+
 /* Admin Pages */
 import AdminDashboard from "../pages/Admin/AdminDashboard";
 import AdminApplicants from "../pages/Admin/AdminApplicants";
@@ -25,6 +28,9 @@ function HomeRedirect() {
   if (auth.access) {
     if (auth.role === "student") {
       return <Navigate to="/student/dashboard" />;
+    }
+    else if (auth.role === "company") {
+      return <Navigate to="/company/dashboard" />;
     }
     else if (auth.role === "admin") {
       return <Navigate to="/admin/dashboard" />;
@@ -84,6 +90,16 @@ export default function AppRouter() {
         element={
           <PrivateRoute allowedRoles={["student"]}>
             <Bookmarks />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Company routes */}
+      <Route
+        path="/company/dashboard"
+        element={
+          <PrivateRoute allowedRoles={["company"]}>
+            <CompanyDashboard />
           </PrivateRoute>
         }
       />

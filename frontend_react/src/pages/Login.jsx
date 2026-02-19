@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
-import api from "../utils/api";
 import "../styles/css/login.css";
 
 function Login() {
@@ -36,7 +36,7 @@ function Login() {
       loginbtn.style.cursor = "not-allowed";
       loginbtn.style.backgroundColor = "#ccc";
       loginbtn.style.borderColor = "#999";
-      const res = await api.post("token/", {
+      const res = await axios.post("http://127.0.0.1:8000/api/token/", {
         email: email,
         password: password,
       });

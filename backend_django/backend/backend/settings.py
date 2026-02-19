@@ -121,7 +121,7 @@ DATABASES = {
         'USER': 'placement_user',
         'PASSWORD': 'Madhu@5148',
         'HOST': 'localhost',
-        'PORT': '5433',
+        'PORT': '5432',
     }
 }
 
