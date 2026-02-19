@@ -1,74 +1,65 @@
-import React, { useState } from 'react'
-import { useAuth } from '../../contexts/AuthContext'
-import StudentNavbar from '../../components/Navbar/StudentNavbar';
-import '../../styles/css/MyApplications.css';
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import StudentNavbar from "../../components/Navbar/StudentNavbar";
+import api from "../../utils/api";
+import "../../styles/css/MyApplications.css";
 
 const MyApplications = () => {
   const { auth, loading } = useAuth();
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [sortBy, setSortBy] = useState('recent');
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [sortBy, setSortBy] = useState("recent");
+  const [applications, setApplications] = useState([]);
+  const [pageLoading, setPageLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const applications = [
-    {
-      id: 1,
-      jobTitle: 'Senior Developer',
-      company: 'Google',
-      appliedDate: '2025-01-15',
-      status: 'shortlisted',
-      salary: '8-10 LPA',
-      location: 'Bangalore',
-      nextStep: 'Technical Interview - Feb 20'
-    },
-    {
-      id: 2,
-      jobTitle: 'Product Manager',
-      company: 'Microsoft',
-      appliedDate: '2025-01-10',
-      status: 'pending',
-      salary: '10-12 LPA',
-      location: 'Pune',
-      nextStep: 'Under Review'
-    },
-    {
-      id: 3,
-      jobTitle: 'Data Scientist',
-      company: 'Amazon',
-      appliedDate: '2025-01-05',
-      status: 'rejected',
-      salary: '7-9 LPA',
-      location: 'Bangalore',
-      nextStep: 'Application Rejected'
-    },
-    {
-      id: 4,
-      jobTitle: 'Frontend Engineer',
-      company: 'Meta',
-      appliedDate: '2025-01-12',
-      status: 'selected',
-      salary: '6-8 LPA',
-      location: 'Delhi',
-      nextStep: 'Offer Received'
-    },
-  ];
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        setError("");
+        const response = await api.get("/applications/myapplications/");
+        setApplications(response.data || []);
+      } catch (err) {
+        setError(
+          err.response?.data?.detail ||
+            "Failed to load applications. Please log in again."
+        );
+      } finally {
+        setPageLoading(false);
+      }
+    };
+
+    if (!loading && auth.user) {
+      fetchApplications();
+    } else if (!loading) {
+      setPageLoading(false);
+    }
+  }, [loading, auth.user]);
 
   if (loading) return <p>Loading...</p>;
   if (!auth.user) return <p>No user data</p>;
+  if (pageLoading) return <p>Loading applications...</p>;
 
   const getStatusColor = (status) => {
     const colors = {
-      'pending': '#f59e0b',
-      'shortlisted': '#3b82f6',
-      'selected': '#10b981',
-      'rejected': '#ef4444'
+      applied: "#f59e0b",
+      shortlisted: "#3b82f6",
+      offered: "#10b981",
+      rejected: "#ef4444",
     };
-    return colors[status] || '#6b7280';
+    return colors[status] || "#6b7280";
   };
 
-  const filteredApplications = applications.filter(app => {
+  const filteredApplications = applications
+    .filter((app) => {
     return filterStatus === 'all' || app.status === filterStatus;
-  }).sort((a, b) => {
-    if (sortBy === 'recent') return new Date(b.appliedDate) - new Date(a.appliedDate);
-    if (sortBy === 'oldest') return new Date(a.appliedDate) - new Date(b.appliedDate);
+    })
+    .sort((a, b) => {
+    if (sortBy === "recent") {
+      return new Date(b.application_date) - new Date(a.application_date);
+    }
+    if (sortBy === "oldest") {
+      return new Date(a.application_date) - new Date(b.application_date);
+    }
     return 0;
   });
 
@@ -80,6 +71,7 @@ const MyApplications = () => {
         <div className="ma-applications-header">
           <h1>My Applications</h1>
           <p>Track your job applications and interview status</p>
+          {error && <p>{error}</p>}
         </div>
 
         <div className="ma-stats-cards">
@@ -92,21 +84,21 @@ const MyApplications = () => {
             <div className="ma-stat-label">Shortlisted</div>
           </div>
           <div className="ma-stat-card">
-            <div className="ma-stat-number">{applications.filter(a => a.status === 'selected').length}</div>
-            <div className="ma-stat-label">Selected</div>
+            <div className="ma-stat-number">{applications.filter(a => a.status === 'offered').length}</div>
+            <div className="ma-stat-label">Offered</div>
           </div>
           <div className="ma-stat-card">
-            <div className="ma-stat-number">{applications.filter(a => a.status === 'pending').length}</div>
-            <div className="ma-stat-label">Pending</div>
+            <div className="ma-stat-number">{applications.filter(a => a.status === 'applied').length}</div>
+            <div className="ma-stat-label">Applied</div>
           </div>
         </div>
 
         <div className="ma-filters-section">
           <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="ma-filter-select">
             <option value="all">All Status</option>
-            <option value="pending">Pending</option>
+            <option value="applied">Applied</option>
             <option value="shortlisted">Shortlisted</option>
-            <option value="selected">Selected</option>
+            <option value="offered">Offered</option>
             <option value="rejected">Rejected</option>
           </select>
 
@@ -122,8 +114,8 @@ const MyApplications = () => {
               <div key={app.id} className="ma-application-card">
                 <div className="ma-app-header">
                   <div className="ma-app-title-section">
-                    <h3>{app.jobTitle}</h3>
-                    <p className="ma-company-name">{app.company}</p>
+                    <h3>{app.job_title}</h3>
+                    <p className="ma-company-name">Application #{app.id}</p>
                   </div>
                   <span className="ma-status-badge" style={{ backgroundColor: getStatusColor(app.status) }}>
                     {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
@@ -131,18 +123,12 @@ const MyApplications = () => {
                 </div>
 
                 <div className="ma-app-details">
-                  <span>{app.location}</span>
-                  <span>{app.salary}</span>
-                  <span>{new Date(app.appliedDate).toLocaleDateString()}</span>
+                  <span>Reg No: {app.student_registration_no}</span>
+                  <span>{new Date(app.application_date).toLocaleDateString()}</span>
                 </div>
 
                 <div className="ma-app-next-step">
-                  <strong>Next Step:</strong> {app.nextStep}
-                </div>
-
-                <div className="ma-app-actions">
-                  <button className="ma-view-btn">View Details</button>
-                  <button className="ma-withdraw-btn">Withdraw</button>
+                  <strong>Status:</strong> {app.status}
                 </div>
               </div>
             ))
@@ -154,7 +140,7 @@ const MyApplications = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MyApplications
+export default MyApplications;
