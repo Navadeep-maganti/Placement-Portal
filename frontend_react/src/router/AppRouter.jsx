@@ -12,7 +12,10 @@ import JobDetails from "../pages/Student/JobDetails";
 import Bookmarks from "../pages/Student/Bookmarks";
 
 /* Company Pages */
-import CompanyDashboard from "../pages/Company/CompanyDashboard";
+import CompanyDashboard from "../pages/Recruiter/CompanyDashboard";
+import MyPostings from "../pages/Recruiter/MyPostings";
+import Manage from "../pages/Recruiter/ManageApplications";
+import ViewApplicants from "../pages/Recruiter/ViewApplicants";
 
 /* Admin Pages */
 import AdminDashboard from "../pages/Admin/AdminDashboard";
@@ -100,6 +103,33 @@ export default function AppRouter() {
         element={
           <PrivateRoute allowedRoles={["company"]}>
             <CompanyDashboard />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/Recruiter/MyPostings"
+        element={
+          <PrivateRoute allowedRoles={["company"]}>
+            <MyPostings />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/Recruiter/Manage"
+        element={
+          <PrivateRoute allowedRoles={["company"]}>
+            <Manage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/Recruiter/ViewApplicants"
+        element={
+          <PrivateRoute allowedRoles={["company"]}>
+            <ViewApplicants />
           </PrivateRoute>
         }
       />
