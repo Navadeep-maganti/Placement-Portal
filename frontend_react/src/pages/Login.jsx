@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
@@ -17,9 +17,12 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const auth = useAuth();
-  if (auth.auth.access) {
-    navigate("/");
-  }
+
+  useEffect(() => {
+    if (auth.auth.access) {
+      navigate("/");
+    }
+  }, [auth.auth.access, navigate]);
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
@@ -31,18 +34,26 @@ function Login() {
 
     try {
       const loginbtn = document.querySelector(".login-btn");
-      loginbtn.disabled = true;
-      loginbtn.textContent = "Signing in...";
-      loginbtn.style.cursor = "not-allowed";
-      loginbtn.style.backgroundColor = "#ccc";
-      loginbtn.style.borderColor = "#999";
+      if (loginbtn) {
+        loginbtn.disabled = true;
+        loginbtn.textContent = "Signing in...";
+        loginbtn.style.cursor = "not-allowed";
+        loginbtn.style.backgroundColor = "#ccc";
+        loginbtn.style.borderColor = "#999";
+      }
       const res = await axios.post("http://127.0.0.1:8000/api/token/", {
         email: email,
         password: password,
       });
 
-
       const { role } = res.data;
+
+      // Allow admin to login regardless of selected role
+      if (role === "admin") {
+        login(res.data);
+        navigate("/admin/dashboard");
+        return;
+      }
 
       if (loginType === "student" && role !== "student") {
         setError("This is not a student account. Please use the recruiter login.");
@@ -60,8 +71,6 @@ function Login() {
         navigate(`/student/dashboard`);
       } else if (role === "company") {
         navigate("/company/dashboard");
-      } else if (role === "admin") {
-        navigate("/admin/dashboard");
       }
 
     } catch (err) {
@@ -80,12 +89,13 @@ function Login() {
     }
     finally {
       const loginbtn = document.querySelector(".login-btn");
-      loginbtn.disabled = false;
-      loginbtn.textContent = "Sign In";
-      loginbtn.style.cursor = "pointer";
-      loginbtn.style.backgroundColor = "#007bff";
-      loginbtn.style.borderColor = "#007bff";
-
+      if (loginbtn) {
+        loginbtn.disabled = false;
+        loginbtn.textContent = "Sign In";
+        loginbtn.style.cursor = "pointer";
+        loginbtn.style.backgroundColor = "#007bff";
+        loginbtn.style.borderColor = "#007bff";
+      }
     }
   };
 
