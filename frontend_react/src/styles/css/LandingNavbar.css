@@ -1,113 +1,116 @@
-:root {
-  /* ================= PRIMARY ================= */
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-soft: #eaf0ff;
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
 
-  /* ================= BACKGROUND ================= */
-  --bg-page: #f9fafb;
-  --bg-card: #ffffff;
-  --bg-hover: #f3f4f6;
-
-  /* ================= NAVBAR ================= */
-  --navbar-bg: #ffffff;
-  --navbar-div-bg: rgba(255, 255, 255, 1);
-  --navbar-border: #c4c4c6;
-  --navbar-text: #272a30;
-  --navbar-text-active: #1646ae;
-  --navbar-hover-bg: #ffffff;
-
-  /* ================= TEXT ================= */
-  --text-main: #111827;
-  --text-muted: #6b7280;
-  --text-placeholder: #9ca3af;
-
-  /* ================= BORDERS ================= */
-  --border: #e5e7eb;
-  --border-light: #f1f5f9;
-
-  /* ================= STATUS ================= */
-  --success: #16a34a;
-  --warning: #d97706;
-  --error: #dc2626;
-
-  /* ================= FOCUS ================= */
-  --focus-ring: rgba(37, 99, 235, 0.15);
+.landing-navbar {
+  background-color: rgba(255, 255, 255, 0.92);
+  padding: 10px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid rgba(24, 23, 28, 0.1);
+  box-shadow: 0 12px 28px rgba(16, 24, 40, 0.1);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-.Landing-navbar {
-    background-color: var(--navbar-bg);
-    padding: 10px 20px;
-    
-    display: flex;
-    height: 60px;
-    justify-content: space-between;
-    align-items: center;
-
-    /* border-radius: 25px; */
-    border-bottom: 1px solid var(--navbar-border);
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
-
-    position: fixed;
-    top: 0;
-    margin-top: 1px;
-    width: 95%;
-    z-index: 1000;
+.nav-title {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: #18171c !important;
+  font-family: "Space Grotesk", "Manrope", sans-serif !important;
+  text-decoration: none;
+  letter-spacing: 0.01em;
 }
 
-/* ================= NAV GROUPS ================= */
+.nav-subtitle {
+  font-size: 11px;
+  color: #6b7280;
+  letter-spacing: 0.2em;
+}
+
 .left-nav,
 .right-nav {
-    background-color: var(--navbar-div-bg);
-    display: flex;
-    gap: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-/* ================= CENTER NAV ================= */
 .center-nav {
-    display: flex;
-    gap: 30px;
-    justify-content: center;
-    align-items: center;
-
-    background-color: #f2f1f1;
-    /* subtle blue tint */
-    padding: 8px 26px;
-    border-radius: 25px;
-
-    box-shadow: inset 0 0 0 1px var(--border-light);
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 8px 18px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(24, 23, 28, 0.06);
 }
 
-/* ================= LINKS ================= */
-.landing-link, .landing-loginBtn {
-    padding: 8px 14px;
-    border-radius: 999px;
-
-    text-decoration: none;
-    color: var(--navbar-text);
-    font-size: 15px;
-    font-weight: 500;
-
-    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-}
+.landing-link,
 .landing-loginBtn {
-    background-color: var(--primary);
-    color: white;
+  padding: 8px 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  color: #18171c;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
-.landing-loginBtn:hover {
-    background-color: var(--primary-hover);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-}
+
 .landing-link:hover {
-    background-color: var(--navbar-hover-bg);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(24, 23, 28, 0.08);
+  transform: translateY(-1px);
 }
-.landing-page-body{
-    margin-top: 65px;
-    padding: 20px;
-    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: var(--color-bg-page);
-    min-height: 100vh;
-    box-sizing: border-box;
+
+.landing-loginBtn {
+  background: linear-gradient(120deg, #2563eb, #5fa0ff);
+  color: #ffffff;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);
+}
+
+.landing-loginBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 26px rgba(37, 99, 235, 0.3);
+}
+
+@media (max-width: 960px) {
+  .landing-navbar {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 12px 16px;
+  }
+
+  .center-nav {
+    order: 3;
+    width: 100%;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 640px) {
+  .landing-navbar {
+    gap: 10px;
+  }
+
+  .nav-title {
+    font-size: 18px !important;
+  }
+
+  .center-nav {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .landing-link {
+    background: #ffffff;
+  }
 }

@@ -10,7 +10,7 @@
   --nav-shadow: 0 12px 28px rgba(16, 24, 40, 0.1);
 }
 
-.student-navbar {
+.cn-Company-navbar {
   background-color: var(--nav-bg);
   padding: 10px 24px;
   display: flex;
@@ -27,7 +27,7 @@
   backdrop-filter: blur(10px);
 }
 
-.nav-title {
+.cn-nav-title {
   font-size: 20px !important;
   font-weight: 700 !important;
   color: var(--nav-ink) !important;
@@ -36,21 +36,21 @@
   letter-spacing: 0.01em;
 }
 
-.nav-subtitle {
+.cn-nav-subtitle {
   font-size: 11px;
   color: var(--nav-muted);
   letter-spacing: 0.2em;
 }
 
-.left-nav,
-.right-nav {
+.cn-left-nav,
+.cn-right-nav {
   background-color: transparent;
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.center-nav {
+.cn-center-nav {
   display: flex;
   gap: 16px;
   justify-content: center;
@@ -61,7 +61,7 @@
   box-shadow: inset 0 0 0 1px rgba(24, 23, 28, 0.06);
 }
 
-.nav-link {
+.cn-nav-link {
   padding: 8px 14px;
   border-radius: 999px;
   text-decoration: none;
@@ -72,20 +72,20 @@
   transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.nav-link:hover {
+.cn-nav-link:hover {
   background-color: #ffffff;
   box-shadow: 0 4px 10px rgba(24, 23, 28, 0.08);
   transform: translateY(-1px);
 }
 
-.nav-link.active {
+.cn-nav-link.active {
   background: linear-gradient(120deg, rgba(37, 99, 235, 0.18), rgba(37, 99, 235, 0.04));
   color: #1d4ed8;
   font-weight: 700;
   box-shadow: 0 6px 16px rgba(37, 99, 235, 0.16);
 }
 
-.profile {
+.cn-profile {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -98,7 +98,7 @@
   text-decoration: none;
 }
 
-.logout-button {
+.cn-logout-button {
   border: none;
   background: #ffffff;
   border-radius: 12px;
@@ -108,19 +108,19 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.logout-button:hover {
+.cn-logout-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 14px rgba(24, 23, 28, 0.12);
 }
 
 @media (max-width: 960px) {
-  .student-navbar {
+  .cn-Company-navbar {
     flex-wrap: wrap;
     justify-content: center;
     padding: 12px 16px;
   }
 
-  .center-nav {
+  .cn-center-nav {
     order: 3;
     width: 100%;
     justify-content: space-around;
@@ -130,21 +130,21 @@
 }
 
 @media (max-width: 640px) {
-  .student-navbar {
+  .cn-Company-navbar {
     gap: 10px;
   }
 
-  .nav-title {
+  .cn-nav-title {
     font-size: 18px !important;
   }
 
-  .center-nav {
+  .cn-center-nav {
     background: transparent;
     box-shadow: none;
     padding: 0;
   }
 
-  .nav-link {
+  .cn-nav-link {
     background: #ffffff;
   }
 }

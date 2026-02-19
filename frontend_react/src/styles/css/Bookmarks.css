@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
 
-.jl-page {
+.bm-bookmarks-page {
   border-radius: 16px;
   margin-top: 80px;
   font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -9,18 +9,18 @@
   box-sizing: border-box;
 }
 
-.jl-container {
+.bm-bookmarks-container {
   max-width: 1200px;
   margin: 80px auto 48px;
   padding: 0 24px 24px;
 }
 
-.jl-header {
+.bm-bookmarks-header {
   text-align: center;
   margin-bottom: 22px;
 }
 
-.jl-header h1 {
+.bm-bookmarks-header h1 {
   font-family: "Space Grotesk", "Manrope", sans-serif;
   font-size: 32px;
   font-weight: 700;
@@ -29,46 +29,35 @@
   margin-bottom: 6px;
 }
 
-.jl-header p {
+.bm-bookmarks-header p {
   color: #6b7280;
   font-size: 14px;
 }
 
-.jl-filters {
-  width: 97%;
+.bm-bookmarks-controls {
   background: rgba(255, 255, 255, 0.9);
   border-radius: 16px;
   padding: 16px;
   box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
   border: 1px solid rgba(148, 163, 184, 0.2);
   backdrop-filter: blur(8px);
-}
-
-.jl-search input {
-  width: 97%;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  background: #ffffff;
-  font-size: 14px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.jl-search input:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-}
-
-.jl-filter-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 14px;
+  justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
-.jl-select {
+.bm-controls-left,
+.bm-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.bm-sort-select {
   background: #eef2ff;
   padding: 10px 12px;
   border-radius: 12px;
@@ -78,13 +67,19 @@
   transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
-.jl-select:hover {
+.bm-sort-select:hover {
   border-color: rgba(37, 99, 235, 0.6);
   box-shadow: 0 6px 16px rgba(37, 99, 235, 0.12);
   transform: translateY(-1px);
 }
 
-.jl-view-toggle {
+.bm-sort-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.bm-view-toggle {
   margin-left: auto;
   display: flex;
   background: #eef2ff;
@@ -93,7 +88,7 @@
   gap: 6px;
 }
 
-.jl-toggle-btn {
+.bm-toggle-btn {
   padding: 8px 14px;
   border-radius: 999px;
   border: none;
@@ -105,36 +100,31 @@
   transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
-.jl-toggle-btn.active {
+.bm-toggle-btn.bm-active {
   background: #2563eb;
   color: #ffffff;
   box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
 }
 
-.jl-toggle-btn:hover {
+.bm-toggle-btn:hover {
   background: rgba(37, 99, 235, 0.12);
 }
 
-.jl-results {
-  margin: 16px 0 12px;
-  color: #475569;
-  font-size: 14px;
-}
-
-.jl-cards {
+.bm-bookmarks-grid,
+.bm-bookmarks-list {
   display: grid;
   gap: 18px;
 }
 
-.jl-grid {
+.bm-bookmarks-grid {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
-.jl-list {
+.bm-bookmarks-list {
   grid-template-columns: 1fr;
 }
 
-.jl-card {
+.bm-bookmark-card {
   background: #ffffff;
   border-radius: 18px;
   padding: 18px;
@@ -146,30 +136,30 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.jl-card:hover {
+.bm-bookmark-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 18px 34px rgba(15, 23, 42, 0.12);
 }
 
-.jl-card-header {
+.bm-bookmark-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
 }
 
-.jl-card-header h3 {
+.bm-bookmark-header h3 {
   font-size: 18px;
   font-weight: 700;
   color: #0f172a;
   margin: 0;
 }
 
-.jl-bookmark {
-  background: rgba(37, 99, 235, 0.12);
-  color: #1d4ed8;
+.bm-remove-bookmark-btn {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
   border: none;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
   padding: 6px 10px;
@@ -178,24 +168,24 @@
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.jl-bookmark:hover {
-  background: rgba(37, 99, 235, 0.2);
+.bm-remove-bookmark-btn:hover {
+  background: rgba(239, 68, 68, 0.22);
   transform: translateY(-1px);
 }
 
-.jl-company {
+.bm-company-name {
   font-size: 14px;
   color: #475569;
   margin: 0;
 }
 
-.jl-meta {
+.bm-bookmark-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.jl-meta-item {
+.bm-bookmark-meta span {
   background: #eff6ff;
   color: #1d4ed8;
   font-size: 12px;
@@ -204,13 +194,13 @@
   font-weight: 600;
 }
 
-.jl-skills {
+.bm-bookmark-skills {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.jl-skill {
+.bm-skill-tag {
   background: #f8fafc;
   color: #334155;
   font-size: 12px;
@@ -219,60 +209,138 @@
   border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
-.jl-footer {
+.bm-bookmark-footer {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
   color: #64748b;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
-.jl-apply {
+.bm-bookmark-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.bm-view-job-btn,
+.bm-apply-btn,
+.bm-explore-btn {
   padding: 10px 12px;
   border-radius: 12px;
   border: none;
-  background: linear-gradient(120deg, #2563eb, #3b82f6);
-  color: #ffffff;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 10px 16px rgba(37, 99, 235, 0.22);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-.jl-apply:hover {
+.bm-view-job-btn,
+.bm-apply-btn {
+  flex: 1;
+}
+
+.bm-view-job-btn,
+.bm-explore-btn {
+  background: linear-gradient(120deg, #2563eb, #3b82f6);
+  color: #ffffff;
+  box-shadow: 0 10px 16px rgba(37, 99, 235, 0.22);
+}
+
+.bm-view-job-btn:hover,
+.bm-explore-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 14px 22px rgba(37, 99, 235, 0.28);
 }
 
-.jl-empty {
+.bm-apply-btn {
+  background: #16a34a;
+  color: #ffffff;
+  box-shadow: 0 10px 16px rgba(22, 163, 74, 0.22);
+}
+
+.bm-apply-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 22px rgba(22, 163, 74, 0.28);
+}
+
+.bm-no-bookmarks {
   text-align: center;
   padding: 48px 12px;
   color: #6b7280;
 }
 
-@media (max-width: 900px) {
-  .jl-header {
-    text-align: center;
-  }
+.bm-empty-state {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
 
-  .jl-view-toggle {
+.bm-empty-icon {
+  font-size: 2rem;
+  margin: 0 0 12px;
+  color: #94a3b8;
+}
+
+.bm-empty-title {
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+  color: #0f172a;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.bm-empty-message {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0 0 18px;
+}
+
+@media (max-width: 900px) {
+  .bm-view-toggle {
     margin-left: 0;
   }
 }
 
 @media (max-width: 768px) {
-  .jl-container {
+  .bm-bookmarks-container {
     margin-top: 86px;
     padding: 0 16px 24px;
   }
 
-  .jl-filter-row {
+  .bm-bookmarks-controls {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .jl-view-toggle {
+  .bm-controls-left,
+  .bm-controls-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .bm-sort-select {
+    width: 100%;
+  }
+
+  .bm-view-toggle {
+    width: 100%;
     justify-content: center;
+  }
+
+  .bm-toggle-btn {
+    flex: 1;
+  }
+
+  .bm-bookmarks-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bm-bookmark-actions {
+    flex-direction: column;
   }
 }

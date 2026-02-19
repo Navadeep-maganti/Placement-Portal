@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
-import api from "../utils/api";
 import "../styles/css/login.css";
 
 function Login() {
@@ -30,10 +30,17 @@ function Login() {
     }
 
     try {
-      const res = await api.post("token/", {
-        username: email,
+      const loginbtn = document.querySelector(".login-btn");
+      loginbtn.disabled = true;
+      loginbtn.textContent = "Signing in...";
+      loginbtn.style.cursor = "not-allowed";
+      loginbtn.style.backgroundColor = "#ccc";
+      loginbtn.style.borderColor = "#999";
+      const res = await axios.post("http://127.0.0.1:8000/api/token/", {
+        email: email,
         password: password,
       });
+
 
       const { role } = res.data;
 
@@ -70,6 +77,15 @@ function Login() {
         setError("Login failed. Please try again later.");
       }
       console.error("Login error:", err.response?.data || err.message);
+    }
+    finally {
+      const loginbtn = document.querySelector(".login-btn");
+      loginbtn.disabled = false;
+      loginbtn.textContent = "Sign In";
+      loginbtn.style.cursor = "pointer";
+      loginbtn.style.backgroundColor = "#007bff";
+      loginbtn.style.borderColor = "#007bff";
+
     }
   };
 

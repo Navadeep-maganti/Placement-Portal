@@ -1,108 +1,315 @@
-/* Placement Statistics Section */
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+
+.landing-page-body {
+  margin-top: 80px;
+  padding: clamp(20px, 3vw, 40px);
+  font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top left, #fbfcff 0%, #f6f8fc 40%, #f3f5f8 100%);
+  min-height: 100vh;
+  color: #14121a;
+  box-sizing: border-box;
+}
+
+.lp-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: clamp(20px, 4vw, 48px);
+  align-items: center;
+  margin-bottom: clamp(28px, 5vw, 48px);
+  animation: fadeUp 0.6s ease;
+}
+
+.lp-hero-text h1 {
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+  font-size: clamp(32px, 3.8vw, 48px);
+  margin: 12px 0;
+}
+
+.lp-hero-text p {
+  color: #5a5563;
+  line-height: 1.6;
+  font-size: 16px;
+  max-width: 520px;
+}
+
+.lp-pill {
+  display: inline-flex;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.16);
+  color: #1d4ed8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 12px;
+}
+
+.lp-hero-actions {
+  margin-top: 18px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.lp-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.lp-btn.primary {
+  background: linear-gradient(120deg, #2563eb, #5fa0ff);
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.24);
+}
+
+.lp-btn.ghost {
+  background: #ffffff;
+  color: #14121a;
+  border: 1px solid rgba(20, 18, 26, 0.12);
+}
+
+.lp-hero-meta {
+  margin-top: 18px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  color: #6b6674;
+  font-size: 13px;
+}
+
+.lp-hero-card {
+  background: linear-gradient(140deg, #111827, #1f2937 65%, #0f172a 100%);
+  color: #ffffff;
+  padding: 26px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.32);
+}
+
+.lp-card-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.lp-status-dot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+  animation-name: pulse;
+  box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.12);
+}
+
+.lp-hero-card h3 {
+  margin: 16px 0 8px;
+  font-size: 22px;
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+}
+
+.lp-hero-card p {
+  color: rgba(255, 255, 255, 0.78);
+  margin: 0 0 20px;
+}
+
+.lp-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.lp-card-grid h4 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.lp-card-grid p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.lp-section-head {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.lp-section-head h2 {
+  font-size: clamp(22px, 3vw, 32px);
+  margin-bottom: 8px;
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+}
+
+.lp-section-head p {
+  color: #6b6674;
+  max-width: 640px;
+  margin: 0 auto;
+}
 
 .stats-section {
-  padding: 70px 8%;
-  background-color: #f9fafb;
-  text-align: center;
-}
-
-.stats-section h2 {
-  font-size: 2.2rem;
-  color: #1f2937;
-  margin-bottom: 10px;
-}
-
-.stats-subtitle {
-  color: #6b7280;
-  margin-bottom: 40px;
-  font-size: 1rem;
+  padding: clamp(30px, 6vw, 60px) 0;
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 18px;
 }
 
 .stat-card {
   background: #ffffff;
-  padding: 30px 20px;
-  border-radius: 12px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease;
+  padding: 24px 18px;
+  border-radius: 18px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .stat-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 28px rgba(15, 23, 42, 0.12);
 }
 
 .stat-card h3 {
-  font-size: 2rem;
+  font-size: 24px;
   color: #2563eb;
   margin-bottom: 8px;
 }
 
 .stat-card p {
-  font-size: 1rem;
+  font-size: 14px;
   color: #374151;
 }
 
-/* Recruitment Process Section */
+.lp-features {
+  padding: clamp(20px, 5vw, 50px) 0;
+}
+
+.lp-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.lp-feature-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(20, 18, 26, 0.08);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+}
+
+.lp-feature-card h4 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.lp-feature-card p {
+  margin: 0;
+  color: #6b6674;
+}
 
 .recruitment-section {
-  padding: 70px 8%;
-  background-color: #ffffff;
-  text-align: center;
-}
-
-.recruitment-section h2 {
-  font-size: 2.2rem;
-  color: #1f2937;
-  margin-bottom: 10px;
-}
-
-.recruitment-subtitle {
-  color: #6b7280;
-  margin-bottom: 45px;
+  padding: clamp(30px, 6vw, 60px) 0;
 }
 
 .recruitment-steps {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 30px;
+  gap: 18px;
 }
 
 .recruitment-card {
-  background: #f9fafb;
-  padding: 30px 20px;
-  border-radius: 14px;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease;
+  background: #ffffff;
+  padding: 24px 20px;
+  border-radius: 18px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .recruitment-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 28px rgba(15, 23, 42, 0.12);
 }
 
 .recruitment-card span {
+  text-align: center;
   display: inline-block;
   background-color: #2563eb;
   color: #ffffff;
-  width: 36px;
-  height: 36px;
-  line-height: 36px;
+  width: 34px;
+  height: 34px;
+  line-height: 34px;
   border-radius: 50%;
   font-weight: bold;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .recruitment-card h3 {
-  font-size: 1.2rem;
-  color: #1f2937;
-  margin-bottom: 10px;
+  font-size: 16px;
+  margin-bottom: 8px;
 }
 
 .recruitment-card p {
-  font-size: 0.95rem;
-  color: #374151;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.lp-cta {
+  padding: clamp(24px, 6vw, 60px) 0;
+}
+
+.lp-cta-card {
+  background: linear-gradient(120deg, #111827, #1f2937 70%, #0f172a 100%);
+  color: #ffffff;
+  padding: clamp(24px, 4vw, 36px);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.28);
+}
+
+.lp-cta-card p {
+  margin: 8px 0 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1024px) {
+  .lp-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-cta-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 720px) {
+  .landing-page-body {
+    margin-top: 90px;
+  }
 }
