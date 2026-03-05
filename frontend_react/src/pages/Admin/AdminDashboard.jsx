@@ -21,45 +21,45 @@ const AdminDashboard = () => {
   const COLORS = ['#10b981', '#ef4444', '#f59e0b'];
 
   return (
-    <div className="admin-dashboard">
-      <div className="admin-header">
+    <div className="ad-admin-dashboard">
+      <div className="ad-admin-header">
         <h1>Admin Dashboard</h1>
         <p>Overview of placement portal statistics</p>
       </div>
 
-      <div className="metrics-grid">
-        <div className="metric-card">
-          <div className="metric-icon" style={{ backgroundColor: '#dbeafe' }}>📊</div>
-          <div className="metric-content">
+      <div className="ad-metrics-grid">
+        <div className="ad-metric-card">
+          <div className="ad-metric-icon" style={{ backgroundColor: '#dbeafe' }}>📊</div>
+          <div className="ad-metric-content">
             <h3>23</h3>
             <p>Total Jobs Posted</p>
           </div>
         </div>
-        <div className="metric-card">
-          <div className="metric-icon" style={{ backgroundColor: '#e0e7ff' }}>👥</div>
-          <div className="metric-content">
+        <div className="ad-metric-card">
+          <div className="ad-metric-icon" style={{ backgroundColor: '#e0e7ff' }}>👥</div>
+          <div className="ad-metric-content">
             <h3>1,245</h3>
             <p>Total Applicants</p>
           </div>
         </div>
-        <div className="metric-card">
-          <div className="metric-icon" style={{ backgroundColor: '#dcfce7' }}>✓</div>
-          <div className="metric-content">
+        <div className="ad-metric-card">
+          <div className="ad-metric-icon" style={{ backgroundColor: '#dcfce7' }}>✓</div>
+          <div className="ad-metric-content">
             <h3>456</h3>
             <p>Students Placed</p>
           </div>
         </div>
-        <div className="metric-card">
-          <div className="metric-icon" style={{ backgroundColor: '#fef3c7' }}>📈</div>
-          <div className="metric-content">
+        <div className="ad-metric-card">
+          <div className="ad-metric-icon" style={{ backgroundColor: '#fef3c7' }}>📈</div>
+          <div className="ad-metric-content">
             <h3>36.6%</h3>
             <p>Placement Rate</p>
           </div>
         </div>
       </div>
 
-      <div className="charts-container">
-        <div className="chart-card">
+      <div className="ad-charts-container">
+        <div className="ad-chart-card">
           <h2>Jobs Status Distribution</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -82,7 +82,7 @@ const AdminDashboard = () => {
           </ResponsiveContainer>
         </div>
 
-        <div className="chart-card">
+        <div className="ad-chart-card">
           <h2>Placement Trends (Last 6 Months)</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={placementData}>
@@ -98,28 +98,28 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="activities-section">
+      <div className="ad-activities-section">
         <h2>Recent Activities</h2>
-        <div className="activity-list">
-          <div className="activity-item">
-            <div className="activity-indicator" style={{ backgroundColor: '#10b981' }}></div>
-            <div className="activity-content">
-              <p className="activity-title">New Job Posted: Senior Developer</p>
-              <p className="activity-time">2 hours ago</p>
+        <div className="ad-activity-list">
+          <div className="ad-activity-item">
+            <div className="ad-activity-indicator" style={{ backgroundColor: '#10b981' }}></div>
+            <div className="ad-activity-content">
+              <p className="ad-activity-title">New Job Posted: Senior Developer</p>
+              <p className="ad-activity-time">2 hours ago</p>
             </div>
           </div>
-          <div className="activity-item">
-            <div className="activity-indicator" style={{ backgroundColor: '#3b82f6' }}></div>
-            <div className="activity-content">
-              <p className="activity-title">Student Placed - Rajesh Kumar</p>
-              <p className="activity-time">5 hours ago</p>
+          <div className="ad-activity-item">
+            <div className="ad-activity-indicator" style={{ backgroundColor: '#3b82f6' }}></div>
+            <div className="ad-activity-content">
+              <p className="ad-activity-title">Student Placed - Rajesh Kumar</p>
+              <p className="ad-activity-time">5 hours ago</p>
             </div>
           </div>
-          <div className="activity-item">
-            <div className="activity-indicator" style={{ backgroundColor: '#f59e0b' }}></div>
-            <div className="activity-content">
-              <p className="activity-title">21 New Applications Received</p>
-              <p className="activity-time">1 day ago</p>
+          <div className="ad-activity-item">
+            <div className="ad-activity-indicator" style={{ backgroundColor: '#f59e0b' }}></div>
+            <div className="ad-activity-content">
+              <p className="ad-activity-title">21 New Applications Received</p>
+              <p className="ad-activity-time">1 day ago</p>
             </div>
           </div>
         </div>

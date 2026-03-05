@@ -1,4 +1,4 @@
-.admin-dashboard {
+.ad-admin-dashboard {
   padding: 40px 20px;
   max-width: 1400px;
   margin: 0 auto;
@@ -6,30 +6,30 @@
   min-height: 100vh;
 }
 
-.admin-header {
+.ad-admin-header {
   margin-bottom: 40px;
 }
 
-.admin-header h1 {
+.ad-admin-header h1 {
   font-size: 2.5rem;
   color: var(--text-main);
   margin-bottom: 10px;
   font-weight: 700;
 }
 
-.admin-header p {
+.ad-admin-header p {
   color: var(--text-muted);
   font-size: 1.1rem;
 }
 
-.metrics-grid {
+.ad-metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
   margin-bottom: 40px;
 }
 
-.metric-card {
+.ad-metric-card {
   background: var(--bg-card);
   border-radius: 12px;
   padding: 24px;
@@ -40,12 +40,12 @@
   gap: 20px;
 }
 
-.metric-card:hover {
+.ad-metric-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
-.metric-icon {
+.ad-metric-icon {
   width: 60px;
   height: 60px;
   border-radius: 10px;
@@ -56,61 +56,61 @@
   flex-shrink: 0;
 }
 
-.metric-content h3 {
+.ad-metric-content h3 {
   font-size: 2rem;
   color: var(--text-main);
   margin: 0;
   font-weight: 700;
 }
 
-.metric-content p {
+.ad-metric-content p {
   margin: 5px 0 0 0;
   color: var(--text-muted);
   font-size: 0.95rem;
 }
 
-.charts-container {
+.ad-charts-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
   gap: 20px;
   margin-bottom: 40px;
 }
 
-.chart-card {
+.ad-chart-card {
   background: var(--bg-card);
   border-radius: 12px;
   padding: 30px;
   border: 1px solid var(--border);
 }
 
-.chart-card h2 {
+.ad-chart-card h2 {
   color: var(--text-main);
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 1.3rem;
 }
 
-.activities-section {
+.ad-activities-section {
   background: var(--bg-card);
   border-radius: 12px;
   padding: 30px;
   border: 1px solid var(--border);
 }
 
-.activities-section h2 {
+.ad-activities-section h2 {
   color: var(--text-main);
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 1.3rem;
 }
 
-.activity-list {
+.ad-activity-list {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-.activity-item {
+.ad-activity-item {
   display: flex;
   align-items: center;
   gap: 15px;
@@ -120,48 +120,48 @@
   transition: all 0.3s ease;
 }
 
-.activity-item:hover {
+.ad-activity-item:hover {
   background: var(--bg-hover);
 }
 
-.activity-indicator {
+.ad-activity-indicator {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-.activity-content {
+.ad-activity-content {
   flex: 1;
 }
 
-.activity-title {
+.ad-activity-title {
   color: var(--text-main);
   margin: 0;
   font-weight: 600;
   font-size: 0.95rem;
 }
 
-.activity-time {
+.ad-activity-time {
   color: var(--text-muted);
   margin: 5px 0 0 0;
   font-size: 0.85rem;
 }
 
 @media (max-width: 768px) {
-  .admin-dashboard {
+  .ad-admin-dashboard {
     padding: 20px 10px;
   }
 
-  .admin-header h1 {
+  .ad-admin-header h1 {
     font-size: 1.8rem;
   }
 
-  .metrics-grid {
+  .ad-metrics-grid {
     grid-template-columns: 1fr;
   }
 
-  .charts-container {
+  .ad-charts-container {
     grid-template-columns: 1fr;
   }
 }
