@@ -1,0 +1,221 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+
+:root {
+  --mp-ink: #14121a;
+  --mp-muted: #5a5563;
+  --mp-accent: #2563eb;
+  --mp-accent-dark: #1d4ed8;
+  --mp-teal: #0fa3b1;
+  --mp-olive: #2a2f25;
+  --mp-card: #ffffff;
+  --mp-border: rgba(20, 18, 26, 0.08);
+  --mp-shadow: 0 18px 40px rgba(25, 20, 39, 0.12);
+  --mp-shadow-soft: 0 12px 30px rgba(27, 22, 39, 0.08);
+}
+
+.mp-page {
+  margin-top: 80px;
+  padding: clamp(20px, 3vw, 40px);
+  font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top left, #fbfcff 0%, #f6f8fc 40%, #f3f5f8 100%);
+  min-height: 100vh;
+  color: var(--mp-ink);
+  box-sizing: border-box;
+}
+
+.mp-header h1 {
+  font-size: 40px;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.mp-header p {
+  margin: 10px 0 28px;
+  color: #5c6170;
+  font-size: 15px;
+}
+
+.mp-form-card {
+  background: #ffffff;
+  border: 1px solid #ececf3;
+  border-radius: 18px;
+  padding: 26px;
+  box-shadow: 0 10px 28px rgba(22, 35, 84, 0.06);
+}
+
+.mp-form-section + .mp-form-section {
+  margin-top: 22px;
+}
+
+.mp-form-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 19px;
+  margin: 0 0 14px;
+  color: #1b1e30;
+}
+
+.mp-form-section label {
+  display: block;
+  margin: 10px 0 8px;
+  font-size: 13px;
+  color: #4b5063;
+  font-weight: 600;
+}
+
+.mp-form-section input,
+.mp-form-section textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e1e5f0;
+  background: #fcfcff;
+  border-radius: 13px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #21253a;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mp-form-section textarea {
+  min-height: 132px;
+  resize: vertical;
+}
+
+.mp-form-section input::placeholder,
+.mp-form-section textarea::placeholder {
+  color: #a1a6ba;
+}
+
+.mp-form-section input:focus,
+.mp-form-section textarea:focus {
+  outline: none;
+  border-color: #5d4eff;
+  box-shadow: 0 0 0 3px rgba(93, 78, 255, 0.16);
+}
+
+.mp-field-error {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: #dc2626;
+}
+
+.mp-grid-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.mp-grid-two > div {
+  min-width: 0;
+}
+
+.mp-actions {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mp-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.mp-btn-primary {
+  background: linear-gradient(120deg, var(--mp-accent), #5fa0ff);
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.24);
+}
+
+.mp-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 28px rgba(37, 99, 235, 0.32);
+}
+
+.mp-btn-ghost {
+  background: #ffffff;
+  border: 1px solid var(--mp-border, rgba(20, 18, 26, 0.12));
+  color: var(--mp-ink, #14121a);
+}
+
+.mp-btn-ghost:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--mp-shadow-soft, 0 12px 30px rgba(27, 22, 39, 0.08));
+}
+
+.mp-benefits {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.mp-benefit-card {
+  border: 1px solid #ebe8ff;
+  background: #f8f6ff;
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.mp-benefit-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ebe7ff;
+  color: #5849ef;
+}
+
+.mp-benefit-card h3 {
+  margin: 10px 0 6px;
+  font-size: 14px;
+}
+
+.mp-benefit-card p {
+  margin: 0;
+  font-size: 12px;
+  color: #61657a;
+  line-height: 1.45;
+}
+
+@media (max-width: 860px) {
+  .mp-header h1 {
+    font-size: 32px;
+  }
+
+  .mp-grid-two {
+    grid-template-columns: 1fr;
+  }
+
+  .mp-benefits {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .mp-page {
+    padding: 24px 14px 36px;
+  }
+
+  .mp-form-card {
+    padding: 18px;
+    border-radius: 14px;
+  }
+
+  .mp-header h1 {
+    font-size: 28px;
+  }
+
+  .mp-actions {
+    grid-template-columns: 1fr;
+  }
+}
