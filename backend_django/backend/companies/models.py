@@ -9,5 +9,8 @@ class Company(models.Model):
     description = models.TextField()
     is_approved = models.BooleanField(default=False)
 
+    class Meta:
+        db_table = "recruiters_company"
+
     def __str__(self):
         return self.company_name

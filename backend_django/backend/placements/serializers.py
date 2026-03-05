@@ -6,6 +6,10 @@ class PlacementSerializer(serializers.ModelSerializer):
         source='company.company_name',
         read_only=True
     )
+    required_skill_names = serializers.SerializerMethodField()
+
+    def get_required_skill_names(self, obj):
+        return list(obj.required_skills.values_list('name', flat=True))
 
     class Meta:
         model = Placement
@@ -22,6 +26,7 @@ class PlacementSerializer(serializers.ModelSerializer):
             'no_of_positions',
             'no_of_applicants',
             'required_skills',
+            'required_skill_names',
         ]
 
 class PlacementCreateSerializer(serializers.ModelSerializer):

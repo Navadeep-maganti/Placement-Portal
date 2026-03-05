@@ -23,6 +23,7 @@ class Migration(migrations.Migration):
                 ),
                 ("name", models.CharField(max_length=50)),
             ],
+            options={"db_table": "jobs_skill"},
         ),
         migrations.AddField(
             model_name="placement",
@@ -38,7 +39,9 @@ class Migration(migrations.Migration):
             model_name="placement",
             name="required_skills",
             field=models.ManyToManyField(
-                related_name="placements", to="placements.skill"
+                db_table="jobs_job_required_skills",
+                related_name="placements",
+                to="placements.skill",
             ),
         ),
     ]

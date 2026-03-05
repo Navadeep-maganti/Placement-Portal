@@ -33,11 +33,13 @@ class Migration(migrations.Migration):
                 (
                     "company",
                     models.ForeignKey(
+                        db_column="recruiter_id",
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="jobs",
                         to="companies.company",
                     ),
                 ),
             ],
+            options={"db_table": "jobs_job"},
         ),
     ]
