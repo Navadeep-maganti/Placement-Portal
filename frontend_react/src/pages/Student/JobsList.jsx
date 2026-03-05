@@ -4,6 +4,19 @@ import StudentNavbar from '../../components/Navbar/StudentNavbar'
 import { useAuth } from '../../contexts/AuthContext'
 import { useEffect } from 'react'
 import api from '../../utils/api'
+function handleBookmark(jobId) {
+  const postBookmark = async () => {
+    try {
+      await api.post('/bookmarks/', { placement_id: jobId });
+      alert('Job bookmarked successfully!');
+    } catch (err) {
+      alert(
+        err.response?.data?.detail || 'Failed to bookmark job'
+      );
+    }
+  }
+  postBookmark();
+}
 const JobsList = () => {
   const { auth, loading } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,8 +24,8 @@ const JobsList = () => {
   const [filterSalary, setFilterSalary] = useState('all');
   const [viewType, setViewType] = useState('grid');
   const [pageLoading, setPageLoading] = useState(true);
-  const [jobs,setJobs] =useState([]);
-  const [error,setError] = useState('');
+  const [jobs, setJobs] = useState([]);
+  const [error, setError] = useState('');
   useEffect(() => {
     const fetchJobs = async () => {
       try {
@@ -24,14 +37,14 @@ const JobsList = () => {
           err.response?.data?.detail || 'Failed to fetch jobs'
         );
       }
-      finally{
+      finally {
         setPageLoading(false);
       }
     };
-    if(!loading && auth.user){
+    if (!loading && auth.user) {
       fetchJobs();
     }
-    else if(!loading){
+    else if (!loading) {
       setPageLoading(false);
     }
   }, [loading, auth.user]);
@@ -58,13 +71,13 @@ const JobsList = () => {
     const company = (job.company_display || '').toLowerCase();
     const skills = (job.skills_display || '').toLowerCase();
     const matchesSearch = title.includes(searchTerm.toLowerCase()) ||
-                         company.includes(searchTerm.toLowerCase()) ||
-                         skills.includes(searchTerm.toLowerCase());
+      company.includes(searchTerm.toLowerCase()) ||
+      skills.includes(searchTerm.toLowerCase());
     const matchesLocation = filterLocation === 'all' || job.location_display === filterLocation;
-    const matchesSalary = filterSalary === 'all' || 
-                         (filterSalary === '5-7' && parseInt(job.salary_display, 10) >= 5 && parseInt(job.salary_display, 10) <= 7) ||
-                         (filterSalary === '7-9' && parseInt(job.salary_display, 10) >= 7 && parseInt(job.salary_display, 10) <= 9) ||
-                         (filterSalary === '9+' && parseInt(job.salary_display, 10) >= 9);
+    const matchesSalary = filterSalary === 'all' ||
+      (filterSalary === '5-7' && parseInt(job.salary_display, 10) >= 5 && parseInt(job.salary_display, 10) <= 7) ||
+      (filterSalary === '7-9' && parseInt(job.salary_display, 10) >= 7 && parseInt(job.salary_display, 10) <= 9) ||
+      (filterSalary === '9+' && parseInt(job.salary_display, 10) >= 9);
     return matchesSearch && matchesLocation && matchesSalary;
   });
 
@@ -74,7 +87,7 @@ const JobsList = () => {
   return (
     <div className="jl-page">
       <StudentNavbar student={auth.user} />
-      
+
       <div className="jl-container">
         <div className="jl-header">
           <h1>Explore Opportunities</h1>
@@ -123,7 +136,9 @@ const JobsList = () => {
             <div key={job.id} className="jl-card">
               <div className="jl-card-header">
                 <h3>{job.title}</h3>
-                <button className="jl-bookmark">BOOKMARK</button>
+                <button className="jl-bookmark" onClick={() => handleBookmark(job.id)}>
+                  BOOKMARK
+                </button>
               </div>
               <p className="jl-company">{job.company_display}</p>
               <div className="jl-meta">
