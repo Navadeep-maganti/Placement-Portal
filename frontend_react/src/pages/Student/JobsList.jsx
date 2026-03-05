@@ -1,38 +1,75 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import '../../styles/css/JobsList.css'
 import StudentNavbar from '../../components/Navbar/StudentNavbar'
 import { useAuth } from '../../contexts/AuthContext'
-
+import { useEffect } from 'react'
+import api from '../../utils/api'
 const JobsList = () => {
   const { auth, loading } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLocation, setFilterLocation] = useState('all');
   const [filterSalary, setFilterSalary] = useState('all');
   const [viewType, setViewType] = useState('grid');
+  const [pageLoading, setPageLoading] = useState(true);
+  const [jobs,setJobs] =useState([]);
+  const [error,setError] = useState('');
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setError('');
+        const response = await api.get('/placements/allplacements/');
+        setJobs(response.data || []);
+      } catch (err) {
+        setError(
+          err.response?.data?.detail || 'Failed to fetch jobs'
+        );
+      }
+      finally{
+        setPageLoading(false);
+      }
+    };
+    if(!loading && auth.user){
+      fetchJobs();
+    }
+    else if(!loading){
+      setPageLoading(false);
+    }
+  }, [loading, auth.user]);
 
-  const jobs = [
-    { id: 1, title: 'Senior Developer', company: 'Google', location: 'Bangalore', salary: '8-10 LPA', type: 'Full-time', skills: 'React, Node.js', applications: 45, deadline: '2025-02-15' },
-    { id: 2, title: 'Product Manager', company: 'Microsoft', location: 'Pune', salary: '10-12 LPA', type: 'Full-time', skills: 'Leadership, Analytics', applications: 32, deadline: '2025-02-20' },
-    { id: 3, title: 'Data Scientist', company: 'Amazon', location: 'Bangalore', salary: '7-9 LPA', type: 'Full-time', skills: 'Python, ML, SQL', applications: 58, deadline: '2025-02-18' },
-    { id: 4, title: 'Frontend Engineer', company: 'Meta', location: 'Delhi', salary: '6-8 LPA', type: 'Full-time', skills: 'React, TypeScript', applications: 67, deadline: '2025-02-22' },
-    { id: 5, title: 'DevOps Engineer', company: 'Netflix', location: 'Bangalore', salary: '9-11 LPA', type: 'Full-time', skills: 'Docker, Kubernetes', applications: 28, deadline: '2025-02-16' },
-    { id: 6, title: 'Backend Developer', company: 'Uber', location: 'Hyderabad', salary: '7-9 LPA', type: 'Full-time', skills: 'Go, Java, Databases', applications: 41, deadline: '2025-02-25' },
-  ];
+  const normalizedJobs = useMemo(() => {
+    return (jobs || []).map((job) => {
+      const skills = Array.isArray(job.required_skill_names) ? job.required_skill_names.join(', ') : '';
+      return {
+        ...job,
+        title: job.job_title || '',
+        company_display: job.company_name || 'Unknown Company',
+        skills_display: skills,
+        location_display: job.location || 'N/A',
+        salary_display: job.salary || 'N/A',
+        type_display: job.type || 'Full-time',
+        applications_display: job.no_of_applicants ?? 0,
+        deadline_display: job.application_deadline || 'N/A',
+      };
+    });
+  }, [jobs]);
+
+  const filteredJobs = normalizedJobs.filter(job => {
+    const title = (job.title || '').toLowerCase();
+    const company = (job.company_display || '').toLowerCase();
+    const skills = (job.skills_display || '').toLowerCase();
+    const matchesSearch = title.includes(searchTerm.toLowerCase()) ||
+                         company.includes(searchTerm.toLowerCase()) ||
+                         skills.includes(searchTerm.toLowerCase());
+    const matchesLocation = filterLocation === 'all' || job.location_display === filterLocation;
+    const matchesSalary = filterSalary === 'all' || 
+                         (filterSalary === '5-7' && parseInt(job.salary_display, 10) >= 5 && parseInt(job.salary_display, 10) <= 7) ||
+                         (filterSalary === '7-9' && parseInt(job.salary_display, 10) >= 7 && parseInt(job.salary_display, 10) <= 9) ||
+                         (filterSalary === '9+' && parseInt(job.salary_display, 10) >= 9);
+    return matchesSearch && matchesLocation && matchesSalary;
+  });
 
   if (loading) return <p>Loading...</p>;
   if (!auth.user) return <p>No user data</p>;
-
-  const filteredJobs = jobs.filter(job => {
-    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         job.skills.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesLocation = filterLocation === 'all' || job.location === filterLocation;
-    const matchesSalary = filterSalary === 'all' || 
-                         (filterSalary === '5-7' && parseInt(job.salary) >= 5 && parseInt(job.salary) <= 7) ||
-                         (filterSalary === '7-9' && parseInt(job.salary) >= 7 && parseInt(job.salary) <= 9) ||
-                         (filterSalary === '9+' && parseInt(job.salary) >= 9);
-    return matchesSearch && matchesLocation && matchesSalary;
-  });
 
   return (
     <div className="jl-page">
@@ -88,20 +125,20 @@ const JobsList = () => {
                 <h3>{job.title}</h3>
                 <button className="jl-bookmark">BOOKMARK</button>
               </div>
-              <p className="jl-company">{job.company}</p>
+              <p className="jl-company">{job.company_display}</p>
               <div className="jl-meta">
-                <span className="jl-meta-item">{job.location}</span>
-                <span className="jl-meta-item">{job.salary}</span>
-                <span className="jl-meta-item">{job.type}</span>
+                <span className="jl-meta-item">{job.location_display}</span>
+                <span className="jl-meta-item">{job.salary_display}</span>
+                <span className="jl-meta-item">{job.type_display}</span>
               </div>
               <div className="jl-skills">
-                {job.skills.split(', ').map((skill, idx) => (
+                {(job.skills_display ? job.skills_display.split(', ') : ['No skills specified']).map((skill, idx) => (
                   <span key={idx} className="jl-skill">{skill}</span>
                 ))}
               </div>
               <div className="jl-footer">
-                <span className="jl-applicants">{job.applications} applied</span>
-                <span className="jl-deadline">{job.deadline}</span>
+                <span className="jl-applicants">{job.applications_display} applied</span>
+                <span className="jl-deadline">{job.deadline_display}</span>
               </div>
               <button className="jl-apply">Apply Now</button>
             </div>
