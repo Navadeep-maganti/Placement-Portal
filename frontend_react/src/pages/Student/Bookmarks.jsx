@@ -1,60 +1,82 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import StudentNavbar from '../../components/Navbar/StudentNavbar'
 import { useAuth } from '../../contexts/AuthContext'
+import api from '../../utils/api'
 import '../../styles/css/Bookmarks.css'
 
 const Bookmarks = () => {
+  const navigate = useNavigate();
   const { auth, loading } = useAuth();
-  const [bookmarks, setBookmarks] = useState([
-    {
-      id: 1,
-      jobTitle: 'Senior Developer',
-      company: 'Google',
-      location: 'Bangalore',
-      salary: '8-10 LPA',
-      type: 'Full-time',
-      skills: ['React', 'Node.js', 'Python'],
-      savedDate: '2025-01-18',
-      deadline: '2025-02-15',
-      applications: 45
-    },
-    {
-      id: 2,
-      jobTitle: 'Product Manager',
-      company: 'Microsoft',
-      location: 'Pune',
-      salary: '10-12 LPA',
-      type: 'Full-time',
-      skills: ['Leadership', 'Analytics', 'Strategy'],
-      savedDate: '2025-01-16',
-      deadline: '2025-02-20',
-      applications: 32
-    },
-    {
-      id: 3,
-      jobTitle: 'Data Scientist',
-      company: 'Amazon',
-      location: 'Bangalore',
-      salary: '7-9 LPA',
-      type: 'Full-time',
-      skills: ['Python', 'ML', 'SQL'],
-      savedDate: '2025-01-15',
-      deadline: '2025-02-18',
-      applications: 58
-    },
-  ]);
-
+  const [bookmarks, setBookmarks] = useState([]);
+  const [error, setError] = useState('');
+  const [pageLoading, setPageLoading] = useState(true);
   const [viewType, setViewType] = useState('grid');
   const [sortBy, setSortBy] = useState('recent');
+  useEffect(() => {
+    const loadBookmarks = async () => {
+      try {
+        setError('');
+        const response = await api.get('/bookmarks/');
+        setBookmarks(response.data || []);
+      }
+      catch (err) {
+        setError(
+          err.response?.data?.detail || 'Failed to load bookmarks'
+        );
+      }
+      finally {
+        setPageLoading(false);
+      }
+    };
+    if (!loading && auth.user) {
+      loadBookmarks();
+    }
+    else if (!loading) {
+      setPageLoading(false);
+    }
+  }, [loading, auth.user]);
 
-  if (loading) return <p>Loading...</p>;
+
+
+  if (loading || pageLoading) return <p>Loading...</p>;
   if (!auth.user) return <p>No user data</p>;
 
-  const handleRemoveBookmark = (id) => {
-    setBookmarks(bookmarks.filter(b => b.id !== id));
+  const handleRemoveBookmark = async (bookmark) => {
+    try {
+      await api.delete(`/bookmarks/${bookmark.placement}/`);
+      setBookmarks((prev) => prev.filter((b) => b.id !== bookmark.id));
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to remove bookmark');
+    }
   };
 
-  const sortedBookmarks = [...bookmarks].sort((a, b) => {
+  const handleViewJob = (bookmark) => {
+    navigate(`/student/jobs/${bookmark.placement}`);
+  };
+
+  const handleApplyNow = async (bookmark) => {
+    try {
+      await api.post('/applications/apply/', { placement_id: bookmark.placement });
+      alert('Application submitted successfully.');
+    } catch (err) {
+      alert(err.response?.data?.detail || err.response?.data?.error || 'Failed to apply');
+    }
+  };
+
+  const normalizedBookmarks = bookmarks.map((bookmark) => ({
+    ...bookmark,
+    jobTitle: bookmark.job_title,
+    company: bookmark.company_name || 'Unknown Company',
+    location: bookmark.location || 'N/A',
+    salary: bookmark.salary ? `${bookmark.salary} LPA` : 'N/A',
+    type: bookmark.type || 'Full-time',
+    skills: bookmark.required_skill_names || [],
+    savedDate: bookmark.created_at,
+    deadline: bookmark.application_deadline || 'N/A',
+  }));
+
+  const sortedBookmarks = [...normalizedBookmarks].sort((a, b) => {
     if (sortBy === 'recent') return new Date(b.savedDate) - new Date(a.savedDate);
     if (sortBy === 'deadline') return new Date(a.deadline) - new Date(b.deadline);
     return 0;
@@ -68,6 +90,7 @@ const Bookmarks = () => {
         <div className="bm-bookmarks-header">
           <h1>Saved Jobs</h1>
           <p>Jobs you have bookmarked for later review</p>
+          {error && <p>{error}</p>}
         </div>
 
         <div className="bm-bookmarks-controls">
@@ -91,9 +114,9 @@ const Bookmarks = () => {
               <div key={bookmark.id} className="bm-bookmark-card">
                 <div className="bm-bookmark-header">
                   <h3>{bookmark.jobTitle}</h3>
-                  <button 
+                  <button
                     className="bm-remove-bookmark-btn"
-                    onClick={() => handleRemoveBookmark(bookmark.id)}
+                    onClick={() => handleRemoveBookmark(bookmark)}
                     title="Remove bookmark"
                   >
                     X
@@ -120,8 +143,8 @@ const Bookmarks = () => {
                 </div>
 
                 <div className="bm-bookmark-actions">
-                  <button className="bm-view-job-btn">View Job</button>
-                  <button className="bm-apply-btn">Apply Now</button>
+                  <button className="bm-view-job-btn" onClick={() => handleViewJob(bookmark)}>View Job</button>
+                  <button className="bm-apply-btn" onClick={() => handleApplyNow(bookmark)}>Apply Now</button>
                 </div>
               </div>
             ))}

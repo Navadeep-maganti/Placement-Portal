@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from .views import MyApplicationsView
+from .views import ApplyToJobView, MyApplicationsView
 urlpatterns = [
     path("myapplications/",MyApplicationsView.as_view(), name="my_applications"),
+    path("apply/", ApplyToJobView.as_view(), name="apply_to_job"),
 ]
