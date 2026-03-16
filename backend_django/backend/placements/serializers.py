@@ -6,10 +6,21 @@ class PlacementSerializer(serializers.ModelSerializer):
         source='company.company_name',
         read_only=True
     )
+    company_location = serializers.CharField(
+        source='company.location',
+        read_only=True,
+    )
     required_skill_names = serializers.SerializerMethodField()
+    salary_lpa = serializers.SerializerMethodField()
 
     def get_required_skill_names(self, obj):
         return list(obj.required_skills.values_list('name', flat=True))
+
+    def get_salary_lpa(self, obj):
+        salary = obj.salary
+        if salary == int(salary):
+            return f"{int(salary)} LPA"
+        return f"{salary} LPA"
 
     class Meta:
         model = Placement
@@ -17,9 +28,11 @@ class PlacementSerializer(serializers.ModelSerializer):
             'id',
             'company',
             'company_name',
+            'company_location',
             'job_title',
             'job_description',
             'salary',
+            'salary_lpa',
             'eligibility_cgpa',
             'application_deadline',
             'is_active',

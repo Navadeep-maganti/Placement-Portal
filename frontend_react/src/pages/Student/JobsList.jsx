@@ -4,6 +4,7 @@ import StudentNavbar from '../../components/Navbar/StudentNavbar'
 import { useAuth } from '../../contexts/AuthContext'
 import { useEffect } from 'react'
 import api from '../../utils/api'
+import StudentFooter from '../../components/Footer/StudentFooter'
 function handleBookmark(jobId) {
   const postBookmark = async () => {
     try {
@@ -57,8 +58,8 @@ const JobsList = () => {
         title: job.job_title || '',
         company_display: job.company_name || 'Unknown Company',
         skills_display: skills,
-        location_display: job.location || 'N/A',
-        salary_display: job.salary || 'N/A',
+        location_display: job.company_location || 'N/A',
+        salary_display: job.salary_lpa || 'N/A',
         type_display: job.type || 'Full-time',
         applications_display: job.no_of_applicants ?? 0,
         deadline_display: job.application_deadline || 'N/A',
@@ -167,6 +168,7 @@ const JobsList = () => {
           </div>
         )}
       </div>
+      <StudentFooter />
     </div>
   )
 }

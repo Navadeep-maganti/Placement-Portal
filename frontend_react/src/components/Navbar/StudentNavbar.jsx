@@ -4,7 +4,7 @@ import { FaUserCircle } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import api from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
-function StudentNavbar({ student }) {
+function StudentNavbar({ student }, applications) {
   const { logout } = useAuth();
   return (
     <nav className="student-navbar">
@@ -20,7 +20,7 @@ function StudentNavbar({ student }) {
       {/* CENTER */}
       <div className="center-nav nav-surface">
         <NavLink
-          to="/student/jobs"
+          to="/student/jobs" property="applications "
           className={({ isActive }) =>
             isActive ? "nav-link active" : "nav-link"
           }

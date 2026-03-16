@@ -2,15 +2,71 @@ import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import { useAuth } from "../../contexts/AuthContext";
 import "../../styles/css/StudentDashboard.css";
 import StudentFooter from "../../components/Footer/StudentFooter";
+import { useState,useEffect } from "react";
+import api from "../../utils/api";
+import { Link } from "react-router-dom";
 function StudentDashboard() {
   const { auth, loading } = useAuth();
+  const [pageLoading, setPageLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [applications, setApplications] = useState([]);
+  const [bookmarks, setBookmarks] = useState([]);
+  useEffect(() => {
+    const fetchBookmarks = async()=>{
+      try{
+        setError('');
+        const response = await api.get('/bookmarks/');
+        console.log('Bookmarks response:', response.data);
+        setBookmarks(response.data || []);
+      }
+      catch(error){
+        setError(
+          error.response?.data?.detail || 'Failed to load bookmarks'
+        );
+      }
+      finally{
+        setPageLoading(false);
+      }
+    };
+    if (!loading && auth.user) {
+      fetchBookmarks();
+    }
+    else if (!loading) {
+      setPageLoading(false);
+    }
+  }, [loading, auth.user]);
 
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        setError('');
+        const response = await api.get("/applications/myapplications/");
+        console.log('Applications response:', response.data);
+        setApplications(response.data || []);
+      } catch (err) {
+        setError(
+          err.response?.data?.detail ||
+            "Failed to load applications. Please log in again."
+        );
+      } finally {
+        setPageLoading(false);
+      } 
+    };
+
+    if (!loading && auth.user) {
+      fetchApplications();
+    } else if (!loading) {
+      setPageLoading(false);
+    }
+  }, [loading, auth.user]);
   if (loading) return <p>Loading...</p>;
+  if (pageLoading) return <p>Loading dashboard...</p>;
   if (!auth.user) return <p>No user data</p>;
 
   return (
     <>
-      <StudentNavbar student={auth.user} />
+      <StudentNavbar student={auth.user} applications={applications} />
       <div className="student-dashboard-body">
         <section className="sd-hero">
           <div className="sd-hero-text">
@@ -21,7 +77,7 @@ function StudentDashboard() {
               tailored to your journey.
             </p>
             <div className="sd-hero-actions">
-              <button className="sd-btn primary">Explore Opportunities</button>
+              <Link to="/student/jobs" className="sd-btn primary">Explore Opportunities</Link>
               <button className="sd-btn ghost">Update Profile</button>
             </div>
           </div>
@@ -48,20 +104,21 @@ function StudentDashboard() {
             <h3>Placement Overview</h3>
             <span className="sd-section-tag">This month</span>
           </div>
+          {error && <p>{error}</p>}
           <div className="overview-div">
             <div className="overview-card appliedRoles">
               <h4 className="overview-title">Applied Roles</h4>
-              <p className="overview-count">5</p>
-              <p className="overview-footnote">2 new since last week</p>
+              <p className="overview-count">{applications.length}</p>
+              <p className="overview-footnote">{applications.filter((app) => app.application_date > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length} new since last week</p>
             </div>
             <div className="overview-card bookmarkedRoles">
               <h4 className="overview-title">Bookmarked Roles</h4>
-              <p className="overview-count">3</p>
+              <p className="overview-count">{bookmarks.length}</p>
               <p className="overview-footnote">Shortlist to stay focused</p>
             </div>
             <div className="overview-card shortlisted">
               <h4 className="overview-title">Shortlisted</h4>
-              <p className="overview-count">2</p>
+              <p className="overview-count">{applications.filter((app) => app.status === "shortlisted").length}</p>
               <div className="shortlist-comment">
                 <span className="dot" aria-hidden="true" />
                 Interviews scheduled
@@ -69,7 +126,7 @@ function StudentDashboard() {
             </div>
             <div className="overview-card offersRecieved">
               <h4 className="overview-title">Offers Received</h4>
-              <p className="overview-count">1</p>
+              <p className="overview-count">{applications.filter((app) => app.status === "offered").length}</p>
               <div className="congratulations">
                 <span className="check-badge" aria-hidden="true">
                   OK

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import StudentNavbar from '../../components/Navbar/StudentNavbar'
 import { useAuth } from '../../contexts/AuthContext'
 import api from '../../utils/api'
 import '../../styles/css/Bookmarks.css'
+import StudentFooter from '../../components/Footer/StudentFooter'
 
 const Bookmarks = () => {
   const navigate = useNavigate();
@@ -155,11 +157,14 @@ const Bookmarks = () => {
               <p className="bm-empty-icon">FILE</p>
               <p className="bm-empty-title">No Bookmarks Yet</p>
               <p className="bm-empty-message">Start bookmarking jobs to save them for later!</p>
-              <button className="bm-explore-btn">Explore Jobs</button>
+              <Link className="bm-explore-btn" to="/student/jobs">
+                Explore Jobs
+              </Link>
             </div>
           </div>
         )}
       </div>
+      <StudentFooter />
     </div>
   )
 }

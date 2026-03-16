@@ -3,6 +3,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import api from "../../utils/api";
 import "../../styles/css/MyApplications.css";
+import StudentFooter from "../../components/Footer/StudentFooter";
 
 const MyApplications = () => {
   const { auth, loading } = useAuth();
@@ -139,6 +140,7 @@ const MyApplications = () => {
           )}
         </div>
       </div>
+      <StudentFooter />
     </div>
   );
 };

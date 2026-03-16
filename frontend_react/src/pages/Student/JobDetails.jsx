@@ -167,6 +167,7 @@ const JobDetails = () => {
           </section>
         </div>
       </div>
+      <StudentFooter />
     </div>
   )
 }
