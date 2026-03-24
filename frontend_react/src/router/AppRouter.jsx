@@ -10,6 +10,7 @@ import MyApplications from "../pages/Student/MyApplications";
 import JobsList from "../pages/Student/JobsList";
 import JobDetails from "../pages/Student/JobDetails";
 import Bookmarks from "../pages/Student/Bookmarks";
+import StudentProfile from "../pages/Student/StudentProfile";
 
 /* Company Pages */
 import CompanyDashboard from "../pages/Recruiter/CompanyDashboard";
@@ -93,6 +94,15 @@ export default function AppRouter() {
         element={
           <PrivateRoute allowedRoles={["student"]}>
             <Bookmarks />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/student/profile"
+        element={
+          <PrivateRoute allowedRoles={["student"]}>
+            <StudentProfile />
           </PrivateRoute>
         }
       />

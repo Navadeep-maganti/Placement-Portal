@@ -2,17 +2,15 @@
 
 .ma-my-applications-page {
   border-radius: 16px;
-  margin-top: 80px;
   font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top left, #fbfcff 0%, #f6f8fc 40%, #f3f5f8 100%);
   min-height: 100vh;
   box-sizing: border-box;
 }
 
 .ma-applications-container {
   max-width: 1200px;
-  margin: 80px auto 48px;
-  padding: 0 24px 24px;
+  margin: 0 auto 48px;
+  padding: calc(var(--student-page-top) + 12px) 24px 24px;
 }
 
 .ma-applications-header {
@@ -32,6 +30,24 @@
 .ma-applications-header p {
   color: #6b7280;
   font-size: 14px;
+}
+
+.ma-inline-message {
+  margin: 10px auto 0;
+  max-width: 760px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.ma-error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.ma-success {
+  background: #dcfce7;
+  color: #166534;
 }
 
 .ma-stats-cards {
@@ -188,6 +204,86 @@
 
 .ma-app-next-step strong {
   color: #0f172a;
+}
+
+.ma-profile-snapshot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ma-profile-snapshot span {
+  background: rgba(15, 118, 110, 0.08);
+  color: #0f766e;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ma-offer-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.ma-offer-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ma-offer-btn.accept {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.ma-offer-btn.decline {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.ma-offer-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.ma-offer-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.ma-history {
+  display: grid;
+  gap: 10px;
+}
+
+.ma-history-item {
+  background: #f8fafc;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.ma-history-status {
+  display: block;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.ma-history-date {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.ma-history-remarks {
+  margin: 8px 0 0;
+  color: #334155;
+  line-height: 1.5;
 }
 
 .ma-app-actions {

@@ -2,17 +2,15 @@
 
 .bm-bookmarks-page {
   border-radius: 16px;
-  margin-top: 80px;
   font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top left, #fbfcff 0%, #f6f8fc 40%, #f3f5f8 100%);
   min-height: 100vh;
   box-sizing: border-box;
 }
 
 .bm-bookmarks-container {
   max-width: 1200px;
-  margin: 80px auto 48px;
-  padding: 0 24px 24px;
+  margin: 0 auto 48px;
+  padding: calc(var(--student-page-top) + 12px) 24px 24px;
 }
 
 .bm-bookmarks-header {
@@ -262,6 +260,13 @@
 .bm-apply-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 14px 22px rgba(22, 163, 74, 0.28);
+}
+
+.bm-apply-btn:disabled {
+  background: #cbd5e1;
+  color: #475569;
+  box-shadow: none;
+  cursor: not-allowed;
 }
 
 .bm-no-bookmarks {

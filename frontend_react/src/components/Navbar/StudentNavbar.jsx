@@ -2,9 +2,8 @@ import { Link, Navigate, NavLink } from "react-router-dom";
 import "../../styles/css/StudentNavbar.css";
 import { FaUserCircle } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
-import api from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
-function StudentNavbar({ student }, applications) {
+function StudentNavbar({ student }) {
   const { logout } = useAuth();
   return (
     <nav className="student-navbar">
@@ -20,7 +19,7 @@ function StudentNavbar({ student }, applications) {
       {/* CENTER */}
       <div className="center-nav nav-surface">
         <NavLink
-          to="/student/jobs" property="applications "
+          to="/student/jobs"
           className={({ isActive }) =>
             isActive ? "nav-link active" : "nav-link"
           }

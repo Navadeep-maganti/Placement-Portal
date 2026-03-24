@@ -2,17 +2,15 @@
 
 .jl-page {
   border-radius: 16px;
-  margin-top: 80px;
   font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top left, #fbfcff 0%, #f6f8fc 40%, #f3f5f8 100%);
   min-height: 100vh;
   box-sizing: border-box;
 }
 
 .jl-container {
   max-width: 1200px;
-  margin: 80px auto 48px;
-  padding: 0 24px 24px;
+  margin: 0 auto 48px;
+  padding: calc(var(--student-page-top) + 12px) 24px 24px;
 }
 
 .jl-header {
@@ -32,6 +30,24 @@
 .jl-header p {
   color: #6b7280;
   font-size: 14px;
+}
+
+.jl-message {
+  margin: 10px auto 0;
+  max-width: 720px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.jl-error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.jl-success {
+  background: #dcfce7;
+  color: #166534;
 }
 
 .jl-filters {
@@ -227,22 +243,84 @@
   gap: 10px;
 }
 
+.jl-status-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.jl-status-badge {
+  align-self: flex-start;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.jl-status-badge.applied {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.jl-status-badge.eligible {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.jl-status-badge.blocked {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.jl-eligibility-note {
+  color: #b91c1c;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.jl-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.jl-secondary-action,
 .jl-apply {
+  flex: 1;
   padding: 10px 12px;
   border-radius: 12px;
-  border: none;
-  background: linear-gradient(120deg, #2563eb, #3b82f6);
-  color: #ffffff;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 10px 16px rgba(37, 99, 235, 0.22);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.jl-apply:hover {
+.jl-secondary-action {
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.jl-apply {
+  border: none;
+  background: linear-gradient(120deg, #2563eb, #3b82f6);
+  color: #ffffff;
+  box-shadow: 0 10px 16px rgba(37, 99, 235, 0.22);
+}
+
+.jl-secondary-action:hover,
+.jl-apply:hover:not(:disabled) {
   transform: translateY(-1px);
+}
+
+.jl-apply:hover:not(:disabled) {
   box-shadow: 0 14px 22px rgba(37, 99, 235, 0.28);
+}
+
+.jl-apply:disabled {
+  background: #cbd5e1;
+  color: #475569;
+  box-shadow: none;
+  cursor: not-allowed;
 }
 
 .jl-empty {
@@ -274,5 +352,9 @@
 
   .jl-view-toggle {
     justify-content: center;
+  }
+
+  .jl-actions {
+    flex-direction: column;
   }
 }

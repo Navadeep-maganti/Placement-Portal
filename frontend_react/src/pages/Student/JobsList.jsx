@@ -1,88 +1,169 @@
-import React, { useMemo, useState } from 'react'
-import '../../styles/css/JobsList.css'
-import StudentNavbar from '../../components/Navbar/StudentNavbar'
-import { useAuth } from '../../contexts/AuthContext'
-import { useEffect } from 'react'
-import api from '../../utils/api'
-import StudentFooter from '../../components/Footer/StudentFooter'
-function handleBookmark(jobId) {
-  const postBookmark = async () => {
-    try {
-      await api.post('/bookmarks/', { placement_id: jobId });
-      alert('Job bookmarked successfully!');
-    } catch (err) {
-      alert(
-        err.response?.data?.detail || 'Failed to bookmark job'
-      );
-    }
-  }
-  postBookmark();
-}
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "../../styles/css/JobsList.css";
+import StudentNavbar from "../../components/Navbar/StudentNavbar";
+import StudentFooter from "../../components/Footer/StudentFooter";
+import ApplicationReviewModal from "../../components/Student/ApplicationReviewModal";
+import { useAuth } from "../../contexts/AuthContext";
+import api from "../../utils/api";
+import { formatStatusLabel } from "../../utils/studentApplication";
+
 const JobsList = () => {
+  const navigate = useNavigate();
   const { auth, loading } = useAuth();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterLocation, setFilterLocation] = useState('all');
-  const [filterSalary, setFilterSalary] = useState('all');
-  const [viewType, setViewType] = useState('grid');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterLocation, setFilterLocation] = useState("all");
+  const [filterSalary, setFilterSalary] = useState("all");
+  const [viewType, setViewType] = useState("grid");
   const [pageLoading, setPageLoading] = useState(true);
   const [jobs, setJobs] = useState([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [applying, setApplying] = useState(false);
+
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        setError('');
-        const response = await api.get('/placements/allplacements/');
+        setError("");
+        const response = await api.get("/placements/allplacements/");
         setJobs(response.data || []);
       } catch (err) {
-        setError(
-          err.response?.data?.detail || 'Failed to fetch jobs'
-        );
-      }
-      finally {
+        setError(err.response?.data?.detail || "Failed to fetch jobs");
+      } finally {
         setPageLoading(false);
       }
     };
+
     if (!loading && auth.user) {
       fetchJobs();
-    }
-    else if (!loading) {
+    } else if (!loading) {
       setPageLoading(false);
     }
   }, [loading, auth.user]);
 
   const normalizedJobs = useMemo(() => {
     return (jobs || []).map((job) => {
-      const skills = Array.isArray(job.required_skill_names) ? job.required_skill_names.join(', ') : '';
+      const numericSalary = Number.parseFloat(job.salary);
       return {
         ...job,
-        title: job.job_title || '',
-        company_display: job.company_name || 'Unknown Company',
-        skills_display: skills,
-        location_display: job.company_location || 'N/A',
-        salary_display: job.salary_lpa || 'N/A',
-        type_display: job.type || 'Full-time',
+        title: job.job_title || "",
+        company_display: job.company_name || "Unknown Company",
+        skills_display: Array.isArray(job.required_skill_names)
+          ? job.required_skill_names
+          : [],
+        location_display: job.company_location || "N/A",
+        salary_display: job.salary_lpa || "N/A",
+        salary_number: Number.isNaN(numericSalary) ? 0 : numericSalary,
         applications_display: job.no_of_applicants ?? 0,
-        deadline_display: job.application_deadline || 'N/A',
+        deadline_display: job.application_deadline
+          ? new Date(job.application_deadline).toLocaleDateString()
+          : "N/A",
       };
     });
   }, [jobs]);
 
-  const filteredJobs = normalizedJobs.filter(job => {
-    const title = (job.title || '').toLowerCase();
-    const company = (job.company_display || '').toLowerCase();
-    const skills = (job.skills_display || '').toLowerCase();
-    const matchesSearch = title.includes(searchTerm.toLowerCase()) ||
-      company.includes(searchTerm.toLowerCase()) ||
-      skills.includes(searchTerm.toLowerCase());
-    const matchesLocation = filterLocation === 'all' || job.location_display === filterLocation;
-    const matchesSalary = filterSalary === 'all' ||
-      (filterSalary === '5-7' && parseInt(job.salary_display, 10) >= 5 && parseInt(job.salary_display, 10) <= 7) ||
-      (filterSalary === '7-9' && parseInt(job.salary_display, 10) >= 7 && parseInt(job.salary_display, 10) <= 9) ||
-      (filterSalary === '9+' && parseInt(job.salary_display, 10) >= 9);
+  const locationOptions = useMemo(() => {
+    return [
+      "all",
+      ...new Set(
+        normalizedJobs
+          .map((job) => job.location_display)
+          .filter((location) => location && location !== "N/A")
+      ),
+    ];
+  }, [normalizedJobs]);
+
+  const filteredJobs = normalizedJobs.filter((job) => {
+    const query = searchTerm.trim().toLowerCase();
+    const matchesSearch =
+      !query ||
+      job.title.toLowerCase().includes(query) ||
+      job.company_display.toLowerCase().includes(query) ||
+      job.skills_display.join(", ").toLowerCase().includes(query);
+
+    const matchesLocation =
+      filterLocation === "all" || job.location_display === filterLocation;
+    const matchesSalary =
+      filterSalary === "all" ||
+      (filterSalary === "5-7" &&
+        job.salary_number >= 5 &&
+        job.salary_number <= 7) ||
+      (filterSalary === "7-9" &&
+        job.salary_number >= 7 &&
+        job.salary_number <= 9) ||
+      (filterSalary === "9+" && job.salary_number >= 9);
+
     return matchesSearch && matchesLocation && matchesSalary;
   });
 
-  if (loading) return <p>Loading...</p>;
+  const updateJobState = (jobId, updates) => {
+    setJobs((prev) =>
+      prev.map((job) => (job.id === jobId ? { ...job, ...updates } : job))
+    );
+  };
+
+  const handleBookmark = async (job) => {
+    try {
+      setError("");
+      setFeedback("");
+      if (job.is_bookmarked) {
+        await api.delete(`/bookmarks/${job.id}/`);
+        updateJobState(job.id, { is_bookmarked: false });
+        setFeedback("Bookmark removed.");
+        return;
+      }
+
+      await api.post("/bookmarks/", { placement_id: job.id });
+      updateJobState(job.id, { is_bookmarked: true });
+      setFeedback("Job bookmarked successfully.");
+    } catch (err) {
+      setError(
+        err.response?.data?.detail ||
+          err.response?.data?.error ||
+          "Failed to update bookmark."
+      );
+    }
+  };
+
+  const handleApply = async (applicationProfile) => {
+    if (!selectedJob) {
+      return;
+    }
+
+    try {
+      setError("");
+      setFeedback("");
+      setApplying(true);
+      const response = await api.post("/applications/apply/", {
+        placement_id: selectedJob.id,
+        application_profile: applicationProfile,
+      });
+      const application = response.data?.application || response.data;
+      updateJobState(selectedJob.id, {
+        has_applied: true,
+        application_status:
+          application?.status || selectedJob.application_status || "applied",
+      });
+      setFeedback(
+        response.data?.message || "Application submitted successfully."
+      );
+      setSelectedJob(null);
+    } catch (err) {
+      const issues = err.response?.data?.eligibility_issues;
+      setError(
+        Array.isArray(issues) && issues.length
+          ? issues.join(" ")
+          : err.response?.data?.detail ||
+              err.response?.data?.error ||
+              "Failed to apply."
+      );
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  if (loading || pageLoading) return <p>Loading...</p>;
   if (!auth.user) return <p>No user data</p>;
 
   return (
@@ -92,7 +173,12 @@ const JobsList = () => {
       <div className="jl-container">
         <div className="jl-header">
           <h1>Explore Opportunities</h1>
-          <p>Discover amazing job openings and apply now</p>
+          <p>
+            Browse open roles, bookmark the best matches, and apply with your
+            current profile.
+          </p>
+          {error && <p className="jl-message jl-error">{error}</p>}
+          {feedback && <p className="jl-message jl-success">{feedback}</p>}
         </div>
 
         <div className="jl-filters">
@@ -106,15 +192,23 @@ const JobsList = () => {
           </div>
 
           <div className="jl-filter-row">
-            <select value={filterLocation} onChange={(e) => setFilterLocation(e.target.value)} className="jl-select">
-              <option value="all">All Locations</option>
-              <option value="Bangalore">Bangalore</option>
-              <option value="Pune">Pune</option>
-              <option value="Delhi">Delhi</option>
-              <option value="Hyderabad">Hyderabad</option>
+            <select
+              value={filterLocation}
+              onChange={(e) => setFilterLocation(e.target.value)}
+              className="jl-select"
+            >
+              {locationOptions.map((location) => (
+                <option key={location} value={location}>
+                  {location === "all" ? "All Locations" : location}
+                </option>
+              ))}
             </select>
 
-            <select value={filterSalary} onChange={(e) => setFilterSalary(e.target.value)} className="jl-select">
+            <select
+              value={filterSalary}
+              onChange={(e) => setFilterSalary(e.target.value)}
+              className="jl-select"
+            >
               <option value="all">All Salaries</option>
               <option value="5-7">5-7 LPA</option>
               <option value="7-9">7-9 LPA</option>
@@ -122,41 +216,101 @@ const JobsList = () => {
             </select>
 
             <div className="jl-view-toggle">
-              <button className={`jl-toggle-btn ${viewType === 'grid' ? 'active' : ''}`} onClick={() => setViewType('grid')}>Grid</button>
-              <button className={`jl-toggle-btn ${viewType === 'list' ? 'active' : ''}`} onClick={() => setViewType('list')}>List</button>
+              <button
+                className={`jl-toggle-btn ${viewType === "grid" ? "active" : ""}`}
+                onClick={() => setViewType("grid")}
+              >
+                Grid
+              </button>
+              <button
+                className={`jl-toggle-btn ${viewType === "list" ? "active" : ""}`}
+                onClick={() => setViewType("list")}
+              >
+                List
+              </button>
             </div>
           </div>
         </div>
 
         <div className="jl-results">
-          <p>Showing <strong>{filteredJobs.length}</strong> opportunities</p>
+          <p>
+            Showing <strong>{filteredJobs.length}</strong> opportunities
+          </p>
         </div>
 
-        <div className={`jl-cards ${viewType === 'grid' ? 'jl-grid' : 'jl-list'}`}>
+        <div className={`jl-cards ${viewType === "grid" ? "jl-grid" : "jl-list"}`}>
           {filteredJobs.map((job) => (
             <div key={job.id} className="jl-card">
               <div className="jl-card-header">
-                <h3>{job.title}</h3>
-                <button className="jl-bookmark" onClick={() => handleBookmark(job.id)}>
-                  BOOKMARK
+                <div>
+                  <h3>{job.title}</h3>
+                  <p className="jl-company">{job.company_display}</p>
+                </div>
+                <button className="jl-bookmark" onClick={() => handleBookmark(job)}>
+                  {job.is_bookmarked ? "SAVED" : "BOOKMARK"}
                 </button>
               </div>
-              <p className="jl-company">{job.company_display}</p>
+
               <div className="jl-meta">
                 <span className="jl-meta-item">{job.location_display}</span>
                 <span className="jl-meta-item">{job.salary_display}</span>
-                <span className="jl-meta-item">{job.type_display}</span>
+                <span className="jl-meta-item">
+                  {job.resume_required ? "Resume Required" : "Resume Optional"}
+                </span>
               </div>
+
               <div className="jl-skills">
-                {(job.skills_display ? job.skills_display.split(', ') : ['No skills specified']).map((skill, idx) => (
-                  <span key={idx} className="jl-skill">{skill}</span>
+                {(job.skills_display.length
+                  ? job.skills_display
+                  : ["No skills specified"]
+                ).map((skill, idx) => (
+                  <span key={idx} className="jl-skill">
+                    {skill}
+                  </span>
                 ))}
               </div>
+
               <div className="jl-footer">
-                <span className="jl-applicants">{job.applications_display} applied</span>
+                <span className="jl-applicants">
+                  {job.applications_display} applied
+                </span>
                 <span className="jl-deadline">{job.deadline_display}</span>
               </div>
-              <button className="jl-apply">Apply Now</button>
+
+              <div className="jl-status-row">
+                <span
+                  className={`jl-status-badge ${
+                    job.has_applied ? "applied" : job.is_eligible ? "eligible" : "blocked"
+                  }`}
+                >
+                  {job.has_applied
+                    ? formatStatusLabel(job.application_status)
+                    : job.is_eligible
+                      ? "Eligible"
+                      : "Not Eligible"}
+                </span>
+                {!job.is_eligible && job.eligibility_issues?.length > 0 && (
+                  <span className="jl-eligibility-note">
+                    {job.eligibility_issues[0]}
+                  </span>
+                )}
+              </div>
+
+              <div className="jl-actions">
+                <button
+                  className="jl-secondary-action"
+                  onClick={() => navigate(`/student/jobs/${job.id}`)}
+                >
+                  View Details
+                </button>
+                <button
+                  className="jl-apply"
+                  onClick={() => setSelectedJob(job)}
+                  disabled={job.has_applied || !job.is_eligible}
+                >
+                  {job.has_applied ? "Already Applied" : "Apply Now"}
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -168,9 +322,18 @@ const JobsList = () => {
           </div>
         )}
       </div>
+      <ApplicationReviewModal
+        open={Boolean(selectedJob)}
+        student={auth.user}
+        job={selectedJob}
+        submitting={applying}
+        error={error}
+        onClose={() => setSelectedJob(null)}
+        onSubmit={handleApply}
+      />
       <StudentFooter />
     </div>
-  )
-}
+  );
+};
 
-export default JobsList
+export default JobsList;

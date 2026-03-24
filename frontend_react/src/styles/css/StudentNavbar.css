@@ -1,13 +1,13 @@
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
 
 :root {
-  --nav-bg: rgba(255, 255, 255, 0.92);
-  --nav-ink: #18171c;
-  --nav-muted: #6b7280;
-  --nav-accent: #2563eb;
-  --nav-border: rgba(24, 23, 28, 0.1);
-  --nav-surface: rgba(255, 255, 255, 0.8);
-  --nav-shadow: 0 12px 28px rgba(16, 24, 40, 0.1);
+  --nav-bg: rgba(246, 250, 255, 0.82);
+  --nav-ink: var(--student-text);
+  --nav-muted: var(--student-text-soft);
+  --nav-accent: var(--student-accent);
+  --nav-border: var(--student-border);
+  --nav-surface: rgba(255, 255, 255, 0.74);
+  --nav-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
 }
 
 .student-navbar {
@@ -58,7 +58,9 @@
   background-color: var(--nav-surface);
   padding: 8px 18px;
   border-radius: 999px;
-  box-shadow: inset 0 0 0 1px rgba(24, 23, 28, 0.06);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.8),
+    0 10px 24px rgba(15, 23, 42, 0.05);
 }
 
 .nav-link {
@@ -79,8 +81,8 @@
 }
 
 .nav-link.active {
-  background: linear-gradient(120deg, rgba(37, 99, 235, 0.18), rgba(37, 99, 235, 0.04));
-  color: #1d4ed8;
+  background: linear-gradient(120deg, rgba(37, 99, 235, 0.22), rgba(14, 165, 233, 0.08));
+  color: var(--student-accent-strong);
   font-weight: 700;
   box-shadow: 0 6px 16px rgba(37, 99, 235, 0.16);
 }

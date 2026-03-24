@@ -6,6 +6,13 @@ class Student(models.Model):
     department = models.CharField(max_length=50)
     graduation_year = models.IntegerField()
     cgpa = models.FloatField()
+    active_backlogs = models.PositiveSmallIntegerField(default=0)
+    phone = models.CharField(max_length=20, blank=True)
+    linkedin_url = models.URLField(blank=True)
+    portfolio_url = models.URLField(blank=True)
+    career_objective = models.TextField(blank=True)
+    skills_summary = models.TextField(blank=True)
+    bio = models.TextField(blank=True)
     resume = models.FileField(upload_to='resumes/', null=True, blank=True)
 
     def __str__(self):

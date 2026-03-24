@@ -7,7 +7,7 @@
 .job-details-container {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: calc(var(--student-page-top) + 8px) 20px 40px;
 }
 
 .job-header-section {
@@ -236,6 +236,27 @@
 .benefit-item span:last-child {
   color: var(--text-main);
   font-size: 0.95rem;
+}
+
+.job-inline-message,
+.job-inline-note,
+.job-company-link {
+  margin: 14px 0 0;
+  line-height: 1.6;
+}
+
+.job-error {
+  color: #b91c1c;
+}
+
+.job-success {
+  color: #15803d;
+}
+
+.job-inline-note a,
+.job-company-link a {
+  color: var(--primary);
+  font-weight: 700;
 }
 
 @media (max-width: 768px) {

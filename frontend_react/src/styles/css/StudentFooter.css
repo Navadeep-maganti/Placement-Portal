@@ -3,10 +3,12 @@
 .student-footer {
   margin-top: clamp(24px, 4vw, 40px);
   padding: clamp(24px, 4vw, 40px);
-  background: linear-gradient(120deg, #111827, #1f2937 60%, #0f172a 100%);
+  background:
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.18), transparent 30%),
+    linear-gradient(135deg, #0f172a, #172554 55%, #0f766e 120%);
   color: #e5e7eb;
   border-radius: 28px;
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.35);
+  box-shadow: var(--student-shadow-strong);
   font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 

@@ -1,0 +1,257 @@
+.sm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 18, 32, 0.62);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1200;
+  animation: smFadeIn 0.24s ease;
+}
+
+.sm-panel {
+  width: min(920px, 100%);
+  max-height: min(88vh, 860px);
+  overflow: auto;
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 255, 0.98));
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: 0 35px 80px rgba(15, 23, 42, 0.28);
+  padding: 28px;
+  animation: smPopIn 0.28s ease;
+}
+
+.sm-panel-compact {
+  width: min(520px, 100%);
+  max-height: none;
+}
+
+.sm-panel-large {
+  width: min(980px, 100%);
+}
+
+.sm-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.sm-eyebrow {
+  margin: 0 0 8px;
+  color: var(--student-accent-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  font-size: 0.75rem;
+}
+
+.sm-header h2 {
+  margin: 0 0 8px;
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+  color: var(--student-text);
+}
+
+.sm-header p,
+.sm-footer p {
+  margin: 0;
+  color: var(--student-text-muted);
+  line-height: 1.6;
+}
+
+.sm-close,
+.sm-secondary-btn,
+.sm-primary-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.sm-close,
+.sm-secondary-btn {
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--student-accent-strong);
+}
+
+.sm-primary-btn {
+  background: linear-gradient(135deg, var(--student-accent), var(--student-accent-strong));
+  color: #fff;
+  box-shadow: 0 16px 28px rgba(37, 99, 235, 0.22);
+}
+
+.sm-primary-btn.danger {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+}
+
+.sm-close:hover,
+.sm-secondary-btn:hover,
+.sm-primary-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.sm-primary-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.sm-highlight {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.sm-highlight div {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.sm-highlight span {
+  display: block;
+  color: var(--student-text-soft);
+  font-size: 0.78rem;
+  margin-bottom: 6px;
+}
+
+.sm-highlight strong {
+  color: var(--student-text);
+}
+
+.sm-message {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-weight: 600;
+}
+
+.sm-error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.sm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sm-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sm-grid label,
+.sm-full {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--student-text);
+  font-weight: 600;
+}
+
+.sm-grid input,
+.sm-full textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  background: #fff;
+  padding: 12px 14px;
+  font: inherit;
+  color: var(--student-text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sm-grid input:focus,
+.sm-full textarea:focus {
+  outline: none;
+  border-color: var(--student-accent);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.sm-grid input:disabled {
+  background: rgba(226, 232, 240, 0.5);
+  color: var(--student-text-soft);
+}
+
+.sm-full textarea {
+  resize: vertical;
+}
+
+.sm-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.sm-footer a {
+  color: var(--student-accent-strong);
+  font-weight: 700;
+}
+
+.sm-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.sm-actions-end {
+  justify-content: flex-end;
+}
+
+@keyframes smFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes smPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 720px) {
+  .sm-overlay {
+    padding: 14px;
+  }
+
+  .sm-panel {
+    padding: 20px;
+    border-radius: 22px;
+  }
+
+  .sm-header,
+  .sm-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sm-highlight,
+  .sm-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sm-actions {
+    flex-direction: column;
+  }
+}

@@ -19,6 +19,9 @@ class MyBookmarksView(generics.ListAPIView):
         if user.role == "student":
             return Bookmark.objects.filter(student__user=user).select_related(
                 "student", "placement", "placement__company"
+            ).prefetch_related(
+                "student__application_set__status",
+                "placement__required_skills",
             )
         return Bookmark.objects.none()
 
@@ -33,6 +36,9 @@ class BookmarkListCreateView(generics.ListCreateAPIView):
         student = self.get_student()
         return Bookmark.objects.filter(student=student).select_related(
             "student", "placement", "placement__company"
+        ).prefetch_related(
+            "student__application_set__status",
+            "placement__required_skills",
         )
 
     def create(self, request, *args, **kwargs):

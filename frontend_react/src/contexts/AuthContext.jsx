@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import api from "../utils/api";
-import { Navigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -14,29 +13,33 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const fetchCurrentUser = async (roleOverride = localStorage.getItem("role")) => {
+    const response = await api.get("/auth/me/");
+    let userData = response.data;
+
+    if (roleOverride === "student") {
+      try {
+        const studentRes = await api.get("/students/me/");
+        userData = { ...userData, ...studentRes.data };
+      } catch (err) {
+        console.error("Failed to fetch student details:", err);
+      }
+    }
+
+    localStorage.setItem("user", JSON.stringify(userData));
+    setAuth((prev) => ({
+      ...prev,
+      user: userData,
+    }));
+    return userData;
+  };
+
   useEffect(() => {
     const initAuth = async () => {
       try {
         const token = localStorage.getItem("access");
-        const role = localStorage.getItem("role");
         if (token) {
-          const response = await api.get("/auth/me/");
-          let userData = response.data;
-
-          // Fetch additional profile data based on role
-          if (role === "student") {
-            try {
-              const studentRes = await api.get("/students/me/");
-              userData = { ...userData, ...studentRes.data };
-            } catch (err) {
-              console.error("Failed to fetch student details:", err);
-            }
-          }
-
-          setAuth(prev => ({
-            ...prev,
-            user: userData,
-          }));
+          await fetchCurrentUser(localStorage.getItem("role"));
         }
       } catch (err) {
         console.error("Auth init error:", err);
@@ -58,34 +61,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("access", data.access);
     localStorage.setItem("refresh", data.refresh);
     localStorage.setItem("role", data.role);
-
-    let userData = {
-      user_id: data.user_id,
-      username: data.username,
-      email: data.email,
-      role: data.role,
-      first_name: data.first_name || "",
-      last_name: data.last_name || "",
-    };
-
-    // Fetch additional profile data based on role
-    if (data.role === "student") {
-      try {
-        const studentRes = await api.get("/students/me/");
-        userData = { ...userData, ...studentRes.data };
-      } catch (err) {
-        console.error("Failed to fetch student details:", err);
-      }
-    }
-
-    localStorage.setItem("user", JSON.stringify(userData));
-
     setAuth({
       access: data.access,
       refresh: data.refresh,
       role: data.role,
-      user: userData,
+      user: null,
     });
+
+    await fetchCurrentUser(data.role);
   };
 
   const logout = () => {
@@ -95,7 +78,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ auth, loading, error, login, logout }}>
+    <AuthContext.Provider
+      value={{ auth, loading, error, login, logout, refreshUser: fetchCurrentUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

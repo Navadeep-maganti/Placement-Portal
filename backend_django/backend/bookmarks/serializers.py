@@ -25,10 +25,25 @@ class BookmarkSerializer(serializers.ModelSerializer):
         decimal_places=2,
         read_only=True,
     )
+    location = serializers.CharField(
+        source='placement.company.location',
+        read_only=True,
+    )
+    has_applied = serializers.SerializerMethodField()
+    application_status = serializers.SerializerMethodField()
     required_skill_names = serializers.SerializerMethodField()
 
     def get_required_skill_names(self, obj):
         return list(obj.placement.required_skills.values_list('name', flat=True))
+
+    def get_has_applied(self, obj):
+        return obj.student.application_set.filter(job=obj.placement).exists()
+
+    def get_application_status(self, obj):
+        application = obj.student.application_set.select_related('status').filter(
+            job=obj.placement
+        ).first()
+        return application.status.code if application else ''
 
     class Meta:
         model = Bookmark
@@ -39,8 +54,11 @@ class BookmarkSerializer(serializers.ModelSerializer):
             'placement',
             'job_title',
             'company_name',
+            'location',
             'application_deadline',
             'salary',
+            'has_applied',
+            'application_status',
             'required_skill_names',
             'created_at'
         ]
@@ -50,8 +68,11 @@ class BookmarkSerializer(serializers.ModelSerializer):
             'student_registration_no',
             'job_title',
             'company_name',
+            'location',
             'application_deadline',
             'salary',
+            'has_applied',
+            'application_status',
             'required_skill_names',
             'created_at',
         ]

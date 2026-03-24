@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import StudentNavbar from '../../components/Navbar/StudentNavbar'
+import ApplicationReviewModal from '../../components/Student/ApplicationReviewModal'
 import { useAuth } from '../../contexts/AuthContext'
 import api from '../../utils/api'
 import '../../styles/css/Bookmarks.css'
 import StudentFooter from '../../components/Footer/StudentFooter'
+import { formatStatusLabel } from '../../utils/studentApplication'
 
 const Bookmarks = () => {
   const navigate = useNavigate();
@@ -15,6 +17,9 @@ const Bookmarks = () => {
   const [pageLoading, setPageLoading] = useState(true);
   const [viewType, setViewType] = useState('grid');
   const [sortBy, setSortBy] = useState('recent');
+  const [feedback, setFeedback] = useState('');
+  const [selectedBookmark, setSelectedBookmark] = useState(null);
+  const [applying, setApplying] = useState(false);
   useEffect(() => {
     const loadBookmarks = async () => {
       try {
@@ -46,8 +51,11 @@ const Bookmarks = () => {
 
   const handleRemoveBookmark = async (bookmark) => {
     try {
+      setError('');
+      setFeedback('');
       await api.delete(`/bookmarks/${bookmark.placement}/`);
       setBookmarks((prev) => prev.filter((b) => b.id !== bookmark.id));
+      setFeedback('Bookmark removed.');
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to remove bookmark');
     }
@@ -57,12 +65,36 @@ const Bookmarks = () => {
     navigate(`/student/jobs/${bookmark.placement}`);
   };
 
-  const handleApplyNow = async (bookmark) => {
+  const handleApplyNow = async (applicationProfile) => {
+    if (!selectedBookmark) {
+      return;
+    }
     try {
-      await api.post('/applications/apply/', { placement_id: bookmark.placement });
-      alert('Application submitted successfully.');
+      setError('');
+      setFeedback('');
+      setApplying(true);
+      const response = await api.post('/applications/apply/', {
+        placement_id: selectedBookmark.placement,
+        application_profile: applicationProfile,
+      });
+      const application = response.data?.application || response.data;
+      setBookmarks((prev) =>
+        prev.map((item) =>
+          item.id === selectedBookmark.id
+            ? {
+                ...item,
+                has_applied: true,
+                application_status: application?.status || item.application_status || 'applied',
+              }
+            : item
+        )
+      );
+      setFeedback(response.data?.message || 'Application submitted successfully.');
+      setSelectedBookmark(null);
     } catch (err) {
-      alert(err.response?.data?.detail || err.response?.data?.error || 'Failed to apply');
+      setError(err.response?.data?.detail || err.response?.data?.error || 'Failed to apply');
+    } finally {
+      setApplying(false);
     }
   };
 
@@ -76,6 +108,8 @@ const Bookmarks = () => {
     skills: bookmark.required_skill_names || [],
     savedDate: bookmark.created_at,
     deadline: bookmark.application_deadline || 'N/A',
+    hasApplied: bookmark.has_applied,
+    applicationStatus: bookmark.application_status,
   }));
 
   const sortedBookmarks = [...normalizedBookmarks].sort((a, b) => {
@@ -93,6 +127,7 @@ const Bookmarks = () => {
           <h1>Saved Jobs</h1>
           <p>Jobs you have bookmarked for later review</p>
           {error && <p>{error}</p>}
+          {feedback && <p>{feedback}</p>}
         </div>
 
         <div className="bm-bookmarks-controls">
@@ -146,7 +181,13 @@ const Bookmarks = () => {
 
                 <div className="bm-bookmark-actions">
                   <button className="bm-view-job-btn" onClick={() => handleViewJob(bookmark)}>View Job</button>
-                  <button className="bm-apply-btn" onClick={() => handleApplyNow(bookmark)}>Apply Now</button>
+                  <button
+                    className="bm-apply-btn"
+                    onClick={() => setSelectedBookmark(bookmark)}
+                    disabled={bookmark.hasApplied}
+                  >
+                    {bookmark.hasApplied ? formatStatusLabel(bookmark.applicationStatus) : 'Apply Now'}
+                  </button>
                 </div>
               </div>
             ))}
@@ -164,6 +205,26 @@ const Bookmarks = () => {
           </div>
         )}
       </div>
+      <ApplicationReviewModal
+        open={Boolean(selectedBookmark)}
+        student={auth.user}
+        job={
+          selectedBookmark
+            ? {
+                id: selectedBookmark.placement,
+                job_title: selectedBookmark.jobTitle,
+                company_name: selectedBookmark.company,
+                salary_lpa: selectedBookmark.salary,
+                application_deadline:
+                  selectedBookmark.deadline === 'N/A' ? '' : selectedBookmark.deadline,
+              }
+            : null
+        }
+        submitting={applying}
+        error={error}
+        onClose={() => setSelectedBookmark(null)}
+        onSubmit={handleApplyNow}
+      />
       <StudentFooter />
     </div>
   )

@@ -9,4 +9,5 @@ urlpatterns = [
     path("placements/", include("placements.urls")),
     path("students/", include("students.urls")),
     path("bookmarks/", include("bookmarks.urls")),
+    path("activity/", include("activitylog.urls")),
 ]
