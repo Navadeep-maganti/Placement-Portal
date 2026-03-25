@@ -196,7 +196,7 @@ class EligibilityCriteria(models.Model):
         db_table = "jobs_eligibility_criteria"
         constraints = [
             models.CheckConstraint(
-                check=Q(min_cgpa__gte=0) & Q(min_cgpa__lte=10),
+                condition=Q(min_cgpa__gte=0) & Q(min_cgpa__lte=10),
                 name="eligibility_min_cgpa_range",
             ),
         ]
