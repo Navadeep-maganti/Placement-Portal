@@ -213,3 +213,46 @@ class ApplicationWorkflowTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         second_application.refresh_from_db()
         self.assertEqual(second_application.status.code, "shortlisted")
+
+    def test_company_can_list_own_applicants(self):
+        applied_status, _ = ApplicationStatus.objects.get_or_create(
+            code="applied",
+            defaults={"name": "Applied", "sort_order": 1},
+        )
+        Application.objects.create(
+            student=self.student,
+            job=self.placement,
+            status=applied_status,
+            application_profile={
+                "first_name": "Stu",
+                "last_name": "Dent",
+                "email": "student@example.com",
+                "department": "CSE",
+                "cgpa": 8.4,
+                "active_backlogs": 0,
+                "skills_summary": "Python, Django",
+            },
+        )
+
+        self.client.force_authenticate(user=self.company_user)
+        response = self.client.get("/api/applications/company-applicants/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["job_title"], "Backend Engineer")
+        self.assertEqual(response.data[0]["applicant_name"], "Stu Dent")
+        self.assertEqual(response.data[0]["applicant_department"], "CSE")
+        self.assertEqual(response.data[0]["applicant_skills_summary"], "Python, Django")
+
+    def test_company_can_list_active_statuses(self):
+        ApplicationStatus.objects.get_or_create(
+            code="shortlisted",
+            defaults={"name": "Shortlisted", "sort_order": 2},
+        )
+
+        self.client.force_authenticate(user=self.company_user)
+        response = self.client.get("/api/applications/statuses/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertGreaterEqual(len(response.data), 1)
+        self.assertIn("code", response.data[0])

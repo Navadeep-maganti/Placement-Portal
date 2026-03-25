@@ -2,7 +2,9 @@ from django.urls import path
 
 from .views import (
     ApplyToJobView,
+    CompanyApplicantsView,
     OfferDecisionView,
+    ApplicationStatusListView,
     ApplicationStatusHistoryView,
     MyApplicationsView,
     UpdateApplicationStatusView,
@@ -10,6 +12,8 @@ from .views import (
 
 urlpatterns = [
     path("myapplications/", MyApplicationsView.as_view(), name="my_applications"),
+    path("company-applicants/", CompanyApplicantsView.as_view(), name="company_applicants"),
+    path("statuses/", ApplicationStatusListView.as_view(), name="application_statuses"),
     path("apply/", ApplyToJobView.as_view(), name="apply_to_job"),
     path(
         "<int:application_id>/offer-decision/",

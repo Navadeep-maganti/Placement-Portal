@@ -227,6 +227,9 @@ class PlacementCreateSerializer(serializers.ModelSerializer):
             "required_skills",
             "eligibility_details",
         ]
+        extra_kwargs = {
+            "company": {"required": False},
+        }
 
     def create(self, validated_data):
         eligibility_data = validated_data.pop("eligibility_details", None)

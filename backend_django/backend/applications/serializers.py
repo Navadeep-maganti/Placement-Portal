@@ -98,11 +98,119 @@ class ApplicationSerializer(serializers.ModelSerializer):
         return f"{salary} LPA"
 
 
+class CompanyApplicationSerializer(ApplicationSerializer):
+    applicant_name = serializers.SerializerMethodField()
+    applicant_email = serializers.SerializerMethodField()
+    applicant_phone = serializers.SerializerMethodField()
+    applicant_department = serializers.SerializerMethodField()
+    applicant_graduation_year = serializers.SerializerMethodField()
+    applicant_cgpa = serializers.SerializerMethodField()
+    applicant_backlogs = serializers.SerializerMethodField()
+    applicant_resume_url = serializers.SerializerMethodField()
+    applicant_resume_name = serializers.SerializerMethodField()
+    applicant_skills_summary = serializers.SerializerMethodField()
+    applicant_career_objective = serializers.SerializerMethodField()
+    applicant_bio = serializers.SerializerMethodField()
+
+    class Meta(ApplicationSerializer.Meta):
+        fields = ApplicationSerializer.Meta.fields + [
+            "applicant_name",
+            "applicant_email",
+            "applicant_phone",
+            "applicant_department",
+            "applicant_graduation_year",
+            "applicant_cgpa",
+            "applicant_backlogs",
+            "applicant_resume_url",
+            "applicant_resume_name",
+            "applicant_skills_summary",
+            "applicant_career_objective",
+            "applicant_bio",
+        ]
+
+    def _get_profile_value(self, obj, key, fallback=None):
+        profile = obj.application_profile or {}
+        value = profile.get(key)
+        if value not in (None, ""):
+            return value
+        return fallback
+
+    def get_applicant_name(self, obj):
+        return (
+            self._get_profile_value(obj, "first_name", obj.student.user.first_name)
+            + " "
+            + self._get_profile_value(obj, "last_name", obj.student.user.last_name)
+        ).strip()
+
+    def get_applicant_email(self, obj):
+        return self._get_profile_value(obj, "email", obj.student.user.email)
+
+    def get_applicant_phone(self, obj):
+        return self._get_profile_value(obj, "phone", obj.student.phone)
+
+    def get_applicant_department(self, obj):
+        return self._get_profile_value(obj, "department", obj.student.department)
+
+    def get_applicant_graduation_year(self, obj):
+        return self._get_profile_value(
+            obj,
+            "graduation_year",
+            obj.student.graduation_year,
+        )
+
+    def get_applicant_cgpa(self, obj):
+        return self._get_profile_value(obj, "cgpa", obj.student.cgpa)
+
+    def get_applicant_backlogs(self, obj):
+        return self._get_profile_value(
+            obj,
+            "active_backlogs",
+            obj.student.active_backlogs,
+        )
+
+    def get_applicant_resume_url(self, obj):
+        return self._get_profile_value(
+            obj,
+            "resume_url",
+            obj.student.resume.url if obj.student.resume else "",
+        )
+
+    def get_applicant_resume_name(self, obj):
+        return self._get_profile_value(
+            obj,
+            "resume_name",
+            obj.student.resume.name.rsplit("/", 1)[-1] if obj.student.resume else "",
+        )
+
+    def get_applicant_skills_summary(self, obj):
+        return self._get_profile_value(
+            obj,
+            "skills_summary",
+            obj.student.skills_summary,
+        )
+
+    def get_applicant_career_objective(self, obj):
+        return self._get_profile_value(
+            obj,
+            "career_objective",
+            obj.student.career_objective,
+        )
+
+    def get_applicant_bio(self, obj):
+        return self._get_profile_value(obj, "bio", obj.student.bio)
+
+
 class ApplicationStatusUpdateSerializer(serializers.Serializer):
     status_id = serializers.PrimaryKeyRelatedField(
         queryset=ApplicationStatus.objects.filter(is_active=True)
     )
     remarks = serializers.CharField(required=False, allow_blank=True)
+
+
+class ApplicationStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ApplicationStatus
+        fields = ["id", "code", "name", "sort_order"]
 
 
 class OfferDecisionSerializer(serializers.Serializer):

@@ -107,3 +107,157 @@ class PlacementEligibilityTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("accepted an offer", " ".join(response.data["eligibility_issues"]).lower())
+
+
+class RecruiterPostingsApiTests(APITestCase):
+    def setUp(self):
+        self.company_user = User.objects.create_user(
+            email="company@example.com",
+            password="password123",
+            first_name="Com",
+            last_name="Pany",
+            role="company",
+        )
+        self.other_company_user = User.objects.create_user(
+            email="othercompany@example.com",
+            password="password123",
+            first_name="Other",
+            last_name="Company",
+            role="company",
+        )
+        self.student_user = User.objects.create_user(
+            email="student@example.com",
+            password="password123",
+            first_name="Stu",
+            last_name="Dent",
+            role="student",
+        )
+
+        self.company = Company.objects.create(
+            user=self.company_user,
+            company_name="Future Labs",
+            location="Bengaluru",
+            industry="Hardware",
+            description="Core company",
+            is_approved=True,
+        )
+        self.other_company = Company.objects.create(
+            user=self.other_company_user,
+            company_name="Next Labs",
+            location="Hyderabad",
+            industry="Software",
+            description="Software company",
+            is_approved=True,
+        )
+
+        self.own_placement = Placement.objects.create(
+            company=self.company,
+            job_title="Backend Engineer",
+            job_description="Build APIs",
+            salary=10,
+            eligibility_cgpa=7.0,
+            application_deadline=date.today() + timedelta(days=14),
+            is_active=True,
+            no_of_positions=2,
+        )
+        self.other_placement = Placement.objects.create(
+            company=self.other_company,
+            job_title="Frontend Engineer",
+            job_description="Build UIs",
+            salary=9,
+            eligibility_cgpa=6.5,
+            application_deadline=date.today() + timedelta(days=10),
+            is_active=True,
+            no_of_positions=1,
+        )
+
+    def test_company_can_list_only_own_postings(self):
+        self.client.force_authenticate(user=self.company_user)
+
+        response = self.client.get("/api/placements/my-postings/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["id"], self.own_placement.id)
+
+    def test_company_can_create_posting_for_itself(self):
+        self.client.force_authenticate(user=self.company_user)
+
+        response = self.client.post(
+            "/api/placements/my-postings/",
+            {
+                "job_title": "Platform Engineer",
+                "job_description": "Build internal tooling",
+                "salary": "12.00",
+                "eligibility_cgpa": 7.5,
+                "application_deadline": str(date.today() + timedelta(days=21)),
+                "is_active": True,
+                "no_of_positions": 3,
+                "required_skills": [],
+                "eligibility_details": {
+                    "min_cgpa": 7.5,
+                    "max_backlogs": 0,
+                    "requires_resume": True,
+                    "allowed_departments": ["CSE", "IT"],
+                },
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        placement = Placement.objects.get(job_title="Platform Engineer")
+        self.assertEqual(placement.company_id, self.company.id)
+        self.assertEqual(placement.eligibility_criteria.max_backlogs, 0)
+        self.assertTrue(placement.eligibility_criteria.requires_resume)
+        self.assertCountEqual(
+            list(
+                placement.eligibility_criteria.allowed_departments.values_list(
+                    "department_name",
+                    flat=True,
+                )
+            ),
+            ["CSE", "IT"],
+        )
+
+    def test_company_cannot_access_other_company_posting(self):
+        self.client.force_authenticate(user=self.company_user)
+
+        response = self.client.get(
+            f"/api/placements/my-postings/{self.other_placement.id}/"
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_student_cannot_access_my_postings_endpoint(self):
+        self.client.force_authenticate(user=self.student_user)
+
+        response = self.client.get("/api/placements/my-postings/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_company_dashboard_summary_returns_live_counts(self):
+        shortlisted_status, _ = ApplicationStatus.objects.get_or_create(
+            code="shortlisted",
+            defaults={"name": "Shortlisted", "sort_order": 2},
+        )
+        Application.objects.create(
+            student=Student.objects.create(
+                user=self.student_user,
+                registration_no="2022CSE001",
+                department="CSE",
+                graduation_year=2026,
+                cgpa=8.2,
+                active_backlogs=0,
+            ),
+            job=self.own_placement,
+            status=shortlisted_status,
+        )
+
+        self.client.force_authenticate(user=self.company_user)
+        response = self.client.get("/api/placements/company-dashboard/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["overview"]["active_job_posts"], 1)
+        self.assertEqual(response.data["overview"]["total_applicants"], 1)
+        self.assertEqual(response.data["overview"]["shortlisted_students"], 1)
+        self.assertIn("recent_activity", response.data)

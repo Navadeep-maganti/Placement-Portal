@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
-from api.permissions import IsStudent
+from api.permissions import IsCompany, IsStudent
 from placements.models import Placement
 from students.models import Student
 
@@ -10,7 +10,9 @@ from .models import Application, ApplicationStatus
 from .serializers import (
     ApplyToJobSerializer,
     ApplicationSerializer,
+    CompanyApplicationSerializer,
     OfferDecisionSerializer,
+    ApplicationStatusSerializer,
     ApplicationStatusHistorySerializer,
     ApplicationStatusUpdateSerializer,
 )
@@ -88,6 +90,38 @@ class MyApplicationsView(generics.ListAPIView):
                 "status_history__changed_by",
             )
         return Application.objects.none()
+
+
+class CompanyApplicantsView(generics.ListAPIView):
+    serializer_class = CompanyApplicationSerializer
+    permission_classes = [permissions.IsAuthenticated, IsCompany]
+
+    def get_queryset(self):
+        return Application.objects.filter(job__company__user=self.request.user).select_related(
+            "student",
+            "student__user",
+            "job",
+            "job__company",
+            "status",
+        ).prefetch_related(
+            "status_history__previous_status",
+            "status_history__new_status",
+            "status_history__changed_by",
+        ).order_by("-application_date", "-id")
+
+
+class ApplicationStatusListView(generics.ListAPIView):
+    serializer_class = ApplicationStatusSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role not in {"company", "admin"}:
+            return ApplicationStatus.objects.none()
+        return ApplicationStatus.objects.filter(is_active=True).order_by(
+            "sort_order",
+            "name",
+        )
 
 
 class ApplyToJobView(generics.GenericAPIView):
