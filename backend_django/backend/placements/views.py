@@ -1,5 +1,5 @@
 from django.utils import timezone
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response
 
@@ -8,8 +8,9 @@ from activitylog.serializers import ActivityLogSerializer
 from applications.models import Application
 from api.permissions import IsCompany
 from bookmarks.models import Bookmark
-from .models import Placement
-from .serializers import PlacementCreateSerializer, PlacementSerializer
+from companies.views import get_or_create_company_for_user
+from .models import Placement, Skill
+from .serializers import PlacementCreateSerializer, PlacementSerializer, SkillsSerializer
 
 
 class StudentPlacementContextMixin:
@@ -65,9 +66,9 @@ class PlacementDetailView(StudentPlacementContextMixin, generics.RetrieveAPIView
 class RecruiterPlacementMixin:
     def get_company(self):
         company = getattr(self.request.user, "company", None)
-        if not company:
-            raise NotFound("Company profile not found for this user.")
-        return company
+        if company:
+            return company
+        return get_or_create_company_for_user(self.request.user)
 
     def get_queryset(self):
         return (
@@ -108,13 +109,41 @@ class RecruiterPlacementDetailView(
         serializer.save(company=company)
 
 
+class SkillsListCreateView(generics.ListCreateAPIView):
+    serializer_class = SkillsSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Skill.objects.order_by("name")
+
+    def create(self, request, *args, **kwargs):
+        name = (request.data.get("name") or "").strip()
+        if not name:
+            return Response(
+                {"name": ["This field may not be blank."]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        skill = Skill.objects.filter(name__iexact=name).first()
+        created = False
+        if not skill:
+            skill = Skill.objects.create(name=name)
+            created = True
+
+        serializer = self.get_serializer(skill)
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
+
 class CompanyDashboardSummaryView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated, IsCompany]
 
     def get(self, request):
-        company = getattr(request.user, "company", None)
-        if not company:
-            raise NotFound("Company profile not found for this user.")
+        company = getattr(request.user, "company", None) or get_or_create_company_for_user(
+            request.user
+        )
 
         today = timezone.localdate()
         placements = Placement.objects.filter(company=company)

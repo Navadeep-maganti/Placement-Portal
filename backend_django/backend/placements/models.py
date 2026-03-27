@@ -166,7 +166,7 @@ class JobRequiredSkill(models.Model):
     placement = models.ForeignKey(
         "Placement",
         on_delete=models.CASCADE,
-        db_column="job_id",
+        db_column="placement_id",
     )
     skill = models.ForeignKey(
         "Skill",

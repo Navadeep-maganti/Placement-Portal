@@ -164,6 +164,108 @@
   gap: 18px;
 }
 
+.mg-jobs-panel {
+  margin-bottom: clamp(20px, 4vw, 36px);
+  background: var(--mg-card);
+  border-radius: 24px;
+  box-shadow: var(--mg-shadow-soft);
+  padding: clamp(20px, 3vw, 28px);
+}
+
+.mg-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.mg-panel-header h2 {
+  margin: 0 0 0.4rem;
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+}
+
+.mg-panel-header p {
+  margin: 0;
+  color: var(--mg-muted);
+}
+
+.mg-job-stats {
+  margin-bottom: 18px;
+}
+
+.mg-job-list {
+  display: grid;
+  gap: 14px;
+}
+
+.mg-job-card {
+  border: 1px solid #e6e8f3;
+  border-radius: 18px;
+  padding: 18px;
+  background: #fcfcff;
+}
+
+.mg-job-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.mg-job-head h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.mg-job-head p {
+  margin: 6px 0 0;
+  color: var(--mg-muted);
+}
+
+.mg-job-status {
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mg-job-status.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.mg-job-status.completed {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.mg-job-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+  color: #4b5063;
+  font-size: 13px;
+}
+
+.mg-job-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.mg-secondary-btn {
+  border: none;
+  border-radius: 999px;
+  background: #e6efff;
+  color: var(--mg-accent-dark);
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .mg-card {
   padding: clamp(20px, 3vw, 28px);
 }
@@ -279,7 +381,9 @@
   }
 
   .mg-hero,
-  .mg-card-header {
+  .mg-card-header,
+  .mg-panel-header,
+  .mg-job-head {
     flex-direction: column;
   }
 

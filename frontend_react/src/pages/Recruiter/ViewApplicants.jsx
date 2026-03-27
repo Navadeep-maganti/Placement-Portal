@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/css/Applications.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
+import ApplicantProfileModal from "../../components/Recruiter/ApplicantProfileModal";
 import { useAuth } from "../../contexts/AuthContext";
 import api from "../../utils/api";
 
@@ -9,18 +10,26 @@ function ViewApplicants(){
     const { auth, loading } = useAuth();
     const navigate = useNavigate();
     const [applications, setApplications] = useState([]);
+    const [statuses, setStatuses] = useState([]);
     const [pageLoading, setPageLoading] = useState(true);
+    const [savingId, setSavingId] = useState(null);
     const [error, setError] = useState("");
+    const [modalError, setModalError] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [jobFilter, setJobFilter] = useState("all");
+    const [selectedApplication, setSelectedApplication] = useState(null);
 
     useEffect(() => {
         const fetchApplicants = async () => {
             try {
                 setError("");
-                const response = await api.get("/applications/company-applicants/");
-                setApplications(response.data || []);
+                const [applicationsResponse, statusesResponse] = await Promise.all([
+                    api.get("/applications/company-applicants/"),
+                    api.get("/applications/statuses/"),
+                ]);
+                setApplications(applicationsResponse.data || []);
+                setStatuses(statusesResponse.data || []);
             } catch (err) {
                 setError(
                     err.response?.data?.detail || "Failed to load applicants."
@@ -77,8 +86,39 @@ function ViewApplicants(){
         };
     }, [applications]);
 
-    if (loading || pageLoading) return <p>Loading applicants...</p>;
-    if (!auth.user) return <p>No user data</p>;
+    const handleStatusUpdate = async ({ applicationId, statusId, remarks }) => {
+        if (!statusId) {
+            setModalError("Please choose a new status before updating.");
+            return;
+        }
+
+        try {
+            setSavingId(applicationId);
+            setModalError("");
+            const response = await api.patch(`/applications/${applicationId}/status/`, {
+                status_id: Number(statusId),
+                remarks,
+            });
+            const updated = response.data;
+            setApplications((prev) =>
+                prev.map((application) =>
+                    application.id === applicationId ? updated : application
+                )
+            );
+            setSelectedApplication(updated);
+        } catch (err) {
+            setModalError(
+                err.response?.data?.detail ||
+                    err.response?.data?.error ||
+                    "Failed to update application status."
+            );
+        } finally {
+            setSavingId(null);
+        }
+    };
+
+    if (loading || pageLoading) return <p>Loading applicant records...</p>;
+    if (!auth.user) return <p>User information is unavailable.</p>;
 
     return(
         <>
@@ -87,15 +127,15 @@ function ViewApplicants(){
             <main className="va-container">
                 <section className="va-hero">
                     <div>
-                        <h1>View Applicants</h1>
-                        <p>Review everyone who has applied to your postings in one place.</p>
+                        <h1>Applicant Review</h1>
+                        <p>Review candidate profiles and assess applications efficiently from a single workspace.</p>
                         {error && <p className="va-inline-message va-error">{error}</p>}
                     </div>
                     <button
                         className="va-primary-btn"
                         onClick={() => navigate("/Recruiter/Manage")}
                     >
-                        Manage Applications
+                        Opening Management
                     </button>
                 </section>
 
@@ -109,7 +149,7 @@ function ViewApplicants(){
                         <strong>{stats.shortlisted}</strong>
                     </div>
                     <div className="va-stat-card">
-                        <span className="va-stat-label">Offers Sent</span>
+                        <span className="va-stat-label">Offers Extended</span>
                         <strong>{stats.offered}</strong>
                     </div>
                     <div className="va-stat-card">
@@ -146,7 +186,7 @@ function ViewApplicants(){
                     >
                         {uniqueJobs.map((job) => (
                             <option key={job} value={job}>
-                                {job === "all" ? "All Roles" : job}
+                                {job === "all" ? "All Positions" : job}
                             </option>
                         ))}
                     </select>
@@ -170,7 +210,7 @@ function ViewApplicants(){
 
                                 <div className="va-info-grid">
                                     <div>
-                                        <span className="va-field-label">Applied For</span>
+                                        <span className="va-field-label">Position Applied For</span>
                                         <p>{application.job_title}</p>
                                     </div>
                                     <div>
@@ -206,7 +246,7 @@ function ViewApplicants(){
                                                 rel="noreferrer"
                                                 className="va-link"
                                             >
-                                                {application.applicant_resume_name || "Open Resume"}
+                                                {application.applicant_resume_name || "View Resume"}
                                             </a>
                                         ) : (
                                             <p>Not uploaded</p>
@@ -241,7 +281,7 @@ function ViewApplicants(){
                     ) : (
                         <div className="va-empty">
                             <h2>No applicants found</h2>
-                            <p>Try changing your search or filters, or wait for students to apply.</p>
+                            <p>No applicants match the current filters. Adjust the search criteria or review applications later.</p>
                         </div>
                     )}
                 </section>

@@ -118,7 +118,16 @@ class ApplicationStatusListView(generics.ListAPIView):
         user = self.request.user
         if user.role not in {"company", "admin"}:
             return ApplicationStatus.objects.none()
-        return ApplicationStatus.objects.filter(is_active=True).order_by(
+        queryset = ApplicationStatus.objects.filter(is_active=True)
+        if user.role == "company":
+            queryset = queryset.filter(
+                code__in={
+                    "shortlisted",
+                    "offered",
+                    "rejected",
+                }
+            )
+        return queryset.order_by(
             "sort_order",
             "name",
         )
@@ -221,6 +230,20 @@ class UpdateApplicationStatusView(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         new_status = serializer.validated_data["status_id"]
+        if user.role == "company" and new_status.code in {
+            "offer_accepted",
+            "offer_declined",
+            "closed_after_offer_acceptance",
+        }:
+            return Response(
+                {
+                    "error": (
+                        "Recruiters cannot directly set accepted, declined, or "
+                        "auto-closed offer states."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         accepted_elsewhere = Application.objects.filter(
             student=application.student,

@@ -54,16 +54,16 @@ function MyPostings() {
     setDeadlineError("");
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (!auth.user) return <p>No user data</p>;
+  if (loading) return <p>Loading job listing form...</p>;
+  if (!auth.user) return <p>User information is unavailable.</p>;
 
   return (
     <>
       <CompanyNavbar Company={auth.user} />
       <main className="mp-page">
         <section className="mp-header">
-          <h1>Post a New Job</h1>
-          <p>Create a new opportunity to find the best campus talent for your organization.</p>
+          <h1>Create Job Listing</h1>
+          <p>Create a new opportunity and present the role professionally to prospective candidates.</p>
         </section>
 
         <form className="mp-form-card" onSubmit={onSubmit}>
@@ -162,10 +162,10 @@ function MyPostings() {
 
           <div className="mp-actions">
             <button className="mp-btn mp-btn-primary" type="submit">
-              Post Job
+              Publish Listing
             </button>
             <button className="mp-btn mp-btn-ghost" type="button">
-              Cancel
+              Clear Form
             </button>
           </div>
         </form>
@@ -176,21 +176,21 @@ function MyPostings() {
               <FiBriefcase size={15} />
             </span>
             <h3>Instant Visibility</h3>
-            <p>Your job will be visible to 2,000+ qualified students immediately.</p>
+            <p>Your job listing will be visible to eligible students as soon as it is published.</p>
           </article>
           <article className="mp-benefit-card">
             <span className="mp-benefit-icon">
               <FiFilter size={15} />
             </span>
             <h3>Auto Filtering</h3>
-            <p>Applications below the CGPA limit are automatically filtered out.</p>
+            <p>Applications below the defined CGPA requirement are filtered automatically.</p>
           </article>
           <article className="mp-benefit-card">
             <span className="mp-benefit-icon">
               <FiHeadphones size={15} />
             </span>
             <h3>Recruiter Support</h3>
-            <p>Need help with your post? Our campus team is here to assist.</p>
+            <p>Our campus placement team is available to support your recruitment process when needed.</p>
           </article>
         </section>
       </main>

@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 (
                     "placement",
                     models.ForeignKey(
-                        db_column="job_id",
+                        db_column="placement_id",
                         on_delete=django.db.models.deletion.CASCADE,
                         to="placements.placement",
                     ),

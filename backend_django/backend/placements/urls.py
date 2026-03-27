@@ -7,9 +7,11 @@ from .views import (
     PlacementDetailView,
     RecruiterPlacementDetailView,
     RecruiterPlacementListCreateView,
+    SkillsListCreateView,
 )
 urlpatterns = [
     path("allplacements/", AllPlacementsView.as_view(), name="all_placements"),
+    path("skills/", SkillsListCreateView.as_view(), name="skills"),
     path(
         "company-dashboard/",
         CompanyDashboardSummaryView.as_view(),
