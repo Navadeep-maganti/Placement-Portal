@@ -159,6 +159,21 @@
   box-shadow: var(--va-shadow-soft);
 }
 
+.va-card-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.va-card-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
 .va-card-header {
   display: flex;
   justify-content: space-between;
@@ -269,7 +284,9 @@
 
 @media (max-width: 720px) {
   .va-hero,
-  .va-card-header {
+  .va-card-header,
+  .va-card-compact,
+  .va-card-summary {
     flex-direction: column;
   }
 

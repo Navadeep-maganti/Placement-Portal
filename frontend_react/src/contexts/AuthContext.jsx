@@ -26,6 +26,15 @@ export const AuthProvider = ({ children }) => {
       }
     }
 
+    if (roleOverride === "company") {
+      try {
+        const companyRes = await api.get("/companies/me/");
+        userData = { ...userData, ...companyRes.data };
+      } catch (err) {
+        console.error("Failed to fetch company details:", err);
+      }
+    }
+
     localStorage.setItem("user", JSON.stringify(userData));
     setAuth((prev) => ({
       ...prev,

@@ -6,7 +6,7 @@ from rest_framework.test import APITestCase
 from api.models import User
 from applications.models import Application, ApplicationStatus
 from companies.models import Company
-from placements.models import EligibleDepartment, Placement
+from placements.models import EligibleDepartment, Placement, Skill
 from students.models import Student
 
 
@@ -261,3 +261,32 @@ class RecruiterPostingsApiTests(APITestCase):
         self.assertEqual(response.data["overview"]["total_applicants"], 1)
         self.assertEqual(response.data["overview"]["shortlisted_students"], 1)
         self.assertIn("recent_activity", response.data)
+
+    def test_any_authenticated_user_can_list_skills(self):
+        Skill.objects.create(name="React")
+        Skill.objects.create(name="Python")
+
+        self.client.force_authenticate(user=self.company_user)
+        response = self.client.get("/api/placements/skills/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual([item["name"] for item in response.data], ["Python", "React"])
+
+    def test_company_can_create_skill_and_reuse_existing_one(self):
+        Skill.objects.create(name="Django")
+        self.client.force_authenticate(user=self.company_user)
+
+        create_response = self.client.post(
+            "/api/placements/skills/",
+            {"name": "TypeScript"},
+            format="json",
+        )
+        reuse_response = self.client.post(
+            "/api/placements/skills/",
+            {"name": "django"},
+            format="json",
+        )
+
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(reuse_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Skill.objects.filter(name__iexact="Django").count(), 1)

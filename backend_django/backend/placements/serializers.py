@@ -212,6 +212,11 @@ class PlacementSerializer(serializers.ModelSerializer):
 
 class PlacementCreateSerializer(serializers.ModelSerializer):
     eligibility_details = EligibilityCriteriaSerializer(write_only=True, required=False)
+    skill_names = serializers.ListField(
+        child=serializers.CharField(),
+        write_only=True,
+        required=False,
+    )
 
     class Meta:
         model = Placement
@@ -225,27 +230,79 @@ class PlacementCreateSerializer(serializers.ModelSerializer):
             "is_active",
             "no_of_positions",
             "required_skills",
+            "skill_names",
             "eligibility_details",
         ]
         extra_kwargs = {
             "company": {"required": False},
+            "required_skills": {"required": False},
         }
+
+    def _sync_required_skills(self, placement, skill_names=None, required_skills=None):
+        if required_skills is not None:
+            placement.required_skills.set(required_skills)
+            return
+        if skill_names is None:
+            return
+
+        normalized_names = []
+        seen = set()
+        for skill_name in skill_names:
+            cleaned = skill_name.strip()
+            if not cleaned:
+                continue
+            key = cleaned.lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            normalized_names.append(cleaned)
+
+        skill_objects = []
+        for skill_name in normalized_names:
+            skill, _ = Skill.objects.get_or_create(name=skill_name)
+            skill_objects.append(skill)
+
+        placement.required_skills.set(skill_objects)
 
     def create(self, validated_data):
         eligibility_data = validated_data.pop("eligibility_details", None)
+        skill_names = validated_data.pop("skill_names", None)
+        required_skills = validated_data.pop("required_skills", None)
         placement = super().create(validated_data)
+        self._sync_required_skills(
+            placement,
+            skill_names=skill_names,
+            required_skills=required_skills,
+        )
         if eligibility_data:
-            serializer = EligibilityCriteriaSerializer(
-                data=eligibility_data,
-                context=self.context,
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save(placement=placement)
+            criteria = getattr(placement, "eligibility_criteria", None)
+            if criteria:
+                serializer = EligibilityCriteriaSerializer(
+                    criteria,
+                    data=eligibility_data,
+                    context=self.context,
+                )
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+            else:
+                serializer = EligibilityCriteriaSerializer(
+                    data=eligibility_data,
+                    context=self.context,
+                )
+                serializer.is_valid(raise_exception=True)
+                serializer.save(placement=placement)
         return placement
 
     def update(self, instance, validated_data):
         eligibility_data = validated_data.pop("eligibility_details", None)
+        skill_names = validated_data.pop("skill_names", None)
+        required_skills = validated_data.pop("required_skills", None)
         placement = super().update(instance, validated_data)
+        self._sync_required_skills(
+            placement,
+            skill_names=skill_names,
+            required_skills=required_skills,
+        )
 
         if eligibility_data is not None:
             criteria = getattr(placement, "eligibility_criteria", None)

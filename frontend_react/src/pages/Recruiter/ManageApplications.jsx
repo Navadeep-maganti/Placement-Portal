@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../../styles/css/Manage.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
 import { useAuth } from "../../contexts/AuthContext";
@@ -8,41 +8,23 @@ import api from "../../utils/api";
 function Manage() {
   const { auth, loading } = useAuth();
   const navigate = useNavigate();
-  const [applications, setApplications] = useState([]);
-  const [statuses, setStatuses] = useState([]);
-  const [selectedStatuses, setSelectedStatuses] = useState({});
-  const [remarks, setRemarks] = useState({});
+  const location = useLocation();
+  const [postings, setPostings] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
-  const [savingId, setSavingId] = useState(null);
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     const fetchManageData = async () => {
       try {
         setError("");
-        const [applicationsResponse, statusesResponse] = await Promise.all([
-          api.get("/applications/company-applicants/"),
-          api.get("/applications/statuses/"),
-        ]);
-
-        const applicationRows = applicationsResponse.data || [];
-        const statusRows = statusesResponse.data || [];
-
-        setApplications(applicationRows);
-        setStatuses(statusRows);
-        setSelectedStatuses(
-          Object.fromEntries(
-            applicationRows.map((application) => [application.id, ""])
-          )
-        );
+        const response = await api.get("/placements/my-postings/");
+        setPostings(response.data || []);
       } catch (err) {
         setError(
           err.response?.data?.detail ||
             err.response?.data?.error ||
-            "Failed to load application management data."
+            "Failed to load posting management data."
         );
       } finally {
         setPageLoading(false);
@@ -56,81 +38,32 @@ function Manage() {
     }
   }, [loading, auth.user]);
 
-  const statusLabel = (status) =>
-    status?.replaceAll("_", " ").replace(/\b\w/g, (char) => char.toUpperCase()) ||
-    "Unknown";
+  useEffect(() => {
+    if (location.state?.message) {
+      setFeedback(location.state.message);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.pathname, location.state, navigate]);
 
-  const filteredApplications = useMemo(() => {
-    const query = searchTerm.trim().toLowerCase();
-    return applications.filter((application) => {
-      const matchesQuery =
-        !query ||
-        application.applicant_name?.toLowerCase().includes(query) ||
-        application.student_registration_no?.toLowerCase().includes(query) ||
-        application.job_title?.toLowerCase().includes(query);
-
-      const matchesStatus =
-        statusFilter === "all" || application.status === statusFilter;
-
-      return matchesQuery && matchesStatus;
-    });
-  }, [applications, searchTerm, statusFilter]);
-
-  const stats = useMemo(
-    () => ({
-      total: applications.length,
-      applied: applications.filter((application) => application.status === "applied")
-        .length,
-      shortlisted: applications.filter(
-        (application) => application.status === "shortlisted"
+  const postingStats = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    return {
+      total: postings.length,
+      active: postings.filter(
+        (posting) => posting.is_active && posting.application_deadline >= today
       ).length,
-      offered: applications.filter((application) => application.status === "offered")
-        .length,
-    }),
-    [applications]
-  );
+      completed: postings.filter(
+        (posting) => !posting.is_active || posting.application_deadline < today
+      ).length,
+      totalPositions: postings.reduce(
+        (total, posting) => total + (posting.no_of_positions || 0),
+        0
+      ),
+    };
+  }, [postings]);
 
-  const handleStatusUpdate = async (applicationId) => {
-    const selectedStatusId = selectedStatuses[applicationId];
-    if (!selectedStatusId) {
-      setError("Please choose a new status before updating.");
-      return;
-    }
-
-    try {
-      setSavingId(applicationId);
-      setError("");
-      setFeedback("");
-
-      const response = await api.patch(
-        `/applications/${applicationId}/status/`,
-        {
-          status_id: Number(selectedStatusId),
-          remarks: remarks[applicationId] || "",
-        }
-      );
-
-      setApplications((prev) =>
-        prev.map((application) =>
-          application.id === applicationId ? response.data : application
-        )
-      );
-      setSelectedStatuses((prev) => ({ ...prev, [applicationId]: "" }));
-      setRemarks((prev) => ({ ...prev, [applicationId]: "" }));
-      setFeedback("Application status updated successfully.");
-    } catch (err) {
-      setError(
-        err.response?.data?.detail ||
-          err.response?.data?.error ||
-          "Failed to update application status."
-      );
-    } finally {
-      setSavingId(null);
-    }
-  };
-
-  if (loading || pageLoading) return <p>Loading applications...</p>;
-  if (!auth.user) return <p>No user data</p>;
+  if (loading || pageLoading) return <p>Loading opening management...</p>;
+  if (!auth.user) return <p>User information is unavailable.</p>;
 
   return (
     <>
@@ -139,175 +72,109 @@ function Manage() {
         <main className="mg-container">
           <section className="mg-hero">
             <div>
-              <h1>Manage Applications</h1>
-              <p>Review progress, move candidates forward, and keep every job pipeline updated.</p>
+              <h1>Opening Management</h1>
+              <p>
+                Review the roles your organization has published, identify active openings, and access editing tools whenever updates are required.
+              </p>
               {error && <p className="mg-inline-message mg-error">{error}</p>}
               {feedback && <p className="mg-inline-message mg-success">{feedback}</p>}
             </div>
-            <button
-              className="mg-primary-btn"
-              onClick={() => navigate("/Recruiter/ViewApplicants")}
-            >
-              View Applicants
-            </button>
+            <div className="mg-job-actions">
+              <button
+                className="mg-secondary-btn"
+                onClick={() => navigate("/Recruiter/ViewApplicants")}
+              >
+                Applicant Review
+              </button>
+              <button
+                className="mg-primary-btn"
+                onClick={() => navigate("/Recruiter/MyPostings")}
+              >
+                Create Listing
+              </button>
+            </div>
           </section>
 
           <section className="mg-stats-grid">
             <div className="mg-stat-card">
-              <span className="mg-stat-label">Total Applications</span>
-              <strong>{stats.total}</strong>
+              <span className="mg-stat-label">Total Listings</span>
+              <strong>{postingStats.total}</strong>
             </div>
             <div className="mg-stat-card">
-              <span className="mg-stat-label">Applied</span>
-              <strong>{stats.applied}</strong>
+              <span className="mg-stat-label">Active</span>
+              <strong>{postingStats.active}</strong>
             </div>
             <div className="mg-stat-card">
-              <span className="mg-stat-label">Shortlisted</span>
-              <strong>{stats.shortlisted}</strong>
+              <span className="mg-stat-label">Completed</span>
+              <strong>{postingStats.completed}</strong>
             </div>
             <div className="mg-stat-card">
-              <span className="mg-stat-label">Offered</span>
-              <strong>{stats.offered}</strong>
+              <span className="mg-stat-label">Open Positions</span>
+              <strong>{postingStats.totalPositions}</strong>
             </div>
           </section>
 
-          <section className="mg-toolbar">
-            <input
-              className="mg-search"
-              type="text"
-              placeholder="Search by applicant, reg no, or role..."
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-            />
-            <select
-              className="mg-select"
-              value={statusFilter}
-              onChange={(event) => setStatusFilter(event.target.value)}
-            >
-              <option value="all">All Statuses</option>
-              <option value="applied">Applied</option>
-              <option value="shortlisted">Shortlisted</option>
-              <option value="offered">Offered</option>
-              <option value="offer_accepted">Offer Accepted</option>
-              <option value="offer_declined">Offer Declined</option>
-              <option value="rejected">Rejected</option>
-            </select>
-          </section>
+          <section className="mg-jobs-panel">
+            <div className="mg-panel-header">
+              <div>
+                <h2>Published Job Listings</h2>
+                <p>
+                  Each card presents the role, application deadline, compensation package, and direct access for updating the listing.
+                </p>
+              </div>
+            </div>
 
-          <section className="mg-list">
-            {filteredApplications.length > 0 ? (
-              filteredApplications.map((application) => (
-                <article key={application.id} className="mg-card">
-                  <div className="mg-card-header">
-                    <div>
-                      <h2>{application.applicant_name || "Unnamed Applicant"}</h2>
-                      <p className="mg-subtitle">
-                        {application.job_title} {" â€¢ "} {application.student_registration_no}
-                      </p>
+            <div className="mg-job-list">
+              {postings.length > 0 ? (
+                postings.map((posting) => (
+                  <article key={posting.id} className="mg-job-card">
+                    <div className="mg-job-head">
+                      <div>
+                        <h3>{posting.job_title}</h3>
+                        <p>
+                          Deadline {new Date(posting.application_deadline).toLocaleDateString()} {" • "}
+                          {posting.no_of_positions} positions
+                        </p>
+                      </div>
+                      <span
+                        className={`mg-job-status ${
+                          posting.is_active ? "active" : "completed"
+                        }`}
+                      >
+                        {posting.is_active ? "Active" : "Completed"}
+                      </span>
                     </div>
-                    <span className={`mg-status mg-status-${application.status}`}>
-                      {statusLabel(application.status)}
-                    </span>
-                  </div>
 
-                  <div className="mg-info-grid">
-                    <div>
-                      <span className="mg-field-label">Email</span>
-                      <p>{application.applicant_email || "Not provided"}</p>
+                    <div className="mg-job-metrics">
+                      <span>{posting.job_type || "Role type not set"}</span>
+                      <span>{posting.location || "Location not set"}</span>
+                      <span>{posting.salary_package || "Package not set"}</span>
+                      <span>{posting.experience_required || "Entry-level candidates eligible"}</span>
                     </div>
-                    <div>
-                      <span className="mg-field-label">Department</span>
-                      <p>{application.applicant_department || "N/A"}</p>
-                    </div>
-                    <div>
-                      <span className="mg-field-label">CGPA</span>
-                      <p>{application.applicant_cgpa ?? "N/A"}</p>
-                    </div>
-                    <div>
-                      <span className="mg-field-label">Applied On</span>
-                      <p>{new Date(application.application_date).toLocaleDateString()}</p>
-                    </div>
-                  </div>
 
-                  <div className="mg-update-panel">
-                    <div className="mg-update-field">
-                      <label className="mg-field-label" htmlFor={`status-${application.id}`}>
-                        New Status
-                      </label>
-                      <select
-                        id={`status-${application.id}`}
-                        className="mg-select"
-                        value={selectedStatuses[application.id] || ""}
-                        onChange={(event) =>
-                          setSelectedStatuses((prev) => ({
-                            ...prev,
-                            [application.id]: event.target.value,
-                          }))
+                    <div className="mg-job-actions">
+                      <button
+                        className="mg-secondary-btn"
+                        onClick={() =>
+                          navigate("/Recruiter/MyPostings", {
+                            state: { editPosting: posting },
+                          })
                         }
                       >
-                        <option value="">Select a status</option>
-                        {statuses.map((status) => (
-                          <option key={status.id} value={status.id}>
-                            {status.name}
-                          </option>
-                        ))}
-                      </select>
+                        Edit Listing
+                      </button>
                     </div>
-
-                    <div className="mg-update-field">
-                      <label className="mg-field-label" htmlFor={`remarks-${application.id}`}>
-                        Remarks
-                      </label>
-                      <textarea
-                        id={`remarks-${application.id}`}
-                        className="mg-textarea"
-                        rows="3"
-                        placeholder="Add recruiter notes for this update..."
-                        value={remarks[application.id] || ""}
-                        onChange={(event) =>
-                          setRemarks((prev) => ({
-                            ...prev,
-                            [application.id]: event.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-
-                    <button
-                      className="mg-primary-btn"
-                      disabled={savingId === application.id}
-                      onClick={() => handleStatusUpdate(application.id)}
-                    >
-                      {savingId === application.id ? "Updating..." : "Update Status"}
-                    </button>
-                  </div>
-
-                  <div className="mg-history">
-                    <span className="mg-field-label">Recent History</span>
-                    {application.status_history?.length > 0 ? (
-                      application.status_history.slice(0, 3).map((entry) => (
-                        <div key={entry.id} className="mg-history-item">
-                          <strong>
-                            {entry.previous_status_name
-                              ? `${entry.previous_status_name} to ${entry.new_status_name}`
-                              : entry.new_status_name}
-                          </strong>
-                          <span>{new Date(entry.changed_at).toLocaleString()}</span>
-                          <p>{entry.remarks || "No remarks provided."}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="mg-history-empty">No history available yet.</p>
-                    )}
-                  </div>
-                </article>
-              ))
-            ) : (
-              <div className="mg-empty">
-                <h2>No applications found</h2>
-                <p>Try adjusting your filters or wait for new applicants to arrive.</p>
-              </div>
-            )}
+                  </article>
+                ))
+              ) : (
+                <div className="mg-empty">
+                  <h2>No job listings available</h2>
+                  <p>
+                    Create a job listing to make your organization&apos;s opportunities available here for review and editing.
+                  </p>
+                </div>
+              )}
+            </div>
           </section>
         </main>
       </div>

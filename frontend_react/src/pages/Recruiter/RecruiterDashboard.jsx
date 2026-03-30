@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/css/CompanyDashboard.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
+import ApplicantProfileModal from "../../components/Recruiter/ApplicantProfileModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { FiBriefcase, FiUsers, FiUserCheck, FiCalendar } from "react-icons/fi";
 import api from "../../utils/api";
 
-function companyDashboard() {
+function RecruiterDashboard() {
   const { auth, loading } = useAuth();
   const navigate = useNavigate();
   const [dashboard, setDashboard] = useState({
@@ -18,6 +19,11 @@ function companyDashboard() {
     },
     recent_activity: [],
   });
+  const [applications, setApplications] = useState([]);
+  const [statuses, setStatuses] = useState([]);
+  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [savingId, setSavingId] = useState(null);
+  const [modalError, setModalError] = useState("");
   const [pageError, setPageError] = useState("");
   const [pageLoading, setPageLoading] = useState(true);
 
@@ -25,8 +31,14 @@ function companyDashboard() {
     const fetchDashboard = async () => {
       try {
         setPageError("");
-        const response = await api.get("/placements/company-dashboard/");
-        setDashboard(response.data || dashboard);
+        const [dashboardResponse, applicantsResponse, statusesResponse] = await Promise.all([
+          api.get("/placements/company-dashboard/"),
+          api.get("/applications/company-applicants/"),
+          api.get("/applications/statuses/"),
+        ]);
+        setDashboard(dashboardResponse.data || dashboard);
+        setApplications(applicantsResponse.data || []);
+        setStatuses(statusesResponse.data || []);
       } catch (error) {
         setPageError(
           error.response?.data?.detail || "Failed to load company dashboard."
@@ -43,29 +55,61 @@ function companyDashboard() {
     }
   }, [loading, auth.user]);
 
+  const applicationById = useMemo(
+    () => new Map(applications.map((application) => [application.id, application])),
+    [applications]
+  );
+
+  const handleStatusUpdate = async ({ applicationId, statusId, remarks }) => {
+    if (!statusId) {
+      setModalError("Please choose a new status before updating.");
+      return;
+    }
+
+    try {
+      setSavingId(applicationId);
+      setModalError("");
+      const response = await api.patch(`/applications/${applicationId}/status/`, {
+        status_id: Number(statusId),
+        remarks,
+      });
+      const updated = response.data;
+      setApplications((prev) =>
+        prev.map((application) =>
+          application.id === applicationId ? updated : application
+        )
+      );
+      setSelectedApplication(updated);
+    } catch (error) {
+      setModalError(
+        error.response?.data?.detail ||
+          error.response?.data?.error ||
+          "Failed to update application status."
+      );
+    } finally {
+      setSavingId(null);
+    }
+  };
+
   const formatRelativeTime = (timestamp) => {
     if (!timestamp) return "Just now";
-
     const date = new Date(timestamp);
     const diffMs = Date.now() - date.getTime();
     const diffMinutes = Math.max(1, Math.floor(diffMs / 60000));
-
     if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes === 1 ? "" : "s"} ago`;
-
     const diffHours = Math.floor(diffMinutes / 60);
     if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
-
     const diffDays = Math.floor(diffHours / 24);
     return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
   };
 
   if (loading || pageLoading) return <p>Loading dashboard...</p>;
   if (!auth.user) return <p>User information is unavailable.</p>;
+
   return (
     <>
       <CompanyNavbar Company={auth.user} />
       <div className="Company-Dashboard-body">
-
         <section className="cd-hero">
           <div className="cd-hero-text">
             <h2>Welcome, {auth.user.first_name}.</h2>
@@ -82,7 +126,6 @@ function companyDashboard() {
               Create Job Posting
             </button>
           </div>
-
         </section>
 
         <section className="cd-main-div">
@@ -98,7 +141,6 @@ function companyDashboard() {
                 </span>
                 <h4 className="cd-overview-title">Active Job Openings</h4>
               </div>
-
               <p className="cd-overview-count">
                 {dashboard.overview.active_job_posts}
               </p>
@@ -151,22 +193,32 @@ function companyDashboard() {
           </div>
           <div className="cd-activity-feed">
             {dashboard.recent_activity.length > 0 ? (
-              dashboard.recent_activity.map((activity) => (
-                <div key={activity.id} className="cd-activity-item">
-                  <p>{activity.description}</p>
-                  <div className="cd-view-applicant">
-                    <span className="cd-activity-time">
-                      {formatRelativeTime(activity.created_at)}
-                    </span>
-                    <button
-                      className="cd-view-profile"
-                      onClick={() => navigate("/Recruiter/ViewApplicants")}
-                    >
-                      View Candidate Profile
-                    </button>
+              dashboard.recent_activity.map((activity) => {
+                const application = applicationById.get(activity.application_id);
+                return (
+                  <div key={activity.id} className="cd-activity-item">
+                    <p>{activity.description}</p>
+                    <div className="cd-view-applicant">
+                      <span className="cd-activity-time">
+                        {formatRelativeTime(activity.created_at)}
+                      </span>
+                      <button
+                        className="cd-view-profile"
+                        onClick={() => {
+                          if (application) {
+                            setModalError("");
+                            setSelectedApplication(application);
+                            return;
+                          }
+                          navigate("/Recruiter/ViewApplicants");
+                        }}
+                      >
+                        View Candidate Profile
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="cd-activity-item">
                 <p>No recent activity is available. New applications and status updates will appear here.</p>
@@ -181,9 +233,22 @@ function companyDashboard() {
         <footer className="cd-footer">
           <p>@2026 Placement Portal NIT AP. All rights reserved.</p>
         </footer>
-
       </div>
+
+      <ApplicantProfileModal
+        open={Boolean(selectedApplication)}
+        application={selectedApplication}
+        statuses={statuses}
+        busy={savingId === selectedApplication?.id}
+        error={modalError}
+        onClose={() => {
+          setSelectedApplication(null);
+          setModalError("");
+        }}
+        onSubmit={handleStatusUpdate}
+      />
     </>
   );
 }
-export default companyDashboard;
+
+export default RecruiterDashboard;

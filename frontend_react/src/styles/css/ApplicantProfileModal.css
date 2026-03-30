@@ -1,0 +1,158 @@
+.apm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.56);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 1400;
+}
+
+.apm-modal {
+  width: min(900px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+}
+
+.apm-header,
+.apm-status-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.apm-header h2 {
+  margin: 0 0 0.4rem;
+}
+
+.apm-close,
+.apm-primary-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.apm-close {
+  background: #e2e8f0;
+}
+
+.apm-primary-btn {
+  background: linear-gradient(120deg, #2563eb, #5fa0ff);
+  color: #ffffff;
+}
+
+.apm-status-row {
+  margin: 16px 0;
+}
+
+.apm-status {
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.apm-status-applied {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.apm-status-shortlisted {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.apm-status-offered,
+.apm-status-offer_accepted {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.apm-status-offer_declined,
+.apm-status-rejected,
+.apm-status-closed_after_offer_acceptance {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.apm-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.apm-section {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.apm-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.apm-actions {
+  display: grid;
+  gap: 12px;
+}
+
+.apm-actions select,
+.apm-actions textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e1e5f0;
+  border-radius: 13px;
+  padding: 12px 14px;
+  background: #fcfcff;
+}
+
+.apm-history {
+  display: grid;
+  gap: 12px;
+}
+
+.apm-history-item {
+  padding: 12px;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.apm-history-item strong,
+.apm-history-item span {
+  display: block;
+}
+
+.apm-history-item span {
+  margin-top: 4px;
+  color: #64748b;
+}
+
+.apm-error {
+  color: #b91c1c;
+}
+
+@media (max-width: 720px) {
+  .apm-grid,
+  .apm-header,
+  .apm-status-row {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .apm-modal {
+    padding: 18px;
+  }
+}
