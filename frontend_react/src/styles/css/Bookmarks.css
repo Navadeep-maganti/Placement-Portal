@@ -32,6 +32,28 @@
   font-size: 14px;
 }
 
+.bm-bookmark-count {
+  margin-top: 10px;
+}
+
+.bm-message {
+  max-width: 720px;
+  margin: 10px auto 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.bm-success {
+  background: rgba(22, 163, 74, 0.12);
+  color: #166534;
+}
+
+.bm-error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+}
+
 .bm-bookmarks-controls {
   background: rgba(255, 255, 255, 0.9);
   border-radius: 16px;
@@ -198,6 +220,43 @@
   gap: 8px;
 }
 
+.bm-bookmark-status-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.bm-status-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bm-status-badge.eligible {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+}
+
+.bm-status-badge.applied {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+.bm-status-badge.blocked {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+}
+
+.bm-eligibility-note {
+  color: #b45309;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .bm-skill-tag {
   background: #f8fafc;
   color: #334155;
@@ -267,6 +326,23 @@
   color: #475569;
   box-shadow: none;
   cursor: not-allowed;
+}
+
+.bm-inline-note {
+  margin: 0;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.bm-inline-note a {
+  color: #1d4ed8;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.bm-inline-note a:hover {
+  text-decoration: underline;
 }
 
 .bm-no-bookmarks {
