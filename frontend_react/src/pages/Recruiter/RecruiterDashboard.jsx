@@ -2,8 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/css/CompanyDashboard.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
-import ApplicantProfileModal from "../../components/Recruiter/ApplicantProfileModal";
+import ApplicantProfileModalEnhanced from "../../components/Recruiter/ApplicantProfileModalEnhanced";
+import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
+import useRecruiterToast from "../../hooks/useRecruiterToast";
 import { FiBriefcase, FiUsers, FiUserCheck, FiCalendar } from "react-icons/fi";
 import api from "../../utils/api";
 
@@ -26,6 +28,7 @@ function RecruiterDashboard() {
   const [modalError, setModalError] = useState("");
   const [pageError, setPageError] = useState("");
   const [pageLoading, setPageLoading] = useState(true);
+  const { toast, showToast } = useRecruiterToast();
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -40,9 +43,10 @@ function RecruiterDashboard() {
         setApplications(applicantsResponse.data || []);
         setStatuses(statusesResponse.data || []);
       } catch (error) {
-        setPageError(
-          error.response?.data?.detail || "Failed to load company dashboard."
-        );
+        const message =
+          error.response?.data?.detail || "Failed to load company dashboard.";
+        setPageError(message);
+        showToast(message, "error");
       } finally {
         setPageLoading(false);
       }
@@ -53,7 +57,7 @@ function RecruiterDashboard() {
     } else if (!loading) {
       setPageLoading(false);
     }
-  }, [loading, auth.user]);
+  }, [loading, auth.user, showToast]);
 
   const applicationById = useMemo(
     () => new Map(applications.map((application) => [application.id, application])),
@@ -62,7 +66,9 @@ function RecruiterDashboard() {
 
   const handleStatusUpdate = async ({ applicationId, statusId, remarks }) => {
     if (!statusId) {
-      setModalError("Please choose a new status before updating.");
+      const message = "Please choose a new status before updating.";
+      setModalError(message);
+      showToast(message, "error");
       return;
     }
 
@@ -80,12 +86,14 @@ function RecruiterDashboard() {
         )
       );
       setSelectedApplication(updated);
+      showToast("Application status updated successfully.");
     } catch (error) {
-      setModalError(
+      const message =
         error.response?.data?.detail ||
           error.response?.data?.error ||
-          "Failed to update application status."
-      );
+          "Failed to update application status.";
+      setModalError(message);
+      showToast(message, "error");
     } finally {
       setSavingId(null);
     }
@@ -108,6 +116,7 @@ function RecruiterDashboard() {
 
   return (
     <>
+      <RecruiterToast toast={toast} modalOpen={Boolean(selectedApplication)} />
       <CompanyNavbar Company={auth.user} />
       <div className="Company-Dashboard-body">
         <section className="cd-hero">
@@ -235,7 +244,7 @@ function RecruiterDashboard() {
         </footer>
       </div>
 
-      <ApplicantProfileModal
+      <ApplicantProfileModalEnhanced
         open={Boolean(selectedApplication)}
         application={selectedApplication}
         statuses={statuses}

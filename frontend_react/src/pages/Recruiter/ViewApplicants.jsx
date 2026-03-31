@@ -2,8 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/css/Applications.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
-import ApplicantProfileModal from "../../components/Recruiter/ApplicantProfileModal";
+import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
+import useRecruiterToast from "../../hooks/useRecruiterToast";
 import api from "../../utils/api";
 
 function ViewApplicants(){
@@ -19,6 +20,7 @@ function ViewApplicants(){
     const [statusFilter, setStatusFilter] = useState("all");
     const [jobFilter, setJobFilter] = useState("all");
     const [selectedApplication, setSelectedApplication] = useState(null);
+    const { toast, showToast } = useRecruiterToast();
 
     useEffect(() => {
         const fetchApplicants = async () => {
@@ -31,9 +33,10 @@ function ViewApplicants(){
                 setApplications(applicationsResponse.data || []);
                 setStatuses(statusesResponse.data || []);
             } catch (err) {
-                setError(
-                    err.response?.data?.detail || "Failed to load applicants."
-                );
+                const message =
+                    err.response?.data?.detail || "Failed to load applicants.";
+                setError(message);
+                showToast(message, "error");
             } finally {
                 setPageLoading(false);
             }
@@ -44,7 +47,7 @@ function ViewApplicants(){
         } else if (!loading) {
             setPageLoading(false);
         }
-    }, [loading, auth.user]);
+    }, [loading, auth.user, showToast]);
 
     const statusLabel = (status) =>
         status
@@ -88,7 +91,9 @@ function ViewApplicants(){
 
     const handleStatusUpdate = async ({ applicationId, statusId, remarks }) => {
         if (!statusId) {
-            setModalError("Please choose a new status before updating.");
+            const message = "Please choose a new status before updating.";
+            setModalError(message);
+            showToast(message, "error");
             return;
         }
 
@@ -106,12 +111,14 @@ function ViewApplicants(){
                 )
             );
             setSelectedApplication(updated);
+            showToast("Application status updated successfully.");
         } catch (err) {
-            setModalError(
+            const message =
                 err.response?.data?.detail ||
                     err.response?.data?.error ||
-                    "Failed to update application status."
-            );
+                    "Failed to update application status.";
+            setModalError(message);
+            showToast(message, "error");
         } finally {
             setSavingId(null);
         }
@@ -122,6 +129,7 @@ function ViewApplicants(){
 
     return(
         <>
+            <RecruiterToast toast={toast} />
             <CompanyNavbar Company={auth.user} />
             <div className="va-page">
             <main className="va-container">
