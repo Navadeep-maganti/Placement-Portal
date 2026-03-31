@@ -17,11 +17,15 @@ class MyBookmarksView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         if user.role == "student":
-            return Bookmark.objects.filter(student__user=user).select_related(
-                "student", "placement", "placement__company"
-            ).prefetch_related(
-                "student__application_set__status",
-                "placement__required_skills",
+            return (
+                Bookmark.objects.filter(student__user=user)
+                .select_related("student", "placement", "placement__company")
+                .prefetch_related(
+                    "student__application_set__status",
+                    "placement__required_skills",
+                    "placement__eligibility_criteria__allowed_departments",
+                )
+                .order_by("-created_at", "-id")
             )
         return Bookmark.objects.none()
 
@@ -34,11 +38,15 @@ class BookmarkListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         student = self.get_student()
-        return Bookmark.objects.filter(student=student).select_related(
-            "student", "placement", "placement__company"
-        ).prefetch_related(
-            "student__application_set__status",
-            "placement__required_skills",
+        return (
+            Bookmark.objects.filter(student=student)
+            .select_related("student", "placement", "placement__company")
+            .prefetch_related(
+                "student__application_set__status",
+                "placement__required_skills",
+                "placement__eligibility_criteria__allowed_departments",
+            )
+            .order_by("-created_at", "-id")
         )
 
     def create(self, request, *args, **kwargs):
