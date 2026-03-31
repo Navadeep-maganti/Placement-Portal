@@ -4,7 +4,7 @@ from .models import Bookmark
 @admin.register(Bookmark)
 class BookmarkAdmin(admin.ModelAdmin):
     list_display = ('student', 'placement', 'created_at')
-    search_fields = ('student__user__username', 'placement__job_title')
+    search_fields = ('student__user__email', 'placement__job_title')
     list_filter = ('created_at',)
     
     

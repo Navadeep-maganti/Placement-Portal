@@ -21,4 +21,4 @@ class Bookmark(models.Model):
         unique_together = (('student', 'placement'),)
 
     def __str__(self):
-        return f"{self.student.user.username} bookmarked {self.placement.job_title}"
+        return f"{self.student.user.email} bookmarked {self.placement.job_title}"

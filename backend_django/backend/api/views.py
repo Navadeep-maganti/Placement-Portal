@@ -19,7 +19,7 @@ def auth_me(request):
     """Get current user info"""
     return Response({
         "user_id": request.user.id,
-        "username": request.user.username,
+        "username": request.user.email,
         "email": request.user.email,
         "first_name": request.user.first_name,
         "last_name": request.user.last_name,
