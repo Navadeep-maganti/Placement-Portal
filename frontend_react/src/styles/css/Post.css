@@ -23,46 +23,6 @@
   box-sizing: border-box;
 }
 
-.mp-toast {
-  position: fixed;
-  top: 96px;
-  right: 24px;
-  z-index: 1000;
-  min-width: 260px;
-  max-width: min(420px, calc(100vw - 32px));
-  padding: 14px 18px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #166534, #22c55e);
-  color: #ffffff;
-  box-shadow: 0 18px 40px rgba(22, 101, 52, 0.24);
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.4;
-  animation: mp-toast-in 0.25s ease-out;
-}
-
-.mp-toast-success {
-  background: linear-gradient(135deg, #166534, #22c55e);
-  box-shadow: 0 18px 40px rgba(22, 101, 52, 0.24);
-}
-
-.mp-toast-error {
-  background: linear-gradient(135deg, #b91c1c, #ef4444);
-  box-shadow: 0 18px 40px rgba(185, 28, 28, 0.24);
-}
-
-@keyframes mp-toast-in {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .mp-header h1 {
   font-size: 40px;
   margin: 0;
@@ -457,14 +417,6 @@
 }
 
 @media (max-width: 560px) {
-  .mp-toast {
-    top: 88px;
-    right: 16px;
-    left: 16px;
-    min-width: 0;
-    max-width: none;
-  }
-
   .mp-page {
     padding: 24px 14px 36px;
   }

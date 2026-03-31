@@ -1,4 +1,16 @@
 import React, { useEffect, useState } from "react";
+import {
+  FiAward,
+  FiBookOpen,
+  FiCalendar,
+  FiCheckCircle,
+  FiDownload,
+  FiFileText,
+  FiMail,
+  FiPhone,
+  FiUser,
+  FiX,
+} from "react-icons/fi";
 import "../../styles/css/ApplicantProfileModal.css";
 
 const formatStatusLabel = (status) =>
@@ -109,31 +121,61 @@ function ApplicantProfileModal({
 
         <div className="apm-section">
           <span className="apm-label">Update Status</span>
-          <div className="apm-actions">
-            <select value={statusId} onChange={(event) => setStatusId(event.target.value)}>
-              <option value="">
-                Current Status: {currentStatusLabel}
-              </option>
-              {statuses.map((status) => (
-                <option key={status.id} value={status.id}>
-                  {status.name}
-                </option>
-              ))}
-            </select>
-            <textarea
-              rows="3"
-              value={remarks}
-              placeholder="Add recruiter notes for this update..."
-              onChange={(event) => setRemarks(event.target.value)}
-            />
-            <button
-              type="button"
-              className="apm-primary-btn"
-              disabled={busy}
-              onClick={() => onSubmit({ applicationId: application.id, statusId, remarks })}
-            >
-              {busy ? "Updating..." : "Update Status"}
-            </button>
+          <div className="apm-actions-card">
+            <div className="apm-actions-head">
+              <div>
+                <p className="apm-actions-title">Status Management</p>
+                <p className="apm-actions-subtitle">
+                  Select a new application status and add recruiter remarks if required.
+                </p>
+              </div>
+              <span className={`apm-status apm-status-${application.status}`}>
+                {currentStatusLabel}
+              </span>
+            </div>
+            <div className="apm-actions">
+              <div className="apm-field">
+                <label className="apm-field-label" htmlFor="apm-status-select">
+                  New Status
+                </label>
+                <select
+                  id="apm-status-select"
+                  value={statusId}
+                  onChange={(event) => setStatusId(event.target.value)}
+                >
+                  <option value="">
+                    Select a status
+                  </option>
+                  {statuses.map((status) => (
+                    <option key={status.id} value={status.id}>
+                      {status.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="apm-field">
+                <label className="apm-field-label" htmlFor="apm-remarks">
+                  Recruiter Remarks
+                </label>
+                <textarea
+                  id="apm-remarks"
+                  rows="4"
+                  value={remarks}
+                  placeholder="Add recruiter notes for this update..."
+                  onChange={(event) => setRemarks(event.target.value)}
+                />
+              </div>
+              <div className="apm-actions-footer">
+                <button
+                  type="button"
+                  className="apm-primary-btn"
+                  disabled={busy}
+                  onClick={() => onSubmit({ applicationId: application.id, statusId, remarks })}
+                >
+                  {busy ? "Updating Status..." : "Save Status Update"}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

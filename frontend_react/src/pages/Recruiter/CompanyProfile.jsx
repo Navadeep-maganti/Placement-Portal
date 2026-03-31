@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
+import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
+import useRecruiterToast from "../../hooks/useRecruiterToast";
 import api from "../../utils/api";
 import "../../styles/css/CompanyProfile.css";
 
@@ -21,6 +23,7 @@ function CompanyProfile() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
+  const { toast, showToast } = useRecruiterToast();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -29,7 +32,10 @@ function CompanyProfile() {
         const response = await api.get("/companies/me/");
         setFormData({ ...emptyProfile, ...response.data });
       } catch (err) {
-        setError(err.response?.data?.detail || "Failed to load recruiter profile.");
+        const message =
+          err.response?.data?.detail || "Failed to load recruiter profile.";
+        setError(message);
+        showToast(message, "error");
       } finally {
         setPageLoading(false);
       }
@@ -40,7 +46,7 @@ function CompanyProfile() {
     } else if (!loading) {
       setPageLoading(false);
     }
-  }, [loading, auth.user]);
+  }, [loading, auth.user, showToast]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -66,8 +72,12 @@ function CompanyProfile() {
       setFormData({ ...emptyProfile, ...response.data });
       await refreshUser("company");
       setFeedback("Recruiter profile updated successfully.");
+      showToast("Recruiter profile updated successfully.");
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to update recruiter profile.");
+      const message =
+        err.response?.data?.detail || "Failed to update recruiter profile.";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setSaving(false);
     }
@@ -78,6 +88,7 @@ function CompanyProfile() {
 
   return (
     <>
+      <RecruiterToast toast={toast} />
       <CompanyNavbar Company={auth.user} />
       <div className="cp-page">
         <main className="cp-container">

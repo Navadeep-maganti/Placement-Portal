@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../styles/css/Post.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
+import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
+import useRecruiterToast from "../../hooks/useRecruiterToast";
 import { FiBriefcase, FiDollarSign, FiEdit2, FiFilter, FiHeadphones, FiTrash2 } from "react-icons/fi";
 import api from "../../utils/api";
 
@@ -33,17 +35,13 @@ function RecruiterPostingsPage() {
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
-  const [toast, setToast] = useState({ message: "", type: "success" });
   const formRef = useRef(null);
   const titleInputRef = useRef(null);
+  const { toast, showToast } = useRecruiterToast();
 
   const scrollToEditForm = () => {
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     titleInputRef.current?.focus();
-  };
-
-  const showToast = (message, type = "success") => {
-    setToast({ message, type });
   };
 
   const toDateInputValue = (date) => {
@@ -90,7 +88,7 @@ function RecruiterPostingsPage() {
     } else if (!loading) {
       setPageLoading(false);
     }
-  }, [loading, auth.user]);
+  }, [loading, auth.user, showToast]);
 
   useEffect(() => {
     const posting = location.state?.editPosting;
@@ -114,18 +112,6 @@ function RecruiterPostingsPage() {
     requestAnimationFrame(scrollToEditForm);
     navigate(location.pathname, { replace: true, state: {} });
   }, [location.pathname, location.state, navigate]);
-
-  useEffect(() => {
-    if (!toast.message) {
-      return undefined;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      setToast({ message: "", type: "success" });
-    }, 3000);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [toast]);
 
   const onFieldChange = (event) => {
     const { name, value } = event.target;
@@ -153,6 +139,7 @@ function RecruiterPostingsPage() {
       ...prev,
       requiredSkills: prev.requiredSkills.filter((item) => item !== skillName),
     }));
+    showToast(`Removed "${skillName}" from required skills.`);
   };
 
   const handleAddSkill = async () => {
@@ -267,6 +254,7 @@ function RecruiterPostingsPage() {
     });
     setFeedback("");
     setError("");
+    showToast(`Editing "${posting.job_title}".`);
     requestAnimationFrame(scrollToEditForm);
   };
 
@@ -297,15 +285,7 @@ function RecruiterPostingsPage() {
 
   return (
     <>
-      {toast.message && (
-        <div
-          className={`mp-toast mp-toast-${toast.type}`}
-          role="status"
-          aria-live="polite"
-        >
-          {toast.message}
-        </div>
-      )}
+      <RecruiterToast toast={toast} />
       <CompanyNavbar Company={auth.user} />
       <main className="mp-page">
         <section className="mp-header">
