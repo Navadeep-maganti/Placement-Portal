@@ -17,6 +17,7 @@ const JobsList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterLocation, setFilterLocation] = useState("all");
   const [filterSalary, setFilterSalary] = useState("all");
+  const [filterEligibility, setFilterEligibility] = useState("eligible");
   const [viewType, setViewType] = useState("grid");
   const [pageLoading, setPageLoading] = useState(true);
   const [jobs, setJobs] = useState([]);
@@ -79,7 +80,7 @@ const JobsList = () => {
     ];
   }, [normalizedJobs]);
 
-  const filteredJobs = normalizedJobs.filter((job) => {
+  const baseFilteredJobs = normalizedJobs.filter((job) => {
     const query = searchTerm.trim().toLowerCase();
     const matchesSearch =
       !query ||
@@ -100,6 +101,29 @@ const JobsList = () => {
       (filterSalary === "9+" && job.salary_number >= 9);
 
     return matchesSearch && matchesLocation && matchesSalary;
+  });
+
+  const eligibilityCounts = useMemo(() => {
+    const eligible = baseFilteredJobs.filter((job) => job.is_eligible).length;
+    const notEligible = baseFilteredJobs.filter((job) => !job.is_eligible).length;
+
+    return {
+      eligible,
+      notEligible,
+      all: baseFilteredJobs.length,
+    };
+  }, [baseFilteredJobs]);
+
+  const filteredJobs = baseFilteredJobs.filter((job) => {
+    if (filterEligibility === "all") {
+      return true;
+    }
+
+    if (filterEligibility === "not_eligible") {
+      return !job.is_eligible;
+    }
+
+    return job.is_eligible;
   });
 
   const updateJobState = (jobId, updates) => {
@@ -195,6 +219,20 @@ const JobsList = () => {
 
           <div className="jl-filter-row">
             <select
+              value={filterEligibility}
+              onChange={(e) => setFilterEligibility(e.target.value)}
+              className="jl-select"
+            >
+              <option value="eligible">
+                Eligible Jobs ({eligibilityCounts.eligible})
+              </option>
+              <option value="not_eligible">
+                Not Eligible ({eligibilityCounts.notEligible})
+              </option>
+              <option value="all">All Jobs ({eligibilityCounts.all})</option>
+            </select>
+
+            <select
               value={filterLocation}
               onChange={(e) => setFilterLocation(e.target.value)}
               className="jl-select"
@@ -236,7 +274,12 @@ const JobsList = () => {
 
         <div className="jl-results">
           <p>
-            Showing <strong>{filteredJobs.length}</strong> opportunities
+            Showing <strong>{filteredJobs.length}</strong>{" "}
+            {filterEligibility === "eligible"
+              ? "eligible opportunities"
+              : filterEligibility === "not_eligible"
+                ? "not eligible opportunities"
+                : "opportunities"}
           </p>
         </div>
 

@@ -66,6 +66,45 @@ const JobDetails = () => {
     ];
   }, [job]);
 
+  const eligibilityCards = useMemo(() => {
+    if (!job) {
+      return [];
+    }
+
+    return [
+      {
+        label: "Minimum CGPA",
+        value: `${job.eligibility_details?.min_cgpa ?? job.eligibility_cgpa}`,
+      },
+      {
+        label: "Backlogs",
+        value: `${job.eligibility_details?.max_backlogs ?? "No explicit limit"}`,
+      },
+      {
+        label: "Graduation Year",
+        value: job.eligibility_details?.graduation_year || "Open to multiple batches",
+      },
+      {
+        label: "Departments",
+        value: job.eligibility_details?.allowed_departments?.length
+          ? job.eligibility_details.allowed_departments.join(", ")
+          : "All departments",
+      },
+    ];
+  }, [job]);
+
+  const statusTone = job?.has_applied
+    ? "applied"
+    : job?.is_eligible
+      ? "eligible"
+      : "blocked";
+
+  const statusLabel = job?.has_applied
+    ? formatStatusLabel(job.application_status)
+    : job?.is_eligible
+      ? "Eligible to apply"
+      : "Not eligible yet";
+
   if (loading || pageLoading) return <PageLoader />;
   if (!auth.user) return <p>Please log in to view job details</p>;
 
@@ -149,131 +188,186 @@ const JobDetails = () => {
       <StudentNavbar student={auth.user} />
 
       <div className="job-details-container">
-        <div className="job-header-section">
-          <div className="job-header-content">
-            <div className="job-title-block">
-              <div className="company-logo">
+        <section className="jd-hero">
+          <div className="jd-hero-main">
+            <div className="jd-hero-topline">
+              <span className="jd-hero-pill">Live Opportunity</span>
+              <span className={`jd-status-chip ${statusTone}`}>{statusLabel}</span>
+            </div>
+
+            <div className="jd-title-row">
+              <div className="jd-company-mark">
                 {(job.company_name || "J").charAt(0).toUpperCase()}
               </div>
-              <div>
+              <div className="jd-title-copy">
                 <h1>{job.job_title}</h1>
-                <p className="company-name">{job.company_name}</p>
+                <p>{job.company_name}</p>
               </div>
             </div>
-            <div className="header-actions">
+
+            <p className="jd-hero-summary">
+              {job.job_description || "No job description provided yet."}
+            </p>
+
+            <div className="jd-hero-actions">
               <button
-                className={`bookmark-btn ${job.is_bookmarked ? "active" : ""}`}
+                className={`jd-bookmark-btn ${job.is_bookmarked ? "active" : ""}`}
                 onClick={handleBookmark}
               >
-                {job.is_bookmarked ? "Bookmarked" : "Bookmark"}
+                {job.is_bookmarked ? "Saved" : "Save Job"}
               </button>
+              {job.company_website && (
+                <a
+                  className="jd-site-link"
+                  href={job.company_website}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Visit Company Site
+                </a>
+              )}
             </div>
           </div>
 
-          <div className="quick-info">
+          <div className="jd-facts-grid">
             {overviewItems.map((item) => (
-              <div key={item.label} className="info-item">
-                <span className="info-label">{item.label}</span>
-                <span className="info-value">{item.value}</span>
+              <div key={item.label} className="jd-fact-card">
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        <div className="job-content">
-          <div className="apply-section">
-            <button
-              className={`apply-btn-large ${job.has_applied ? "applied" : ""}`}
-              onClick={() => setApplyModalOpen(true)}
-              disabled={job.has_applied || !job.is_eligible}
-            >
-              {job.has_applied ? formatStatusLabel(job.application_status) : "Apply Now"}
-            </button>
-            <p className="applied-message">
-              {job.has_applied
-                ? "Your application is already in the tracker."
-                : job.is_eligible
-                  ? "You are eligible for this role."
-                  : "You need to fix the listed eligibility issues before applying."}
-            </p>
-            {!auth.user.resume && job.resume_required && (
-              <p className="job-inline-note">
-                This job requires a resume. Update it from{" "}
-                <Link to="/student/profile">your profile</Link>.
-              </p>
-            )}
-          </div>
+        <div className="jd-layout">
+          <main className="jd-main">
+            <section className="jd-section">
+              <div className="jd-section-head">
+                <h2>Role Snapshot</h2>
+                <span>What stands out</span>
+              </div>
+              <div className="jd-copy-card">
+                <p>{job.job_description || "No job description provided yet."}</p>
+              </div>
+            </section>
 
-          <section className="job-section">
-            <h2>About This Role</h2>
-            <p>{job.job_description || "No job description provided yet."}</p>
-          </section>
-
-          <section className="job-section">
-            <h2>Required Skills</h2>
-            <div className="skills-container">
-              {(job.required_skill_names?.length
-                ? job.required_skill_names
-                : ["No specific skills listed"]
-              ).map((skill, idx) => (
-                <span key={idx} className="skill-badge">
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </section>
-
-          <section className="job-section">
-            <h2>Eligibility</h2>
-            <div className="benefits-grid">
-              <div className="benefit-item">
-                <span className="benefit-icon">CGPA</span>
+            <section className="jd-section">
+              <div className="jd-section-head">
+                <h2>Required Skills</h2>
                 <span>
-                  Minimum {job.eligibility_details?.min_cgpa ?? job.eligibility_cgpa}
+                  {job.required_skill_names?.length || 0} highlighted
                 </span>
               </div>
-              <div className="benefit-item">
-                <span className="benefit-icon">Backlogs</span>
-                <span>
-                  {job.eligibility_details?.max_backlogs ?? "No explicit limit"}
-                </span>
-              </div>
-              <div className="benefit-item">
-                <span className="benefit-icon">Batch</span>
-                <span>
-                  {job.eligibility_details?.graduation_year || "Open to multiple batches"}
-                </span>
-              </div>
-              <div className="benefit-item">
-                <span className="benefit-icon">Dept</span>
-                <span>
-                  {job.eligibility_details?.allowed_departments?.length
-                    ? job.eligibility_details.allowed_departments.join(", ")
-                    : "All departments"}
-                </span>
-              </div>
-            </div>
-            {job.eligibility_issues?.length > 0 && (
-              <ul className="job-list">
-                {job.eligibility_issues.map((issue, idx) => (
-                  <li key={idx}>{issue}</li>
+              <div className="jd-skill-wrap">
+                {(job.required_skill_names?.length
+                  ? job.required_skill_names
+                  : ["No specific skills listed"]
+                ).map((skill, idx) => (
+                  <span key={idx} className="jd-skill-pill">
+                    {skill}
+                  </span>
                 ))}
-              </ul>
-            )}
-          </section>
+              </div>
+            </section>
 
-          <section className="job-section">
-            <h2>About The Company</h2>
-            <p>{job.company_description || "No company overview provided."}</p>
-            {job.company_website && (
-              <p className="job-company-link">
-                Company website:{" "}
-                <a href={job.company_website} target="_blank" rel="noreferrer">
-                  {job.company_website}
-                </a>
+            <section className="jd-section">
+              <div className="jd-section-head">
+                <h2>Eligibility</h2>
+                <span>Before you apply</span>
+              </div>
+              <div className="jd-eligibility-grid">
+                {eligibilityCards.map((item) => (
+                  <div key={item.label} className="jd-eligibility-card">
+                    <span>{item.label}</span>
+                    <strong>{item.value}</strong>
+                  </div>
+                ))}
+              </div>
+              {job.eligibility_issues?.length > 0 && (
+                <div className="jd-warning-panel">
+                  <h3>Eligibility issues to fix</h3>
+                  <ul className="jd-list">
+                    {job.eligibility_issues.map((issue, idx) => (
+                      <li key={idx}>{issue}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </section>
+
+            <section className="jd-section">
+              <div className="jd-section-head">
+                <h2>About the Company</h2>
+                <span>{job.company_industry || "Industry not listed"}</span>
+              </div>
+              <div className="jd-company-card">
+                <p>{job.company_description || "No company overview provided."}</p>
+                {job.company_website && (
+                  <p className="jd-company-link">
+                    Company website:{" "}
+                    <a href={job.company_website} target="_blank" rel="noreferrer">
+                      {job.company_website}
+                    </a>
+                  </p>
+                )}
+              </div>
+            </section>
+          </main>
+
+          <aside className="jd-sidebar">
+            <div className="jd-apply-card">
+              <div className={`jd-apply-status ${statusTone}`}>
+                {job.has_applied
+                  ? "Application in tracker"
+                  : job.is_eligible
+                    ? "Ready to apply"
+                    : "Action needed"}
+              </div>
+
+              <h3>
+                {job.has_applied
+                  ? formatStatusLabel(job.application_status)
+                  : "Make your move"}
+              </h3>
+              <p>
+                {job.has_applied
+                  ? "Your application is already submitted and being tracked."
+                  : job.is_eligible
+                    ? "Your profile currently matches the listed requirements for this role."
+                    : "Review the requirements below and update your profile before applying."}
               </p>
-            )}
-          </section>
+
+              <button
+                className={`jd-apply-btn ${job.has_applied ? "applied" : ""}`}
+                onClick={() => setApplyModalOpen(true)}
+                disabled={job.has_applied || !job.is_eligible}
+              >
+                {job.has_applied ? formatStatusLabel(job.application_status) : "Apply Now"}
+              </button>
+
+              {!auth.user.resume && job.resume_required && (
+                <p className="jd-inline-note">
+                  This job requires a resume. Update it from{" "}
+                  <Link to="/student/profile">your profile</Link>.
+                </p>
+              )}
+
+              <div className="jd-sidebar-meta">
+                <div>
+                  <span>Applicants</span>
+                  <strong>{job.no_of_applicants ?? 0}</strong>
+                </div>
+                <div>
+                  <span>Deadline</span>
+                  <strong>
+                    {job.application_deadline
+                      ? new Date(job.application_deadline).toLocaleDateString()
+                      : "N/A"}
+                  </strong>
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
       <ApplicationReviewModal
