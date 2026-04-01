@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
 import ChangePasswordModal from "../../components/Common/ChangePasswordModal";
 import PageLoader from "../../components/Common/PageLoader";
+import RecruiterFooter from "../../components/Footer/RecruiterFooter";
 import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
 import useRecruiterToast from "../../hooks/useRecruiterToast";
@@ -188,6 +189,7 @@ function CompanyProfile() {
           </section>
         </main>
       </div>
+      <RecruiterFooter />
       <ChangePasswordModal
         open={passwordModalOpen}
         onClose={() => setPasswordModalOpen(false)}

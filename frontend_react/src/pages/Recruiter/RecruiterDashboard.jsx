@@ -4,6 +4,7 @@ import "../../styles/css/CompanyDashboard.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
 import ApplicantProfileModalEnhanced from "../../components/Recruiter/ApplicantProfileModalEnhanced";
 import PageLoader from "../../components/Common/PageLoader";
+import RecruiterFooter from "../../components/Footer/RecruiterFooter";
 import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
 import useRecruiterToast from "../../hooks/useRecruiterToast";
@@ -269,10 +270,8 @@ function RecruiterDashboard() {
           </div>
         </section>
 
-        <footer className="cd-footer">
-          <p>@2026 Placement Portal NIT AP. All rights reserved.</p>
-        </footer>
       </div>
+      <RecruiterFooter />
 
       <ApplicantProfileModalEnhanced
         open={Boolean(selectedApplication)}

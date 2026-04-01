@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "../../styles/css/Post.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
 import PageLoader from "../../components/Common/PageLoader";
+import RecruiterFooter from "../../components/Footer/RecruiterFooter";
 import RecruiterApprovalPending from "../../components/Recruiter/RecruiterApprovalPending";
 import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import SkillPicker from "../../components/Common/SkillPicker";
@@ -453,6 +454,7 @@ function RecruiterPostingsPage() {
           </article>
         </section>
       </main>
+      <RecruiterFooter />
     </>
   );
 }

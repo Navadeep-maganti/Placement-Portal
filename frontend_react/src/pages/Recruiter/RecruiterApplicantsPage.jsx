@@ -4,6 +4,7 @@ import "../../styles/css/Applications.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
 import ApplicantProfileModalEnhanced from "../../components/Recruiter/ApplicantProfileModalEnhanced";
 import PageLoader from "../../components/Common/PageLoader";
+import RecruiterFooter from "../../components/Footer/RecruiterFooter";
 import RecruiterApprovalPending from "../../components/Recruiter/RecruiterApprovalPending";
 import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
@@ -254,6 +255,7 @@ function RecruiterApplicantsPage() {
           </section>
         </main>
       </div>
+      <RecruiterFooter />
 
       <ApplicantProfileModalEnhanced
         open={Boolean(selectedApplication)}
