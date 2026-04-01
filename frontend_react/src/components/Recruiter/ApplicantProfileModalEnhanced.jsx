@@ -175,6 +175,26 @@ function ApplicantProfileModalEnhanced({
                 )}
               </div>
             </div>
+
+            <div className="apme-section apme-section-surface">
+              <span className="apme-label">Resume</span>
+              {application.applicant_resume_url ? (
+                <a
+                  className="apme-resume-link"
+                  href={application.applicant_resume_url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <FiDownload size={16} />
+                  <span>{application.applicant_resume_name || "Open Resume"}</span>
+                </a>
+              ) : (
+                <div className="apme-empty-card">
+                  <FiFileText size={18} />
+                  <p>Resume not uploaded.</p>
+                </div>
+              )}
+            </div>
           </div>
 
           <aside className="apme-side-column">
@@ -232,26 +252,6 @@ function ApplicantProfileModalEnhanced({
                   </button>
                 </div>
               </div>
-            </div>
-
-            <div className="apme-section apme-section-surface">
-              <span className="apme-label">Resume</span>
-              {application.applicant_resume_url ? (
-                <a
-                  className="apme-resume-link"
-                  href={application.applicant_resume_url}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <FiDownload size={16} />
-                  <span>{application.applicant_resume_name || "Open Resume"}</span>
-                </a>
-              ) : (
-                <div className="apme-empty-card">
-                  <FiFileText size={18} />
-                  <p>Resume not uploaded.</p>
-                </div>
-              )}
             </div>
           </aside>
         </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../../styles/css/Applications.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
 import ApplicantProfileModalEnhanced from "../../components/Recruiter/ApplicantProfileModalEnhanced";
@@ -14,6 +14,7 @@ import api from "../../utils/api";
 function RecruiterApplicantsPage() {
   const { auth, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const isApproved = Boolean(auth.user?.is_approved);
   const [applications, setApplications] = useState([]);
   const [statuses, setStatuses] = useState([]);
@@ -26,6 +27,7 @@ function RecruiterApplicantsPage() {
   const [jobFilter, setJobFilter] = useState("all");
   const [selectedApplication, setSelectedApplication] = useState(null);
   const { toast, showToast } = useRecruiterToast();
+  const requestedStatusFilter = location.state?.statusFilter;
 
   useEffect(() => {
     const fetchApplicants = async () => {
@@ -52,6 +54,13 @@ function RecruiterApplicantsPage() {
       setPageLoading(false);
     }
   }, [loading, auth.user, isApproved, showToast]);
+
+  useEffect(() => {
+    if (requestedStatusFilter) {
+      setStatusFilter(requestedStatusFilter);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.pathname, navigate, requestedStatusFilter]);
 
   const statusLabel = (status) =>
     status?.replaceAll("_", " ").replace(/\b\w/g, (char) => char.toUpperCase()) ||
@@ -81,6 +90,21 @@ function RecruiterApplicantsPage() {
       return matchesQuery && matchesStatus && matchesJob;
     });
   }, [applications, jobFilter, searchTerm, statusFilter]);
+
+  const availableStatusOptions = useMemo(() => {
+    const baseOptions = [
+      "applied",
+      "shortlisted",
+      "offered",
+      "offer_accepted",
+      "offer_declined",
+      "rejected",
+    ];
+    const apiOptions = statuses
+      .map((status) => status.code)
+      .filter(Boolean);
+    return [...new Set([...baseOptions, ...apiOptions])];
+  }, [statuses]);
 
   const stats = useMemo(
     () => ({
@@ -199,12 +223,11 @@ function RecruiterApplicantsPage() {
               onChange={(event) => setStatusFilter(event.target.value)}
             >
               <option value="all">All Statuses</option>
-              <option value="applied">Applied</option>
-              <option value="shortlisted">Shortlisted</option>
-              <option value="offered">Offered</option>
-              <option value="offer_accepted">Offer Accepted</option>
-              <option value="offer_declined">Offer Declined</option>
-              <option value="rejected">Rejected</option>
+              {availableStatusOptions.map((statusCode) => (
+                <option key={statusCode} value={statusCode}>
+                  {statusLabel(statusCode)}
+                </option>
+              ))}
             </select>
             <select
               className="va-select"
