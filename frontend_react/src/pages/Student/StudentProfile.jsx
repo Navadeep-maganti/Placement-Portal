@@ -4,7 +4,9 @@ import StudentFooter from "../../components/Footer/StudentFooter";
 import ChangePasswordModal from "../../components/Common/ChangePasswordModal";
 import PageLoader from "../../components/Common/PageLoader";
 import SkillPicker from "../../components/Common/SkillPicker";
+import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
+import useRecruiterToast from "../../hooks/useRecruiterToast";
 import api from "../../utils/api";
 import "../../styles/css/StudentProfile.css";
 
@@ -34,12 +36,11 @@ function StudentProfile() {
   const [resumeFile, setResumeFile] = useState(null);
   const [removeResume, setRemoveResume] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const [availableSkills, setAvailableSkills] = useState([]);
   const [skillLoading, setSkillLoading] = useState(true);
   const [addingSkill, setAddingSkill] = useState(false);
+  const { toast, showToast } = useRecruiterToast();
 
   useEffect(() => {
     if (!auth.user) {
@@ -73,9 +74,10 @@ function StudentProfile() {
         const response = await api.get("/placements/skills/");
         setAvailableSkills(response.data || []);
       } catch (err) {
-        setError(
+        showToast(
           err.response?.data?.detail ||
-            "Failed to load skills. You can still edit the rest of your profile."
+            "Failed to load skills. You can still edit the rest of your profile.",
+          "error"
         );
       } finally {
         setSkillLoading(false);
@@ -146,6 +148,7 @@ function StudentProfile() {
   const handleRemoveResume = () => {
     setResumeFile(null);
     setRemoveResume(true);
+    showToast("Resume will be removed after you save.");
   };
 
   const toggleSkillSelection = (skillName) => {
@@ -172,19 +175,18 @@ function StudentProfile() {
         skills_summary: nextSkillNames.join(", "),
       };
     });
+    showToast(`Removed "${skillName}" from your skills.`);
   };
 
   const handleAddSkill = async (skillName) => {
     const trimmedName = skillName.trim();
     if (!trimmedName) {
-      setError("Enter a skill name before adding it.");
+      showToast("Enter a skill name before adding it.", "error");
       return false;
     }
 
     try {
       setAddingSkill(true);
-      setError("");
-      setMessage("");
       const response = await api.post("/placements/skills/", { name: trimmedName });
       const createdSkill = response.data;
 
@@ -215,10 +217,10 @@ function StudentProfile() {
         };
       });
 
-      setMessage(`Skill "${createdSkill.name}" is ready to use.`);
+      showToast(`Skill "${createdSkill.name}" is ready to use.`);
       return true;
     } catch (err) {
-      setError(err.response?.data?.name?.[0] || "Failed to add the skill.");
+      showToast(err.response?.data?.name?.[0] || "Failed to add the skill.", "error");
       return false;
     } finally {
       setAddingSkill(false);
@@ -228,8 +230,6 @@ function StudentProfile() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSaving(true);
-    setError("");
-    setMessage("");
 
     const payload = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
@@ -259,11 +259,11 @@ function StudentProfile() {
         },
       });
       await refreshUser(auth.role);
-      setMessage("Profile updated successfully.");
+      showToast("Profile updated successfully.");
       setResumeFile(null);
       setRemoveResume(false);
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to update profile.");
+      showToast(err.response?.data?.detail || "Failed to update profile.", "error");
     } finally {
       setSaving(false);
     }
@@ -271,6 +271,7 @@ function StudentProfile() {
 
   return (
     <div className="sp-page">
+      <RecruiterToast toast={toast} modalOpen={passwordModalOpen} />
       <StudentNavbar student={auth.user} />
 
       <div className="sp-container">
@@ -301,9 +302,6 @@ function StudentProfile() {
               <h2>Edit Details</h2>
               <p>Update the information recruiters see when they review you.</p>
             </div>
-
-            {error && <p className="sp-banner sp-error">{error}</p>}
-            {message && <p className="sp-banner sp-success">{message}</p>}
 
             <div className="sp-form-grid">
               <label>
@@ -580,8 +578,7 @@ function StudentProfile() {
         open={passwordModalOpen}
         onClose={() => setPasswordModalOpen(false)}
         onSuccess={(successMessage) => {
-          setError("");
-          setMessage(successMessage);
+          showToast(successMessage);
         }}
       />
     </div>

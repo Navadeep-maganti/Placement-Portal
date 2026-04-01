@@ -5,7 +5,9 @@ import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import StudentFooter from "../../components/Footer/StudentFooter";
 import ApplicationReviewModal from "../../components/Student/ApplicationReviewModal";
 import PageLoader from "../../components/Common/PageLoader";
+import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
+import useRecruiterToast from "../../hooks/useRecruiterToast";
 import api from "../../utils/api";
 import { formatStatusLabel } from "../../utils/studentApplication";
 
@@ -19,9 +21,9 @@ const JobsList = () => {
   const [pageLoading, setPageLoading] = useState(true);
   const [jobs, setJobs] = useState([]);
   const [error, setError] = useState("");
-  const [feedback, setFeedback] = useState("");
   const [selectedJob, setSelectedJob] = useState(null);
   const [applying, setApplying] = useState(false);
+  const { toast, showToast } = useRecruiterToast();
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -30,7 +32,9 @@ const JobsList = () => {
         const response = await api.get("/placements/allplacements/");
         setJobs(response.data || []);
       } catch (err) {
-        setError(err.response?.data?.detail || "Failed to fetch jobs");
+        const message = err.response?.data?.detail || "Failed to fetch jobs";
+        setError(message);
+        showToast(message, "error");
       } finally {
         setPageLoading(false);
       }
@@ -105,27 +109,27 @@ const JobsList = () => {
   };
 
   const handleBookmark = async (job) => {
-    try {
-      setError("");
-      setFeedback("");
-      if (job.is_bookmarked) {
-        await api.delete(`/bookmarks/${job.id}/`);
-        updateJobState(job.id, { is_bookmarked: false });
-        setFeedback("Bookmark removed.");
-        return;
-      }
+      try {
+        setError("");
+        if (job.is_bookmarked) {
+          await api.delete(`/bookmarks/${job.id}/`);
+          updateJobState(job.id, { is_bookmarked: false });
+          showToast("Bookmark removed.");
+          return;
+        }
 
-      await api.post("/bookmarks/", { placement_id: job.id });
-      updateJobState(job.id, { is_bookmarked: true });
-      setFeedback("Job bookmarked successfully.");
-    } catch (err) {
-      setError(
-        err.response?.data?.detail ||
+        await api.post("/bookmarks/", { placement_id: job.id });
+        updateJobState(job.id, { is_bookmarked: true });
+        showToast("Job bookmarked successfully.");
+      } catch (err) {
+        const message =
+          err.response?.data?.detail ||
           err.response?.data?.error ||
-          "Failed to update bookmark."
-      );
-    }
-  };
+          "Failed to update bookmark.";
+        setError(message);
+        showToast(message, "error");
+      }
+    };
 
   const handleApply = async (applicationProfile) => {
     if (!selectedJob) {
@@ -134,7 +138,6 @@ const JobsList = () => {
 
     try {
       setError("");
-      setFeedback("");
       setApplying(true);
       const response = await api.post("/applications/apply/", {
         placement_id: selectedJob.id,
@@ -146,19 +149,18 @@ const JobsList = () => {
         application_status:
           application?.status || selectedJob.application_status || "applied",
       });
-      setFeedback(
-        response.data?.message || "Application submitted successfully."
-      );
+      showToast(response.data?.message || "Application submitted successfully.");
       setSelectedJob(null);
     } catch (err) {
       const issues = err.response?.data?.eligibility_issues;
-      setError(
+      const message =
         Array.isArray(issues) && issues.length
           ? issues.join(" ")
           : err.response?.data?.detail ||
-              err.response?.data?.error ||
-              "Failed to apply."
-      );
+            err.response?.data?.error ||
+            "Failed to apply.";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setApplying(false);
     }
@@ -169,6 +171,7 @@ const JobsList = () => {
 
   return (
     <div className="jl-page">
+      <RecruiterToast toast={toast} modalOpen={Boolean(selectedJob)} />
       <StudentNavbar student={auth.user} />
 
       <div className="jl-container">
@@ -178,8 +181,6 @@ const JobsList = () => {
             Browse open roles, bookmark the best matches, and apply with your
             current profile.
           </p>
-          {error && <p className="jl-message jl-error">{error}</p>}
-          {feedback && <p className="jl-message jl-success">{feedback}</p>}
         </div>
 
         <div className="jl-filters">
@@ -329,7 +330,10 @@ const JobsList = () => {
         job={selectedJob}
         submitting={applying}
         error={error}
-        onClose={() => setSelectedJob(null)}
+        onClose={() => {
+          setSelectedJob(null);
+          setError("");
+        }}
         onSubmit={handleApply}
       />
       <StudentFooter />

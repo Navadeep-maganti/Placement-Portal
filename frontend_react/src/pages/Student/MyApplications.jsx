@@ -4,7 +4,9 @@ import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import StudentFooter from "../../components/Footer/StudentFooter";
 import ConfirmDialog from "../../components/Student/ConfirmDialog";
 import PageLoader from "../../components/Common/PageLoader";
+import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import api from "../../utils/api";
+import useRecruiterToast from "../../hooks/useRecruiterToast";
 import "../../styles/css/MyApplications.css";
 import { formatStatusLabel } from "../../utils/studentApplication";
 
@@ -26,22 +28,20 @@ const MyApplications = () => {
   const [sortBy, setSortBy] = useState("recent");
   const [applications, setApplications] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [feedback, setFeedback] = useState("");
   const [processingId, setProcessingId] = useState(null);
   const [declineTarget, setDeclineTarget] = useState(null);
+  const { toast, showToast } = useRecruiterToast();
 
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        setError("");
         const response = await api.get("/applications/myapplications/");
         setApplications(response.data || []);
       } catch (err) {
-        setError(
+        const message =
           err.response?.data?.detail ||
-            "Failed to load applications. Please log in again."
-        );
+          "Failed to load applications. Please log in again.";
+        showToast(message, "error");
       } finally {
         setPageLoading(false);
       }
@@ -60,8 +60,6 @@ const MyApplications = () => {
   const handleOfferDecision = async (applicationId, decision) => {
     try {
       setProcessingId(applicationId);
-      setError("");
-      setFeedback("");
       const response = await api.post(
         `/applications/${applicationId}/offer-decision/`,
         { decision }
@@ -71,17 +69,17 @@ const MyApplications = () => {
           application.id === applicationId ? response.data : application
         )
       );
-      setFeedback(
+      showToast(
         decision === "accept"
           ? "Offer accepted successfully."
           : "Offer declined successfully."
       );
     } catch (err) {
-      setError(
+      const message =
         err.response?.data?.detail ||
-          err.response?.data?.error ||
-          "Failed to update offer decision."
-      );
+        err.response?.data?.error ||
+        "Failed to update offer decision.";
+      showToast(message, "error");
     } finally {
       setProcessingId(null);
     }
@@ -108,14 +106,13 @@ const MyApplications = () => {
 
   return (
     <div className="ma-my-applications-page">
+      <RecruiterToast toast={toast} modalOpen={Boolean(declineTarget)} />
       <StudentNavbar student={auth.user} />
 
       <div className="ma-applications-container">
         <div className="ma-applications-header">
           <h1>My Applications</h1>
           <p>Track applications, offer outcomes, and recruiter status updates.</p>
-          {error && <p className="ma-inline-message ma-error">{error}</p>}
-          {feedback && <p className="ma-inline-message ma-success">{feedback}</p>}
         </div>
 
         <div className="ma-stats-cards">

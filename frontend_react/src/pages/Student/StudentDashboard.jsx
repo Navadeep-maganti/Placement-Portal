@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import StudentFooter from "../../components/Footer/StudentFooter";
 import PageLoader from "../../components/Common/PageLoader";
+import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
+import useRecruiterToast from "../../hooks/useRecruiterToast";
 import "../../styles/css/StudentDashboard.css";
 import api from "../../utils/api";
 
@@ -22,6 +24,7 @@ function StudentDashboard() {
   const [applications, setApplications] = useState([]);
   const [bookmarks, setBookmarks] = useState([]);
   const [jobs, setJobs] = useState([]);
+  const { toast, showToast } = useRecruiterToast();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -36,10 +39,11 @@ function StudentDashboard() {
         setApplications(applicationsRes.data || []);
         setJobs(jobsRes.data || []);
       } catch (err) {
-        setError(
+        const message =
           err.response?.data?.detail ||
-            "Failed to load dashboard data. Please refresh and try again."
-        );
+          "Failed to load dashboard data. Please refresh and try again.";
+        setError(message);
+        showToast(message, "error");
       } finally {
         setPageLoading(false);
       }
@@ -100,6 +104,7 @@ function StudentDashboard() {
 
   return (
     <>
+      <RecruiterToast toast={toast} />
       <StudentNavbar student={auth.user} />
       <div className="student-dashboard-body">
         <section className="sd-hero">
