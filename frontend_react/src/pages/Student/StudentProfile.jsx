@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import StudentFooter from "../../components/Footer/StudentFooter";
+import PageLoader from "../../components/Common/PageLoader";
 import { useAuth } from "../../contexts/AuthContext";
 import api from "../../utils/api";
 import "../../styles/css/StudentProfile.css";
@@ -89,7 +90,7 @@ function StudentProfile() {
     return new URL(resumePath, BACKEND_ORIGIN).toString();
   }, [auth.user?.resume, removeResume]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <PageLoader />;
   if (!auth.user) return <p>No user data</p>;
 
   const handleChange = (event) => {

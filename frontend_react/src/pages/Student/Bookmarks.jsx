@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import StudentNavbar from '../../components/Navbar/StudentNavbar'
 import ApplicationReviewModal from '../../components/Student/ApplicationReviewModal'
+import PageLoader from '../../components/Common/PageLoader'
 import { useAuth } from '../../contexts/AuthContext'
 import api from '../../utils/api'
 import '../../styles/css/Bookmarks.css'
@@ -57,7 +58,7 @@ const Bookmarks = () => {
     }
   }, [loading, auth.user]);
 
-  if (loading || pageLoading) return <p>Loading...</p>;
+  if (loading || pageLoading) return <PageLoader />;
   if (!auth.user) return <p>No user data</p>;
 
   const handleRemoveBookmark = async (bookmark) => {

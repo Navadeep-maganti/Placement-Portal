@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
+import PageLoader from "../../components/Common/PageLoader";
 import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
 import useRecruiterToast from "../../hooks/useRecruiterToast";
@@ -83,7 +84,7 @@ function CompanyProfile() {
     }
   };
 
-  if (loading || pageLoading) return <p>Loading profile...</p>;
+  if (loading || pageLoading) return <PageLoader />;
   if (!auth.user) return <p>User information is unavailable.</p>;
 
   return (

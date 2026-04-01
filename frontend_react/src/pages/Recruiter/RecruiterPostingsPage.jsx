@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../styles/css/Post.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
+import PageLoader from "../../components/Common/PageLoader";
 import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
 import useRecruiterToast from "../../hooks/useRecruiterToast";
@@ -280,7 +281,7 @@ function RecruiterPostingsPage() {
     }
   };
 
-  if (loading || pageLoading) return <p>Loading job listings...</p>;
+  if (loading || pageLoading) return <PageLoader />;
   if (!auth.user) return <p>User information is unavailable.</p>;
 
   return (

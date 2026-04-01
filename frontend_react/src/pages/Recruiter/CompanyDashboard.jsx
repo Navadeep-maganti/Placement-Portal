@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/css/CompanyDashboard.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
+import PageLoader from "../../components/Common/PageLoader";
 import { useAuth } from "../../contexts/AuthContext";
 import { FiBriefcase, FiUsers, FiUserCheck, FiCalendar } from "react-icons/fi";
 import api from "../../utils/api";
@@ -59,7 +60,7 @@ function companyDashboard() {
     return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
   };
 
-  if (loading || pageLoading) return <p>Loading dashboard...</p>;
+  if (loading || pageLoading) return <PageLoader />;
   if (!auth.user) return <p>User information is unavailable.</p>;
   return (
     <>

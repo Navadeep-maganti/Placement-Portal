@@ -27,9 +27,15 @@ import EditJob from "../pages/Admin/EditJob";
 
 /* Route Protection */
 import PrivateRoute from "./PrivateRoute";
+import PageLoader from "../components/Common/PageLoader";
 
 function HomeRedirect() {
-  const { auth } = useAuth();
+  const { auth, loading } = useAuth();
+
+  if (loading) {
+    return <PageLoader />;
+  }
+
   if (auth.access) {
     if (auth.role === "student") {
       return <Navigate to="/student/dashboard" />;

@@ -3,6 +3,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import StudentFooter from "../../components/Footer/StudentFooter";
 import ConfirmDialog from "../../components/Student/ConfirmDialog";
+import PageLoader from "../../components/Common/PageLoader";
 import api from "../../utils/api";
 import "../../styles/css/MyApplications.css";
 import { formatStatusLabel } from "../../utils/studentApplication";
@@ -53,7 +54,7 @@ const MyApplications = () => {
     }
   }, [loading, auth.user]);
 
-  if (loading || pageLoading) return <p>Loading applications...</p>;
+  if (loading || pageLoading) return <PageLoader />;
   if (!auth.user) return <p>No user data</p>;
 
   const handleOfferDecision = async (applicationId, decision) => {

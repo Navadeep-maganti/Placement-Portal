@@ -1,6 +1,7 @@
 import "../../styles/css/Post.css"
 import React, { useMemo, useState } from "react";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
+import PageLoader from "../../components/Common/PageLoader";
 import { useAuth } from "../../contexts/AuthContext";
 import { FiBriefcase, FiDollarSign, FiFilter, FiHeadphones } from "react-icons/fi";
 
@@ -54,7 +55,7 @@ function MyPostings() {
     setDeadlineError("");
   };
 
-  if (loading) return <p>Loading job listing form...</p>;
+  if (loading) return <PageLoader />;
   if (!auth.user) return <p>User information is unavailable.</p>;
 
   return (

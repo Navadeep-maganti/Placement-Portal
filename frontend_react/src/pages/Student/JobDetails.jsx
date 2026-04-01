@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import StudentFooter from "../../components/Footer/StudentFooter";
 import ApplicationReviewModal from "../../components/Student/ApplicationReviewModal";
+import PageLoader from "../../components/Common/PageLoader";
 import { useAuth } from "../../contexts/AuthContext";
 import api from "../../utils/api";
 import "../../styles/css/JobDetails.css";
@@ -61,7 +62,7 @@ const JobDetails = () => {
     ];
   }, [job]);
 
-  if (loading || pageLoading) return <p>Loading...</p>;
+  if (loading || pageLoading) return <PageLoader />;
   if (!auth.user) return <p>Please log in to view job details</p>;
 
   const handleBookmark = async () => {

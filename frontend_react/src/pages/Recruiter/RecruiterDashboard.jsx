@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../../styles/css/CompanyDashboard.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
 import ApplicantProfileModalEnhanced from "../../components/Recruiter/ApplicantProfileModalEnhanced";
+import PageLoader from "../../components/Common/PageLoader";
 import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
 import useRecruiterToast from "../../hooks/useRecruiterToast";
@@ -111,7 +112,7 @@ function RecruiterDashboard() {
     return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
   };
 
-  if (loading || pageLoading) return <p>Loading dashboard...</p>;
+  if (loading || pageLoading) return <PageLoader />;
   if (!auth.user) return <p>User information is unavailable.</p>;
 
   return (

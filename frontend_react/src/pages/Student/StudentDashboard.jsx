@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import StudentFooter from "../../components/Footer/StudentFooter";
+import PageLoader from "../../components/Common/PageLoader";
 import { useAuth } from "../../contexts/AuthContext";
 import "../../styles/css/StudentDashboard.css";
 import api from "../../utils/api";
@@ -94,7 +95,7 @@ function StudentDashboard() {
     return appliedAt >= weekAgo;
   }).length;
 
-  if (loading || pageLoading) return <p>Loading dashboard...</p>;
+  if (loading || pageLoading) return <PageLoader />;
   if (!auth.user) return <p>No user data</p>;
 
   return (

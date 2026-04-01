@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/css/Applications.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
+import PageLoader from "../../components/Common/PageLoader";
 import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
 import useRecruiterToast from "../../hooks/useRecruiterToast";
@@ -124,7 +125,7 @@ function ViewApplicants(){
         }
     };
 
-    if (loading || pageLoading) return <p>Loading applicant records...</p>;
+    if (loading || pageLoading) return <PageLoader />;
     if (!auth.user) return <p>User information is unavailable.</p>;
 
     return(

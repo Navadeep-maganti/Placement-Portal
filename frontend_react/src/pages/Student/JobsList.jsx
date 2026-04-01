@@ -4,6 +4,7 @@ import "../../styles/css/JobsList.css";
 import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import StudentFooter from "../../components/Footer/StudentFooter";
 import ApplicationReviewModal from "../../components/Student/ApplicationReviewModal";
+import PageLoader from "../../components/Common/PageLoader";
 import { useAuth } from "../../contexts/AuthContext";
 import api from "../../utils/api";
 import { formatStatusLabel } from "../../utils/studentApplication";
@@ -163,7 +164,7 @@ const JobsList = () => {
     }
   };
 
-  if (loading || pageLoading) return <p>Loading...</p>;
+  if (loading || pageLoading) return <PageLoader />;
   if (!auth.user) return <p>No user data</p>;
 
   return (

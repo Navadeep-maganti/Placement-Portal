@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../styles/css/Manage.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
+import PageLoader from "../../components/Common/PageLoader";
 import { useAuth } from "../../contexts/AuthContext";
 import api from "../../utils/api";
 
@@ -62,7 +63,7 @@ function Manage() {
     };
   }, [postings]);
 
-  if (loading || pageLoading) return <p>Loading opening management...</p>;
+  if (loading || pageLoading) return <PageLoader />;
   if (!auth.user) return <p>User information is unavailable.</p>;
 
   return (
@@ -132,7 +133,7 @@ function Manage() {
                       <div>
                         <h3>{posting.job_title}</h3>
                         <p>
-                          Deadline {new Date(posting.application_deadline).toLocaleDateString()} {" � "}
+                          Deadline {new Date(posting.application_deadline).toLocaleDateString()} {" • "}
                           {posting.no_of_positions} positions
                         </p>
                       </div>
@@ -183,3 +184,4 @@ function Manage() {
 }
 
 export default Manage;
+

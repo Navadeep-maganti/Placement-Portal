@@ -1,13 +1,14 @@
 import { useAuth } from "../../contexts/AuthContext";
 import LandingNavbar from "../../components/Navbar/LandingNavbar";
 import LandingFooter from "../../components/Footer/LandingFooter";
+import PageLoader from "../../components/Common/PageLoader";
 import "../../styles/css/LandingPage.css";
 import { Link } from "react-router-dom";
 
 function LandingPage() {
   const { loading } = useAuth();
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <PageLoader />;
 
   return (
     <>
