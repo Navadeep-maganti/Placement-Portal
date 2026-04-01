@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import StudentFooter from "../../components/Footer/StudentFooter";
+import ChangePasswordModal from "../../components/Common/ChangePasswordModal";
 import PageLoader from "../../components/Common/PageLoader";
 import { useAuth } from "../../contexts/AuthContext";
 import api from "../../utils/api";
@@ -33,6 +34,7 @@ function StudentProfile() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
 
   useEffect(() => {
     if (!auth.user) {
@@ -426,11 +428,41 @@ function StudentProfile() {
                 </div>
               </div>
             </div>
+
+            <div className="sp-card">
+              <div className="sp-card-header">
+                <h2>Account Security</h2>
+                <p>Update your password to keep your account protected.</p>
+              </div>
+
+              <p className="sp-security-copy">
+                You will be asked to enter your current password before saving
+                a new one.
+              </p>
+
+              <div className="sp-inline-actions">
+                <button
+                  type="button"
+                  className="sp-secondary-btn"
+                  onClick={() => setPasswordModalOpen(true)}
+                >
+                  Change Password
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <StudentFooter />
+      <ChangePasswordModal
+        open={passwordModalOpen}
+        onClose={() => setPasswordModalOpen(false)}
+        onSuccess={(successMessage) => {
+          setError("");
+          setMessage(successMessage);
+        }}
+      />
     </div>
   );
 }

@@ -159,6 +159,7 @@
 }
 
 .sm-grid input,
+.sm-field input,
 .sm-full textarea {
   width: 100%;
   box-sizing: border-box;
@@ -172,6 +173,7 @@
 }
 
 .sm-grid input:focus,
+.sm-field input:focus,
 .sm-full textarea:focus {
   outline: none;
   border-color: var(--student-accent);
@@ -185,6 +187,32 @@
 
 .sm-full textarea {
   resize: vertical;
+}
+
+.sm-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--student-text);
+  font-weight: 600;
+}
+
+.sm-field-error {
+  color: #b91c1c;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.sm-note {
+  margin: 0;
+  color: var(--student-text-muted);
+  line-height: 1.6;
 }
 
 .sm-footer {

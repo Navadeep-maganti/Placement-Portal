@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
+import ChangePasswordModal from "../../components/Common/ChangePasswordModal";
 import PageLoader from "../../components/Common/PageLoader";
 import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
@@ -24,6 +25,7 @@ function CompanyProfile() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const { toast, showToast } = useRecruiterToast();
 
   useEffect(() => {
@@ -155,8 +157,36 @@ function CompanyProfile() {
               </button>
             </div>
           </form>
+
+          <section className="cp-card cp-security-card">
+            <div className="cp-security-head">
+              <div>
+                <h2>Account Security</h2>
+                <p>
+                  Change your password with confirmation before the update is
+                  applied.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="cp-secondary-btn"
+                onClick={() => setPasswordModalOpen(true)}
+              >
+                Change Password
+              </button>
+            </div>
+          </section>
         </main>
       </div>
+      <ChangePasswordModal
+        open={passwordModalOpen}
+        onClose={() => setPasswordModalOpen(false)}
+        onSuccess={(successMessage) => {
+          setError("");
+          setFeedback(successMessage);
+          showToast(successMessage);
+        }}
+      />
     </>
   );
 }

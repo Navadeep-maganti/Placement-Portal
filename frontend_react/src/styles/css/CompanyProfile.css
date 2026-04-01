@@ -47,6 +47,11 @@
   padding: clamp(20px, 3vw, 28px);
 }
 
+.cp-card h2 {
+  margin: 0 0 0.5rem;
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+}
+
 .cp-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -93,16 +98,31 @@
   justify-content: flex-end;
 }
 
-.cp-primary-btn {
+.cp-primary-btn,
+.cp-secondary-btn {
   border: none;
   border-radius: 999px;
-  background: linear-gradient(120deg, #2563eb, #5fa0ff);
-  color: #fff;
   padding: 12px 20px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cp-primary-btn {
+  background: linear-gradient(120deg, #2563eb, #5fa0ff);
+  color: #fff;
   box-shadow: 0 12px 24px rgba(37, 99, 235, 0.24);
+}
+
+.cp-secondary-btn {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.cp-primary-btn:hover,
+.cp-secondary-btn:hover {
+  transform: translateY(-1px);
 }
 
 .cp-inline-message {
@@ -117,6 +137,23 @@
   color: #166534;
 }
 
+.cp-security-card {
+  margin-top: 24px;
+}
+
+.cp-security-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.cp-security-head p {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
 @media (max-width: 720px) {
   .cp-page {
     padding: 24px 14px 36px;
@@ -126,5 +163,10 @@
   .cp-grid {
     grid-template-columns: 1fr;
     flex-direction: column;
+  }
+
+  .cp-security-head {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
