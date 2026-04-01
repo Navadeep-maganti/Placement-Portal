@@ -23,10 +23,9 @@ function StudentFooter() {
 
         <div className="sf-links">
           <h4>Resources</h4>
-          <Link to="/student/prep">Interview Prep</Link>
+          <Link to="/student/mentors">Mentors</Link>
           <Link to="/student/workshops">Workshops</Link>
           <Link to="/student/hackathons">Hackathons</Link>
-          <Link to="/student/mentors">Mentors</Link>
         </div>
 
         <div className="sf-contact">
@@ -38,7 +37,7 @@ function StudentFooter() {
       </div>
 
       <div className="sf-bottom">
-        <span>© 2026 NIT AP Placement Portal</span>
+        <span>Copyright 2026 NIT AP Placement Portal</span>
         <span>All rights reserved</span>
       </div>
     </footer>
