@@ -158,6 +158,18 @@
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
+.cd-overview-button {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.cd-overview-button:disabled {
+  cursor: not-allowed;
+}
+
 .cd-overview-icon {
   display: inline-flex;
   align-items: center;

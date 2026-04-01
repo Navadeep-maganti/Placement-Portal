@@ -121,6 +121,13 @@ function RecruiterDashboard() {
     return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
   };
 
+  const handleOverviewNavigation = (destination, state = {}) => {
+    if (!isApproved) {
+      return;
+    }
+    navigate(destination, { state });
+  };
+
   if (loading || pageLoading) return <PageLoader />;
   if (!auth.user) return <p>User information is unavailable.</p>;
 
@@ -173,7 +180,12 @@ function RecruiterDashboard() {
             <span className="cd-section-tag">This month</span>
           </div>
           <div className="cd-overview-div">
-            <div className="cd-overview-card cd-active-job-posts">
+            <button
+              type="button"
+              className="cd-overview-card cd-overview-button cd-active-job-posts"
+              disabled={!isApproved}
+              onClick={() => handleOverviewNavigation("/Recruiter/Manage")}
+            >
               <div className="cd-overview-head">
                 <span className="cd-overview-icon">
                   <FiBriefcase size={18} />
@@ -183,8 +195,13 @@ function RecruiterDashboard() {
               <p className="cd-overview-count">
                 {dashboard.overview.active_job_posts}
               </p>
-            </div>
-            <div className="cd-overview-card cd-total-applicants">
+            </button>
+            <button
+              type="button"
+              className="cd-overview-card cd-overview-button cd-total-applicants"
+              disabled={!isApproved}
+              onClick={() => handleOverviewNavigation("/Recruiter/ViewApplicants")}
+            >
               <div className="cd-overview-head">
                 <span className="cd-overview-icon">
                   <FiUsers size={18} />
@@ -194,8 +211,17 @@ function RecruiterDashboard() {
               <p className="cd-overview-count">
                 {dashboard.overview.total_applicants}
               </p>
-            </div>
-            <div className="cd-overview-card cd-shortlisted-students">
+            </button>
+            <button
+              type="button"
+              className="cd-overview-card cd-overview-button cd-shortlisted-students"
+              disabled={!isApproved}
+              onClick={() =>
+                handleOverviewNavigation("/Recruiter/ViewApplicants", {
+                  statusFilter: "shortlisted",
+                })
+              }
+            >
               <div className="cd-overview-head">
                 <span className="cd-overview-icon">
                   <FiUserCheck size={18} />
@@ -205,8 +231,17 @@ function RecruiterDashboard() {
               <p className="cd-overview-count">
                 {dashboard.overview.shortlisted_students}
               </p>
-            </div>
-            <div className="cd-overview-card cd-scheduled-interviews">
+            </button>
+            <button
+              type="button"
+              className="cd-overview-card cd-overview-button cd-scheduled-interviews"
+              disabled={!isApproved}
+              onClick={() =>
+                handleOverviewNavigation("/Recruiter/ViewApplicants", {
+                  statusFilter: "interview_scheduled",
+                })
+              }
+            >
               <div className="cd-overview-head">
                 <span className="cd-overview-icon">
                   <FiCalendar size={18} />
@@ -216,7 +251,7 @@ function RecruiterDashboard() {
               <p className="cd-overview-count">
                 {dashboard.overview.scheduled_interviews}
               </p>
-            </div>
+            </button>
           </div>
         </section>
 
