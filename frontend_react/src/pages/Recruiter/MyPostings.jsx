@@ -1,12 +1,14 @@
 import "../../styles/css/Post.css"
 import React, { useMemo, useState } from "react";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
+import RecruiterApprovalPending from "../../components/Recruiter/RecruiterApprovalPending";
 import PageLoader from "../../components/Common/PageLoader";
 import { useAuth } from "../../contexts/AuthContext";
 import { FiBriefcase, FiDollarSign, FiFilter, FiHeadphones } from "react-icons/fi";
 
 function MyPostings() {
   const { auth, loading } = useAuth();
+  const isApproved = Boolean(auth.user?.is_approved);
   const toDateInputValue = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -57,6 +59,14 @@ function MyPostings() {
 
   if (loading) return <PageLoader />;
   if (!auth.user) return <p>User information is unavailable.</p>;
+  if (!isApproved) {
+    return (
+      <>
+        <CompanyNavbar Company={auth.user} />
+        <RecruiterApprovalPending />
+      </>
+    );
+  }
 
   return (
     <>

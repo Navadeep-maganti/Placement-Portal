@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "../../styles/css/Post.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
 import PageLoader from "../../components/Common/PageLoader";
+import RecruiterApprovalPending from "../../components/Recruiter/RecruiterApprovalPending";
 import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
 import useRecruiterToast from "../../hooks/useRecruiterToast";
@@ -21,6 +22,7 @@ const emptyForm = {
 
 function RecruiterPostingsPage() {
   const { auth, loading } = useAuth();
+  const isApproved = Boolean(auth.user?.is_approved);
   const location = useLocation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState(emptyForm);
@@ -84,12 +86,13 @@ function RecruiterPostingsPage() {
       }
     };
 
-    if (!loading && auth.user) {
+    if (!loading && auth.user && isApproved) {
       loadPage();
     } else if (!loading) {
       setPageLoading(false);
+      setSkillLoading(false);
     }
-  }, [loading, auth.user, showToast]);
+  }, [loading, auth.user, isApproved, showToast]);
 
   useEffect(() => {
     const posting = location.state?.editPosting;
@@ -283,6 +286,17 @@ function RecruiterPostingsPage() {
 
   if (loading || pageLoading) return <PageLoader />;
   if (!auth.user) return <p>User information is unavailable.</p>;
+  if (!isApproved) {
+    return (
+      <>
+        <CompanyNavbar Company={auth.user} />
+        <RecruiterApprovalPending
+          title="Job Listings Unavailable"
+          message="Your recruiter profile is currently under administrative review. Access to job listing creation and management will be enabled once your account has been approved."
+        />
+      </>
+    );
+  }
 
   return (
     <>

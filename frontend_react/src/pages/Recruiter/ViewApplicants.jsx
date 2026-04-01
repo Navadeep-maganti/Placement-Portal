@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../../styles/css/Applications.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
 import PageLoader from "../../components/Common/PageLoader";
+import RecruiterApprovalPending from "../../components/Recruiter/RecruiterApprovalPending";
 import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
 import useRecruiterToast from "../../hooks/useRecruiterToast";
@@ -11,6 +12,7 @@ import api from "../../utils/api";
 function ViewApplicants(){
     const { auth, loading } = useAuth();
     const navigate = useNavigate();
+    const isApproved = Boolean(auth.user?.is_approved);
     const [applications, setApplications] = useState([]);
     const [statuses, setStatuses] = useState([]);
     const [pageLoading, setPageLoading] = useState(true);
@@ -43,12 +45,12 @@ function ViewApplicants(){
             }
         };
 
-        if (!loading && auth.user) {
+        if (!loading && auth.user && isApproved) {
             fetchApplicants();
         } else if (!loading) {
             setPageLoading(false);
         }
-    }, [loading, auth.user, showToast]);
+    }, [loading, auth.user, isApproved, showToast]);
 
     const statusLabel = (status) =>
         status
@@ -127,6 +129,14 @@ function ViewApplicants(){
 
     if (loading || pageLoading) return <PageLoader />;
     if (!auth.user) return <p>User information is unavailable.</p>;
+    if (!isApproved) {
+        return (
+            <>
+                <CompanyNavbar Company={auth.user} />
+                <RecruiterApprovalPending />
+            </>
+        );
+    }
 
     return(
         <>

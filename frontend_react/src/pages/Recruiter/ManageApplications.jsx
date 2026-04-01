@@ -2,6 +2,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../styles/css/Manage.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
+import RecruiterApprovalPending from "../../components/Recruiter/RecruiterApprovalPending";
 import PageLoader from "../../components/Common/PageLoader";
 import { useAuth } from "../../contexts/AuthContext";
 import api from "../../utils/api";
@@ -10,6 +11,7 @@ function Manage() {
   const { auth, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isApproved = Boolean(auth.user?.is_approved);
   const [postings, setPostings] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState("");
@@ -32,12 +34,12 @@ function Manage() {
       }
     };
 
-    if (!loading && auth.user) {
+    if (!loading && auth.user && isApproved) {
       fetchManageData();
     } else if (!loading) {
       setPageLoading(false);
     }
-  }, [loading, auth.user]);
+  }, [loading, auth.user, isApproved]);
 
   useEffect(() => {
     if (location.state?.message) {
@@ -65,6 +67,17 @@ function Manage() {
 
   if (loading || pageLoading) return <PageLoader />;
   if (!auth.user) return <p>User information is unavailable.</p>;
+  if (!isApproved) {
+    return (
+      <>
+        <CompanyNavbar Company={auth.user} />
+        <RecruiterApprovalPending
+          title="Opening Management Unavailable"
+          message="Your recruiter profile is currently under administrative review. Opening management features will become available after your account has been approved."
+        />
+      </>
+    );
+  }
 
   return (
     <>
