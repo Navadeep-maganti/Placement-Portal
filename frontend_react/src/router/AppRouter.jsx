@@ -11,6 +11,9 @@ import JobsList from "../pages/Student/JobsList";
 import JobDetails from "../pages/Student/JobDetails";
 import Bookmarks from "../pages/Student/Bookmarks";
 import StudentProfile from "../pages/Student/StudentProfile";
+import Mentors from "../pages/Student/Mentors";
+import Workshops from "../pages/Student/Workshops";
+import Hackathons from "../pages/Student/Hackathons";
 
 /* Company Pages */
 import CompanyDashboard from "../pages/Recruiter/RecruiterDashboard";
@@ -110,6 +113,33 @@ export default function AppRouter() {
         element={
           <PrivateRoute allowedRoles={["student"]}>
             <StudentProfile />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/student/mentors"
+        element={
+          <PrivateRoute allowedRoles={["student"]}>
+            <Mentors />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/student/workshops"
+        element={
+          <PrivateRoute allowedRoles={["student"]}>
+            <Workshops />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/student/hackathons"
+        element={
+          <PrivateRoute allowedRoles={["student"]}>
+            <Hackathons />
           </PrivateRoute>
         }
       />

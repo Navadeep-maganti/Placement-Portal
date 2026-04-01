@@ -241,20 +241,23 @@ function StudentDashboard() {
             <Link className="category-card" to="/student/profile">
               Profile management
             </Link>
-            <Link className="category-card" to="/student/profile">
-              Resume management
-            </Link>
             <Link className="category-card" to="/student/jobs">
               Job discovery
-            </Link>
-            <Link className="category-card" to="/student/bookmarks">
-              Job bookmarking
             </Link>
             <Link className="category-card" to="/student/applications">
               Application tracking
             </Link>
-            <Link className="category-card" to="/student/applications">
-              Offer management
+            <Link className="category-card" to="/student/mentors">
+              Mentor connect
+            </Link>
+            <Link className="category-card" to="/student/workshops">
+              Workshop calendar
+            </Link>
+            <Link className="category-card" to="/student/hackathons">
+              Hackathon board
+            </Link>
+            <Link className="category-card" to="/student/bookmarks">
+              Saved opportunities
             </Link>
           </div>
         </section>
