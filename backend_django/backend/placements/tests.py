@@ -132,6 +132,13 @@ class RecruiterPostingsApiTests(APITestCase):
             last_name="Dent",
             role="student",
         )
+        self.pending_company_user = User.objects.create_user(
+            email="pending@example.com",
+            password="password123",
+            first_name="Pending",
+            last_name="Recruiter",
+            role="company",
+        )
 
         self.company = Company.objects.create(
             user=self.company_user,
@@ -148,6 +155,14 @@ class RecruiterPostingsApiTests(APITestCase):
             industry="Software",
             description="Software company",
             is_approved=True,
+        )
+        self.pending_company = Company.objects.create(
+            user=self.pending_company_user,
+            company_name="Pending Labs",
+            location="Chennai",
+            industry="Software",
+            description="Pending approval company",
+            is_approved=False,
         )
 
         self.own_placement = Placement.objects.create(
@@ -290,3 +305,43 @@ class RecruiterPostingsApiTests(APITestCase):
         self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(reuse_response.status_code, status.HTTP_200_OK)
         self.assertEqual(Skill.objects.filter(name__iexact="Django").count(), 1)
+
+    def test_unapproved_company_cannot_create_posting(self):
+        self.client.force_authenticate(user=self.pending_company_user)
+
+        response = self.client.post(
+            "/api/placements/my-postings/",
+            {
+                "job_title": "Pending Role",
+                "job_description": "Should not be created",
+                "salary": "10.00",
+                "eligibility_cgpa": 7.0,
+                "application_deadline": str(date.today() + timedelta(days=14)),
+                "is_active": True,
+                "no_of_positions": 1,
+                "required_skills": [],
+                "eligibility_details": {"min_cgpa": 7.0},
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(
+            response.data["detail"],
+            "Your recruiter account is pending admin approval.",
+        )
+
+    def test_unapproved_company_cannot_create_skill(self):
+        self.client.force_authenticate(user=self.pending_company_user)
+
+        response = self.client.post(
+            "/api/placements/skills/",
+            {"name": "Go"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(
+            response.data["detail"],
+            "Your recruiter account is pending admin approval.",
+        )

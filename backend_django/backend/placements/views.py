@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from activitylog.models import ActivityLog
 from activitylog.serializers import ActivityLogSerializer
 from applications.models import Application
-from api.permissions import IsCompany
+from api.permissions import IsApprovedCompany, IsCompany
 from bookmarks.models import Bookmark
 from companies.views import get_or_create_company_for_user
 from .models import Placement, Skill
@@ -88,7 +88,7 @@ class RecruiterPlacementMixin:
 
 
 class RecruiterPlacementListCreateView(RecruiterPlacementMixin, generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAuthenticated, IsCompany]
+    permission_classes = [permissions.IsAuthenticated, IsCompany, IsApprovedCompany]
 
     def perform_create(self, serializer):
         company = self.get_company()
@@ -99,7 +99,7 @@ class RecruiterPlacementDetailView(
     RecruiterPlacementMixin,
     generics.RetrieveUpdateDestroyAPIView,
 ):
-    permission_classes = [permissions.IsAuthenticated, IsCompany]
+    permission_classes = [permissions.IsAuthenticated, IsCompany, IsApprovedCompany]
 
     def perform_update(self, serializer):
         placement = self.get_object()
@@ -117,6 +117,14 @@ class SkillsListCreateView(generics.ListCreateAPIView):
         return Skill.objects.order_by("name")
 
     def create(self, request, *args, **kwargs):
+        if request.user.role == "company":
+            company = getattr(request.user, "company", None)
+            if not company or not company.is_approved:
+                return Response(
+                    {"detail": "Your recruiter account is pending admin approval."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
         name = (request.data.get("name") or "").strip()
         if not name:
             return Response(

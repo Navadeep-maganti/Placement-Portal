@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
 import ChangePasswordModal from "../../components/Common/ChangePasswordModal";
 import PageLoader from "../../components/Common/PageLoader";
@@ -20,6 +21,8 @@ const emptyProfile = {
 
 function CompanyProfile() {
   const { auth, loading, refreshUser } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState(emptyProfile);
   const [pageLoading, setPageLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -50,6 +53,13 @@ function CompanyProfile() {
       setPageLoading(false);
     }
   }, [loading, auth.user, showToast]);
+
+  useEffect(() => {
+    if (location.state?.message) {
+      setFeedback(location.state.message);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.pathname, location.state, navigate]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;

@@ -13,6 +13,7 @@ import api from "../../utils/api";
 function RecruiterDashboard() {
   const { auth, loading } = useAuth();
   const navigate = useNavigate();
+  const isApproved = Boolean(auth.user?.is_approved);
   const [dashboard, setDashboard] = useState({
     overview: {
       active_job_posts: 0,
@@ -35,14 +36,21 @@ function RecruiterDashboard() {
     const fetchDashboard = async () => {
       try {
         setPageError("");
-        const [dashboardResponse, applicantsResponse, statusesResponse] = await Promise.all([
-          api.get("/placements/company-dashboard/"),
-          api.get("/applications/company-applicants/"),
-          api.get("/applications/statuses/"),
-        ]);
+        const dashboardResponse = await api.get("/placements/company-dashboard/");
         setDashboard(dashboardResponse.data || dashboard);
-        setApplications(applicantsResponse.data || []);
-        setStatuses(statusesResponse.data || []);
+
+        if (auth.user?.is_approved) {
+          const [applicantsResponse, statusesResponse] = await Promise.all([
+            api.get("/applications/company-applicants/"),
+            api.get("/applications/statuses/"),
+          ]);
+          setApplications(applicantsResponse.data || []);
+          setStatuses(statusesResponse.data || []);
+          return;
+        }
+
+        setApplications([]);
+        setStatuses([]);
       } catch (error) {
         const message =
           error.response?.data?.detail || "Failed to load company dashboard.";
@@ -131,12 +139,32 @@ function RecruiterDashboard() {
           <div className="cd-posting">
             <button
               className="cd-btn"
+              disabled={!isApproved}
               onClick={() => navigate("/Recruiter/MyPostings")}
             >
-              Create Job Posting
+              {isApproved ? "Create Job Posting" : "Approval Pending"}
             </button>
           </div>
         </section>
+
+        {!isApproved && (
+          <section className="cd-pending-banner">
+            <div>
+              <h3>Recruiter approval in progress</h3>
+              <p>
+                Your account has been created successfully, but job posting and
+                applicant management will unlock only after admin approval.
+                Meanwhile, you can complete your recruiter profile.
+              </p>
+            </div>
+            <button
+              className="cd-btn cd-btn-secondary"
+              onClick={() => navigate("/company/profile")}
+            >
+              Complete Profile
+            </button>
+          </section>
+        )}
 
         <section className="cd-main-div">
           <div className="cd-section-header">
@@ -196,6 +224,7 @@ function RecruiterDashboard() {
             <h3>Recent Activity</h3>
             <button
               className="cd-btn"
+              disabled={!isApproved}
               onClick={() => navigate("/Recruiter/ViewApplicants")}
             >
               Review All Applicants

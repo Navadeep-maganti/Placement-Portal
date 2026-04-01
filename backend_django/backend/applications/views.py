@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
-from api.permissions import IsCompany, IsStudent
+from api.permissions import IsApprovedCompany, IsCompany, IsStudent
 from placements.models import Placement
 from students.models import Student
 
@@ -94,7 +94,7 @@ class MyApplicationsView(generics.ListAPIView):
 
 class CompanyApplicantsView(generics.ListAPIView):
     serializer_class = CompanyApplicationSerializer
-    permission_classes = [permissions.IsAuthenticated, IsCompany]
+    permission_classes = [permissions.IsAuthenticated, IsCompany, IsApprovedCompany]
 
     def get_queryset(self):
         return Application.objects.filter(job__company__user=self.request.user).select_related(
@@ -120,6 +120,9 @@ class ApplicationStatusListView(generics.ListAPIView):
             return ApplicationStatus.objects.none()
         queryset = ApplicationStatus.objects.filter(is_active=True)
         if user.role == "company":
+            company = getattr(user, "company", None)
+            if not company or not company.is_approved:
+                return ApplicationStatus.objects.none()
             queryset = queryset.filter(
                 code__in={
                     "shortlisted",
@@ -216,6 +219,14 @@ class UpdateApplicationStatusView(generics.GenericAPIView):
         )
 
         user = request.user
+        if user.role == "company":
+            company = getattr(user, "company", None)
+            if not company or not company.is_approved:
+                return Response(
+                    {"detail": "Your recruiter account is pending admin approval."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
         if user.role == "company" and application.job.company.user_id != user.id:
             return Response(
                 {"error": "You can only update applications for your own jobs."},

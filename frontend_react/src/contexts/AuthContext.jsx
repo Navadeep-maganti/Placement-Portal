@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }) => {
       user: null,
     });
 
-    await fetchCurrentUser(data.role);
+    return await fetchCurrentUser(data.role);
   };
 
   const logout = () => {
