@@ -2,6 +2,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../styles/css/Manage.css";
 import CompanyNavbar from "../../components/Navbar/companyNavbar";
+import RecruiterFooter from "../../components/Footer/RecruiterFooter";
 import RecruiterApprovalPending from "../../components/Recruiter/RecruiterApprovalPending";
 import PageLoader from "../../components/Common/PageLoader";
 import { useAuth } from "../../contexts/AuthContext";
@@ -192,6 +193,7 @@ function Manage() {
           </section>
         </main>
       </div>
+      <RecruiterFooter />
     </>
   );
 }
