@@ -160,19 +160,28 @@ function StudentDashboard() {
             </div>
           )}
           <div className="overview-div">
-            <div className="overview-card appliedRoles">
+            <Link
+              className="overview-card overview-card-link appliedRoles"
+              to="/student/applications"
+            >
               <h4 className="overview-title">Applied Roles</h4>
               <p className="overview-count">{applications.length}</p>
               <p className="overview-footnote">
                 {recentWeekCount} new since last week
               </p>
-            </div>
-            <div className="overview-card bookmarkedRoles">
+            </Link>
+            <Link
+              className="overview-card overview-card-link bookmarkedRoles"
+              to="/student/bookmarks"
+            >
               <h4 className="overview-title">Bookmarked Roles</h4>
               <p className="overview-count">{bookmarks.length}</p>
               <p className="overview-footnote">Shortlist to stay focused</p>
-            </div>
-            <div className="overview-card shortlisted">
+            </Link>
+            <Link
+              className="overview-card overview-card-link shortlisted"
+              to="/student/applications?status=shortlisted"
+            >
               <h4 className="overview-title">Shortlisted</h4>
               <p className="overview-count">
                 {applications.filter((app) => app.status === "shortlisted").length}
@@ -181,8 +190,11 @@ function StudentDashboard() {
                 <span className="dot" aria-hidden="true" />
                 Recruiter activity
               </div>
-            </div>
-            <div className="overview-card offersRecieved">
+            </Link>
+            <Link
+              className="overview-card overview-card-link offersRecieved"
+              to="/student/applications?status=offers"
+            >
               <h4 className="overview-title">Offers Received</h4>
               <p className="overview-count">{offeredApplications.length}</p>
               <div className="congratulations">
@@ -191,7 +203,7 @@ function StudentDashboard() {
                 </span>
                 Review decisions
               </div>
-            </div>
+            </Link>
           </div>
         </section>
 

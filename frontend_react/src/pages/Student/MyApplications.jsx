@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import StudentFooter from "../../components/Footer/StudentFooter";
@@ -24,13 +25,19 @@ const getStatusColor = (status) => {
 
 const MyApplications = () => {
   const { auth, loading } = useAuth();
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryStatus = searchParams.get("status") || "all";
+  const [filterStatus, setFilterStatus] = useState(queryStatus);
   const [sortBy, setSortBy] = useState("recent");
   const [applications, setApplications] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
   const [declineTarget, setDeclineTarget] = useState(null);
   const { toast, showToast } = useRecruiterToast();
+
+  useEffect(() => {
+    setFilterStatus(queryStatus);
+  }, [queryStatus]);
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -86,7 +93,17 @@ const MyApplications = () => {
   };
 
   const filteredApplications = applications
-    .filter((app) => filterStatus === "all" || app.status === filterStatus)
+    .filter((app) => {
+      if (filterStatus === "all") {
+        return true;
+      }
+
+      if (filterStatus === "offers") {
+        return ["offered", "offer_accepted", "offer_declined"].includes(app.status);
+      }
+
+      return app.status === filterStatus;
+    })
     .sort((a, b) => {
       if (sortBy === "recent") {
         return new Date(b.application_date) - new Date(a.application_date);
@@ -103,6 +120,19 @@ const MyApplications = () => {
   const offeredCount = applications.filter((app) =>
     ["offered", "offer_accepted", "offer_declined"].includes(app.status)
   ).length;
+
+  const handleFilterChange = (nextStatus) => {
+    setFilterStatus(nextStatus);
+    const nextParams = new URLSearchParams(searchParams);
+
+    if (!nextStatus || nextStatus === "all") {
+      nextParams.delete("status");
+    } else {
+      nextParams.set("status", nextStatus);
+    }
+
+    setSearchParams(nextParams, { replace: true });
+  };
 
   return (
     <div className="ma-my-applications-page">
@@ -145,12 +175,13 @@ const MyApplications = () => {
         <div className="ma-filters-section">
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => handleFilterChange(e.target.value)}
             className="ma-filter-select"
           >
             <option value="all">All Status</option>
             <option value="applied">Applied</option>
             <option value="shortlisted">Shortlisted</option>
+            <option value="offers">All Offers</option>
             <option value="offered">Offered</option>
             <option value="offer_accepted">Offer Accepted</option>
             <option value="offer_declined">Offer Declined</option>

@@ -225,6 +225,12 @@ a{
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
+.overview-card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
 .overview-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--sd-shadow-soft);
