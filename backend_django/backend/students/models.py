@@ -11,6 +11,7 @@ class Student(models.Model):
     linkedin_url = models.URLField(blank=True)
     portfolio_url = models.URLField(blank=True)
     career_objective = models.TextField(blank=True)
+    skills = models.ManyToManyField("placements.Skill", blank=True, related_name="students")
     skills_summary = models.TextField(blank=True)
     bio = models.TextField(blank=True)
     resume = models.FileField(upload_to='resumes/', null=True, blank=True)

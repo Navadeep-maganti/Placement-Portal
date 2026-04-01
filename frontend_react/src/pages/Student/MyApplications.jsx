@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import StudentFooter from "../../components/Footer/StudentFooter";
 import ConfirmDialog from "../../components/Student/ConfirmDialog";
 import PageLoader from "../../components/Common/PageLoader";
+import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import api from "../../utils/api";
+import useRecruiterToast from "../../hooks/useRecruiterToast";
 import "../../styles/css/MyApplications.css";
 import { formatStatusLabel } from "../../utils/studentApplication";
 
@@ -22,26 +25,30 @@ const getStatusColor = (status) => {
 
 const MyApplications = () => {
   const { auth, loading } = useAuth();
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryStatus = searchParams.get("status") || "all";
+  const [filterStatus, setFilterStatus] = useState(queryStatus);
   const [sortBy, setSortBy] = useState("recent");
   const [applications, setApplications] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [feedback, setFeedback] = useState("");
   const [processingId, setProcessingId] = useState(null);
   const [declineTarget, setDeclineTarget] = useState(null);
+  const { toast, showToast } = useRecruiterToast();
+
+  useEffect(() => {
+    setFilterStatus(queryStatus);
+  }, [queryStatus]);
 
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        setError("");
         const response = await api.get("/applications/myapplications/");
         setApplications(response.data || []);
       } catch (err) {
-        setError(
+        const message =
           err.response?.data?.detail ||
-            "Failed to load applications. Please log in again."
-        );
+          "Failed to load applications. Please log in again.";
+        showToast(message, "error");
       } finally {
         setPageLoading(false);
       }
@@ -60,8 +67,6 @@ const MyApplications = () => {
   const handleOfferDecision = async (applicationId, decision) => {
     try {
       setProcessingId(applicationId);
-      setError("");
-      setFeedback("");
       const response = await api.post(
         `/applications/${applicationId}/offer-decision/`,
         { decision }
@@ -71,24 +76,34 @@ const MyApplications = () => {
           application.id === applicationId ? response.data : application
         )
       );
-      setFeedback(
+      showToast(
         decision === "accept"
           ? "Offer accepted successfully."
           : "Offer declined successfully."
       );
     } catch (err) {
-      setError(
+      const message =
         err.response?.data?.detail ||
-          err.response?.data?.error ||
-          "Failed to update offer decision."
-      );
+        err.response?.data?.error ||
+        "Failed to update offer decision.";
+      showToast(message, "error");
     } finally {
       setProcessingId(null);
     }
   };
 
   const filteredApplications = applications
-    .filter((app) => filterStatus === "all" || app.status === filterStatus)
+    .filter((app) => {
+      if (filterStatus === "all") {
+        return true;
+      }
+
+      if (filterStatus === "offers") {
+        return ["offered", "offer_accepted", "offer_declined"].includes(app.status);
+      }
+
+      return app.status === filterStatus;
+    })
     .sort((a, b) => {
       if (sortBy === "recent") {
         return new Date(b.application_date) - new Date(a.application_date);
@@ -106,16 +121,28 @@ const MyApplications = () => {
     ["offered", "offer_accepted", "offer_declined"].includes(app.status)
   ).length;
 
+  const handleFilterChange = (nextStatus) => {
+    setFilterStatus(nextStatus);
+    const nextParams = new URLSearchParams(searchParams);
+
+    if (!nextStatus || nextStatus === "all") {
+      nextParams.delete("status");
+    } else {
+      nextParams.set("status", nextStatus);
+    }
+
+    setSearchParams(nextParams, { replace: true });
+  };
+
   return (
     <div className="ma-my-applications-page">
+      <RecruiterToast toast={toast} modalOpen={Boolean(declineTarget)} />
       <StudentNavbar student={auth.user} />
 
       <div className="ma-applications-container">
         <div className="ma-applications-header">
           <h1>My Applications</h1>
           <p>Track applications, offer outcomes, and recruiter status updates.</p>
-          {error && <p className="ma-inline-message ma-error">{error}</p>}
-          {feedback && <p className="ma-inline-message ma-success">{feedback}</p>}
         </div>
 
         <div className="ma-stats-cards">
@@ -148,12 +175,13 @@ const MyApplications = () => {
         <div className="ma-filters-section">
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => handleFilterChange(e.target.value)}
             className="ma-filter-select"
           >
             <option value="all">All Status</option>
             <option value="applied">Applied</option>
             <option value="shortlisted">Shortlisted</option>
+            <option value="offers">All Offers</option>
             <option value="offered">Offered</option>
             <option value="offer_accepted">Offer Accepted</option>
             <option value="offer_declined">Offer Declined</option>

@@ -3,7 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import StudentNavbar from '../../components/Navbar/StudentNavbar'
 import ApplicationReviewModal from '../../components/Student/ApplicationReviewModal'
 import PageLoader from '../../components/Common/PageLoader'
+import RecruiterToast from '../../components/Recruiter/RecruiterToast'
 import { useAuth } from '../../contexts/AuthContext'
+import useRecruiterToast from '../../hooks/useRecruiterToast'
 import api from '../../utils/api'
 import '../../styles/css/Bookmarks.css'
 import StudentFooter from '../../components/Footer/StudentFooter'
@@ -30,9 +32,9 @@ const Bookmarks = () => {
   const [pageLoading, setPageLoading] = useState(true);
   const [viewType, setViewType] = useState('grid');
   const [sortBy, setSortBy] = useState('recent');
-  const [feedback, setFeedback] = useState('');
   const [selectedBookmark, setSelectedBookmark] = useState(null);
   const [applying, setApplying] = useState(false);
+  const { toast, showToast } = useRecruiterToast();
 
   useEffect(() => {
     const loadBookmarks = async () => {
@@ -41,11 +43,12 @@ const Bookmarks = () => {
         const response = await api.get('/bookmarks/');
         setBookmarks(response.data || []);
       } catch (err) {
-        setError(
+        const message =
           err.response?.data?.detail ||
-            err.response?.data?.error ||
-            'Failed to load bookmarks'
-        );
+          err.response?.data?.error ||
+          'Failed to load bookmarks';
+        setError(message);
+        showToast(message, 'error');
       } finally {
         setPageLoading(false);
       }
@@ -64,19 +67,19 @@ const Bookmarks = () => {
   const handleRemoveBookmark = async (bookmark) => {
     try {
       setError('');
-      setFeedback('');
       await api.delete(`/bookmarks/${bookmark.placement}/`);
       setBookmarks((prev) => prev.filter((item) => item.id !== bookmark.id));
       if (selectedBookmark?.id === bookmark.id) {
         setSelectedBookmark(null);
       }
-      setFeedback('Bookmark removed.');
+      showToast('Bookmark removed.');
     } catch (err) {
-      setError(
+      const message =
         err.response?.data?.detail ||
-          err.response?.data?.error ||
-          'Failed to remove bookmark'
-      );
+        err.response?.data?.error ||
+        'Failed to remove bookmark';
+      setError(message);
+      showToast(message, 'error');
     }
   };
 
@@ -91,7 +94,6 @@ const Bookmarks = () => {
 
     try {
       setError('');
-      setFeedback('');
       setApplying(true);
       const response = await api.post('/applications/apply/', {
         placement_id: selectedBookmark.placement,
@@ -110,17 +112,18 @@ const Bookmarks = () => {
             : item
         )
       );
-      setFeedback(response.data?.message || 'Application submitted successfully.');
+      showToast(response.data?.message || 'Application submitted successfully.');
       setSelectedBookmark(null);
     } catch (err) {
       const issues = err.response?.data?.eligibility_issues;
-      setError(
+      const message =
         Array.isArray(issues) && issues.length
           ? issues.join(' ')
           : err.response?.data?.detail ||
-              err.response?.data?.error ||
-              'Failed to apply'
-      );
+            err.response?.data?.error ||
+            'Failed to apply';
+      setError(message);
+      showToast(message, 'error');
     } finally {
       setApplying(false);
     }
@@ -169,6 +172,7 @@ const Bookmarks = () => {
 
   return (
     <div className="bm-bookmarks-page">
+      <RecruiterToast toast={toast} modalOpen={Boolean(selectedBookmark)} />
       <StudentNavbar student={auth.user} />
 
       <div className="bm-bookmarks-container">
@@ -178,8 +182,6 @@ const Bookmarks = () => {
           <p className="bm-bookmark-count">
             {sortedBookmarks.length} saved {sortedBookmarks.length === 1 ? 'role' : 'roles'}
           </p>
-          {error && <p className="bm-message bm-error">{error}</p>}
-          {feedback && <p className="bm-message bm-success">{feedback}</p>}
         </div>
 
         <div className="bm-bookmarks-controls">
@@ -322,7 +324,10 @@ const Bookmarks = () => {
         }
         submitting={applying}
         error={error}
-        onClose={() => setSelectedBookmark(null)}
+        onClose={() => {
+          setSelectedBookmark(null)
+          setError('')
+        }}
         onSubmit={handleApplyNow}
       />
       <StudentFooter />

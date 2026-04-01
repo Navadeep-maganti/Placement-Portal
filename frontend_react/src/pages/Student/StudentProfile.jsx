@@ -3,7 +3,10 @@ import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import StudentFooter from "../../components/Footer/StudentFooter";
 import ChangePasswordModal from "../../components/Common/ChangePasswordModal";
 import PageLoader from "../../components/Common/PageLoader";
+import SkillPicker from "../../components/Common/SkillPicker";
+import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
+import useRecruiterToast from "../../hooks/useRecruiterToast";
 import api from "../../utils/api";
 import "../../styles/css/StudentProfile.css";
 
@@ -22,6 +25,7 @@ const emptyForm = {
   linkedin_url: "",
   portfolio_url: "",
   career_objective: "",
+  skill_names: [],
   skills_summary: "",
   bio: "",
 };
@@ -32,9 +36,11 @@ function StudentProfile() {
   const [resumeFile, setResumeFile] = useState(null);
   const [removeResume, setRemoveResume] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [availableSkills, setAvailableSkills] = useState([]);
+  const [skillLoading, setSkillLoading] = useState(true);
+  const [addingSkill, setAddingSkill] = useState(false);
+  const { toast, showToast } = useRecruiterToast();
 
   useEffect(() => {
     if (!auth.user) {
@@ -54,12 +60,40 @@ function StudentProfile() {
       linkedin_url: auth.user.linkedin_url || "",
       portfolio_url: auth.user.portfolio_url || "",
       career_objective: auth.user.career_objective || "",
+      skill_names: auth.user.skill_names || [],
       skills_summary: auth.user.skills_summary || "",
       bio: auth.user.bio || "",
     });
     setResumeFile(null);
     setRemoveResume(false);
   }, [auth.user]);
+
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        const response = await api.get("/placements/skills/");
+        setAvailableSkills(response.data || []);
+      } catch (err) {
+        showToast(
+          err.response?.data?.detail ||
+            "Failed to load skills. You can still edit the rest of your profile.",
+          "error"
+        );
+      } finally {
+        setSkillLoading(false);
+      }
+    };
+
+    if (!loading && auth.user) {
+      fetchSkills();
+    } else if (!loading) {
+      setSkillLoading(false);
+    }
+  }, [loading, auth.user]);
+
+  const selectedSkillsText = formData.skill_names.length
+    ? formData.skill_names.join(", ")
+    : formData.skills_summary;
 
   const profileCompletion = useMemo(() => {
     const fields = [
@@ -73,13 +107,13 @@ function StudentProfile() {
       formData.linkedin_url,
       formData.portfolio_url,
       formData.career_objective,
-      formData.skills_summary,
+      selectedSkillsText,
       formData.bio,
       removeResume ? "" : auth.user?.resume,
     ];
     const completed = fields.filter((value) => `${value}`.trim()).length;
     return Math.round((completed / fields.length) * 100);
-  }, [auth.user?.resume, formData, removeResume]);
+  }, [auth.user?.resume, formData, removeResume, selectedSkillsText]);
 
   const resumeUrl = useMemo(() => {
     const resumePath = auth.user?.resume;
@@ -114,21 +148,103 @@ function StudentProfile() {
   const handleRemoveResume = () => {
     setResumeFile(null);
     setRemoveResume(true);
+    showToast("Resume will be removed after you save.");
+  };
+
+  const toggleSkillSelection = (skillName) => {
+    setFormData((prev) => {
+      const exists = prev.skill_names.includes(skillName);
+      const nextSkillNames = exists
+        ? prev.skill_names.filter((item) => item !== skillName)
+        : [...prev.skill_names, skillName];
+
+      return {
+        ...prev,
+        skill_names: nextSkillNames,
+        skills_summary: nextSkillNames.join(", "),
+      };
+    });
+  };
+
+  const removeSelectedSkill = (skillName) => {
+    setFormData((prev) => {
+      const nextSkillNames = prev.skill_names.filter((item) => item !== skillName);
+      return {
+        ...prev,
+        skill_names: nextSkillNames,
+        skills_summary: nextSkillNames.join(", "),
+      };
+    });
+    showToast(`Removed "${skillName}" from your skills.`);
+  };
+
+  const handleAddSkill = async (skillName) => {
+    const trimmedName = skillName.trim();
+    if (!trimmedName) {
+      showToast("Enter a skill name before adding it.", "error");
+      return false;
+    }
+
+    try {
+      setAddingSkill(true);
+      const response = await api.post("/placements/skills/", { name: trimmedName });
+      const createdSkill = response.data;
+
+      setAvailableSkills((prev) => {
+        const exists = prev.some(
+          (skill) => skill.name.toLowerCase() === createdSkill.name.toLowerCase()
+        );
+        if (exists) {
+          return prev;
+        }
+        return [...prev, createdSkill].sort((a, b) => a.name.localeCompare(b.name));
+      });
+
+      setFormData((prev) => {
+        const exists = prev.skill_names.some(
+          (selectedSkill) =>
+            selectedSkill.toLowerCase() === createdSkill.name.toLowerCase()
+        );
+        if (exists) {
+          return prev;
+        }
+
+        const nextSkillNames = [...prev.skill_names, createdSkill.name];
+        return {
+          ...prev,
+          skill_names: nextSkillNames,
+          skills_summary: nextSkillNames.join(", "),
+        };
+      });
+
+      showToast(`Skill "${createdSkill.name}" is ready to use.`);
+      return true;
+    } catch (err) {
+      showToast(err.response?.data?.name?.[0] || "Failed to add the skill.", "error");
+      return false;
+    } finally {
+      setAddingSkill(false);
+    }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSaving(true);
-    setError("");
-    setMessage("");
 
     const payload = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
-      if (key === "registration_no") {
+      if (key === "registration_no" || key === "skill_names" || key === "skills_summary") {
         return;
       }
       payload.append(key, value ?? "");
     });
+    if (formData.skill_names.length > 0) {
+      formData.skill_names.forEach((skillName) => {
+        payload.append("skill_names", skillName);
+      });
+    } else {
+      payload.append("skill_names", "");
+    }
     if (resumeFile) {
       payload.append("resume", resumeFile);
     }
@@ -143,11 +259,11 @@ function StudentProfile() {
         },
       });
       await refreshUser(auth.role);
-      setMessage("Profile updated successfully.");
+      showToast("Profile updated successfully.");
       setResumeFile(null);
       setRemoveResume(false);
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to update profile.");
+      showToast(err.response?.data?.detail || "Failed to update profile.", "error");
     } finally {
       setSaving(false);
     }
@@ -155,6 +271,7 @@ function StudentProfile() {
 
   return (
     <div className="sp-page">
+      <RecruiterToast toast={toast} modalOpen={passwordModalOpen} />
       <StudentNavbar student={auth.user} />
 
       <div className="sp-container">
@@ -185,9 +302,6 @@ function StudentProfile() {
               <h2>Edit Details</h2>
               <p>Update the information recruiters see when they review you.</p>
             </div>
-
-            {error && <p className="sp-banner sp-error">{error}</p>}
-            {message && <p className="sp-banner sp-success">{message}</p>}
 
             <div className="sp-form-grid">
               <label>
@@ -307,16 +421,21 @@ function StudentProfile() {
               />
             </label>
 
-            <label className="sp-full-width">
-              Skills Summary
-              <textarea
-                name="skills_summary"
-                value={formData.skills_summary}
-                onChange={handleChange}
-                rows="3"
-                placeholder="Example: Java, React, SQL, Machine Learning, Figma"
+            <div className="sp-full-width">
+              <span className="sp-field-title">Skills</span>
+              <SkillPicker
+                availableSkills={availableSkills}
+                selectedSkills={formData.skill_names}
+                onToggleSkill={toggleSkillSelection}
+                onRemoveSkill={removeSelectedSkill}
+                onAddSkill={handleAddSkill}
+                loading={skillLoading}
+                adding={addingSkill}
+                helpText="Search existing skills, select what matches you, or add a new one if it is missing."
+                searchPlaceholder="Search or add a skill"
+                emptyMessage="No skills available yet. Start by adding your first skill."
               />
-            </label>
+            </div>
 
             <label className="sp-full-width">
               Profile Bio
@@ -416,7 +535,7 @@ function StudentProfile() {
                 </div>
                 <div>
                   <span>Skills</span>
-                  <strong>{formData.skills_summary || "Add your key skills"}</strong>
+                  <strong>{selectedSkillsText || "Add your key skills"}</strong>
                 </div>
                 <div>
                   <span>Resume Status</span>
@@ -459,8 +578,7 @@ function StudentProfile() {
         open={passwordModalOpen}
         onClose={() => setPasswordModalOpen(false)}
         onSuccess={(successMessage) => {
-          setError("");
-          setMessage(successMessage);
+          showToast(successMessage);
         }}
       />
     </div>

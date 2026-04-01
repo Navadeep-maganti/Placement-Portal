@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const LOGOUT_REDIRECT_FLAG = "logout_redirect_in_progress";
+
 const api = axios.create({
   baseURL: "http://127.0.0.1:8000/api/",
 });
@@ -23,12 +25,14 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem("refresh");
-        
+        const logoutRedirectInProgress =
+          sessionStorage.getItem(LOGOUT_REDIRECT_FLAG) === "true";
+         
         if (!refreshToken) {
           // No refresh token, need to log in
           localStorage.removeItem("access");
           localStorage.removeItem("refresh");
-          window.location.href = "/login";
+          window.location.replace(logoutRedirectInProgress ? "/" : "/login");
           return Promise.reject(error);
         }
 
@@ -51,7 +55,9 @@ api.interceptors.response.use(
         // Refresh failed, need to log in again
         localStorage.removeItem("access");
         localStorage.removeItem("refresh");
-        window.location.href = "/login";
+        const logoutRedirectInProgress =
+          sessionStorage.getItem(LOGOUT_REDIRECT_FLAG) === "true";
+        window.location.replace(logoutRedirectInProgress ? "/" : "/login");
         return Promise.reject(refreshError);
       }
     }

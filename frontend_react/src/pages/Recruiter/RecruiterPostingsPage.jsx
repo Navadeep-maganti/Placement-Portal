@@ -6,9 +6,10 @@ import PageLoader from "../../components/Common/PageLoader";
 import RecruiterFooter from "../../components/Footer/RecruiterFooter";
 import RecruiterApprovalPending from "../../components/Recruiter/RecruiterApprovalPending";
 import RecruiterToast from "../../components/Recruiter/RecruiterToast";
+import SkillPicker from "../../components/Common/SkillPicker";
 import { useAuth } from "../../contexts/AuthContext";
 import useRecruiterToast from "../../hooks/useRecruiterToast";
-import { FiBriefcase, FiDollarSign, FiEdit2, FiFilter, FiHeadphones, FiTrash2 } from "react-icons/fi";
+import { FiBriefcase, FiDollarSign, FiEdit2, FiTrash2 } from "react-icons/fi";
 import api from "../../utils/api";
 
 const emptyForm = {
@@ -32,7 +33,6 @@ function RecruiterPostingsPage() {
   const [error, setError] = useState("");
   const [postings, setPostings] = useState([]);
   const [availableSkills, setAvailableSkills] = useState([]);
-  const [newSkillName, setNewSkillName] = useState("");
   const [skillLoading, setSkillLoading] = useState(true);
   const [addingSkill, setAddingSkill] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
@@ -147,11 +147,11 @@ function RecruiterPostingsPage() {
     showToast(`Removed "${skillName}" from required skills.`);
   };
 
-  const handleAddSkill = async () => {
-    const trimmedName = newSkillName.trim();
+  const handleAddSkill = async (skillName) => {
+    const trimmedName = skillName.trim();
     if (!trimmedName) {
       showToast("Enter a skill name before adding it.", "error");
-      return;
+      return false;
     }
 
     try {
@@ -175,11 +175,12 @@ function RecruiterPostingsPage() {
           ? prev
           : { ...prev, requiredSkills: [...prev.requiredSkills, createdSkill.name] };
       });
-      setNewSkillName("");
       showToast(`Skill "${createdSkill.name}" selected successfully.`);
+      return true;
     } catch (err) {
       const message = err.response?.data?.name?.[0] || "Failed to add the skill.";
       showToast(message, "error");
+      return false;
     } finally {
       setAddingSkill(false);
     }
@@ -353,62 +354,18 @@ function RecruiterPostingsPage() {
 
           <section className="mp-form-section">
             <h2>Required Skills</h2>
-            <p className="mp-help-text">Select the required skills for this role. Add a new skill if it is not listed.</p>
-            <div className="mp-skill-selector">
-              {skillLoading ? (
-                <p className="mp-help-text">Loading skills...</p>
-              ) : availableSkills.length > 0 ? (
-                availableSkills.map((skill) => {
-                  const isSelected = formData.requiredSkills.includes(skill.name);
-                  return (
-                    <button
-                      key={skill.id}
-                      className={`mp-skill-option ${isSelected ? "selected" : ""}`}
-                      type="button"
-                      onClick={() => toggleSkillSelection(skill.name)}
-                    >
-                      {skill.name}
-                    </button>
-                  );
-                })
-              ) : (
-                <p className="mp-help-text">No skills available yet. Add the first one below.</p>
-              )}
-            </div>
-            <div className="mp-skill-create-row">
-              <input
-                name="newSkillName"
-                type="text"
-                placeholder="Add a new skill"
-                value={newSkillName}
-                onChange={(event) => setNewSkillName(event.target.value)}
-              />
-              <button
-                className="mp-btn mp-btn-ghost"
-                type="button"
-                disabled={addingSkill}
-                onClick={handleAddSkill}
-              >
-                {addingSkill ? "Adding..." : "Add Skill"}
-              </button>
-            </div>
-            {formData.requiredSkills.length > 0 && (
-              <div className="mp-selected-skills">
-                {formData.requiredSkills.map((skill) => (
-                  <span key={skill} className="mp-skill-chip mp-skill-chip-selected">
-                    <span>{skill}</span>
-                    <button
-                      className="mp-skill-remove"
-                      type="button"
-                      aria-label={`Remove ${skill}`}
-                      onClick={() => removeSelectedSkill(skill)}
-                    >
-                      x
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
+            <SkillPicker
+              availableSkills={availableSkills}
+              selectedSkills={formData.requiredSkills}
+              onToggleSkill={toggleSkillSelection}
+              onRemoveSkill={removeSelectedSkill}
+              onAddSkill={handleAddSkill}
+              loading={skillLoading}
+              adding={addingSkill}
+              helpText="Search available skills, tap to select them, or add a new skill if it is missing."
+              searchPlaceholder="Search or add a required skill"
+              emptyMessage="No skills available yet. Add the first one here."
+            />
           </section>
 
           <div className="mp-actions">

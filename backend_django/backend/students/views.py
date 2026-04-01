@@ -28,6 +28,8 @@ def student_me(request):
     student = Student.objects.get(user=request.user)
     if request.method == "PATCH":
         payload = request.data.copy()
+        if hasattr(request.data, "getlist") and "skill_names" in request.data:
+            payload.setlist("skill_names", request.data.getlist("skill_names"))
         remove_resume = str(payload.get("remove_resume", "")).lower() in {
             "1",
             "true",

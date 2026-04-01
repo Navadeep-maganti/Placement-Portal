@@ -4,7 +4,9 @@ import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import StudentFooter from "../../components/Footer/StudentFooter";
 import ApplicationReviewModal from "../../components/Student/ApplicationReviewModal";
 import PageLoader from "../../components/Common/PageLoader";
+import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
+import useRecruiterToast from "../../hooks/useRecruiterToast";
 import api from "../../utils/api";
 import "../../styles/css/JobDetails.css";
 import { formatStatusLabel } from "../../utils/studentApplication";
@@ -15,9 +17,9 @@ const JobDetails = () => {
   const [job, setJob] = useState(null);
   const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState("");
-  const [feedback, setFeedback] = useState("");
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [applying, setApplying] = useState(false);
+  const { toast, showToast } = useRecruiterToast();
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -26,7 +28,9 @@ const JobDetails = () => {
         const response = await api.get(`/placements/${jobId}/`);
         setJob(response.data);
       } catch (err) {
-        setError(err.response?.data?.detail || "Failed to load job details.");
+        const message = err.response?.data?.detail || "Failed to load job details.";
+        setError(message);
+        showToast(message, "error");
       } finally {
         setPageLoading(false);
       }
@@ -72,23 +76,23 @@ const JobDetails = () => {
 
     try {
       setError("");
-      setFeedback("");
       if (job.is_bookmarked) {
         await api.delete(`/bookmarks/${job.id}/`);
         setJob((prev) => ({ ...prev, is_bookmarked: false }));
-        setFeedback("Bookmark removed.");
+        showToast("Bookmark removed.");
         return;
       }
 
       await api.post("/bookmarks/", { placement_id: job.id });
       setJob((prev) => ({ ...prev, is_bookmarked: true }));
-      setFeedback("Job bookmarked successfully.");
+      showToast("Job bookmarked successfully.");
     } catch (err) {
-      setError(
+      const message =
         err.response?.data?.detail ||
-          err.response?.data?.error ||
-          "Failed to update bookmark."
-      );
+        err.response?.data?.error ||
+        "Failed to update bookmark.";
+      setError(message);
+      showToast(message, "error");
     }
   };
 
@@ -99,7 +103,6 @@ const JobDetails = () => {
 
     try {
       setError("");
-      setFeedback("");
       setApplying(true);
       const response = await api.post("/applications/apply/", {
         placement_id: job.id,
@@ -111,19 +114,18 @@ const JobDetails = () => {
         has_applied: true,
         application_status: application?.status || prev.application_status || "applied",
       }));
-      setFeedback(
-        response.data?.message || "Application submitted successfully."
-      );
+      showToast(response.data?.message || "Application submitted successfully.");
       setApplyModalOpen(false);
     } catch (err) {
       const issues = err.response?.data?.eligibility_issues;
-      setError(
+      const message =
         Array.isArray(issues) && issues.length
           ? issues.join(" ")
           : err.response?.data?.detail ||
-              err.response?.data?.error ||
-              "Failed to apply."
-      );
+            err.response?.data?.error ||
+            "Failed to apply.";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setApplying(false);
     }
@@ -143,6 +145,7 @@ const JobDetails = () => {
 
   return (
     <div className="job-details-page">
+      <RecruiterToast toast={toast} modalOpen={applyModalOpen} />
       <StudentNavbar student={auth.user} />
 
       <div className="job-details-container">
@@ -166,9 +169,6 @@ const JobDetails = () => {
               </button>
             </div>
           </div>
-
-          {error && <p className="job-inline-message job-error">{error}</p>}
-          {feedback && <p className="job-inline-message job-success">{feedback}</p>}
 
           <div className="quick-info">
             {overviewItems.map((item) => (
@@ -282,7 +282,10 @@ const JobDetails = () => {
         job={job}
         submitting={applying}
         error={error}
-        onClose={() => setApplyModalOpen(false)}
+        onClose={() => {
+          setApplyModalOpen(false);
+          setError("");
+        }}
         onSubmit={handleApply}
       />
       <StudentFooter />

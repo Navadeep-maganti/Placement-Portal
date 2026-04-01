@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import api from "../utils/api";
 
 const AuthContext = createContext();
+const LOGOUT_REDIRECT_FLAG = "logout_redirect_in_progress";
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(() => ({
@@ -62,6 +63,9 @@ export const AuthProvider = ({ children }) => {
     if (auth.access) {
       initAuth();
     } else {
+      if (window.location.pathname === "/") {
+        sessionStorage.removeItem(LOGOUT_REDIRECT_FLAG);
+      }
       setLoading(false);
     }
   }, []);
@@ -81,9 +85,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    sessionStorage.setItem(LOGOUT_REDIRECT_FLAG, "true");
     localStorage.clear();
     setAuth({ access: null, refresh: null, role: null, user: null });
-    window.location.href = "/";
+    window.location.replace("/");
   };
 
   return (
