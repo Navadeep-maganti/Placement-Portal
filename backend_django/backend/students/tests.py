@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from api.models import User
+from placements.models import Skill
 from students.models import Student
 
 
@@ -72,3 +73,24 @@ class StudentProfileTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.student.refresh_from_db()
         self.assertFalse(bool(self.student.resume))
+
+    def test_student_can_select_existing_and_new_skills(self):
+        Skill.objects.create(name="React")
+
+        response = self.client.patch(
+            "/api/students/me/",
+            {
+                "skill_names": ["React", "Go", "React"],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.student.refresh_from_db()
+
+        self.assertEqual(
+            list(self.student.skills.order_by("name").values_list("name", flat=True)),
+            ["Go", "React"],
+        )
+        self.assertEqual(self.student.skills_summary, "React, Go")
+        self.assertEqual(response.data["skill_names"], ["Go", "React"])

@@ -3,6 +3,7 @@ import StudentNavbar from "../../components/Navbar/StudentNavbar";
 import StudentFooter from "../../components/Footer/StudentFooter";
 import ChangePasswordModal from "../../components/Common/ChangePasswordModal";
 import PageLoader from "../../components/Common/PageLoader";
+import SkillPicker from "../../components/Common/SkillPicker";
 import { useAuth } from "../../contexts/AuthContext";
 import api from "../../utils/api";
 import "../../styles/css/StudentProfile.css";
@@ -22,6 +23,7 @@ const emptyForm = {
   linkedin_url: "",
   portfolio_url: "",
   career_objective: "",
+  skill_names: [],
   skills_summary: "",
   bio: "",
 };
@@ -35,6 +37,9 @@ function StudentProfile() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [availableSkills, setAvailableSkills] = useState([]);
+  const [skillLoading, setSkillLoading] = useState(true);
+  const [addingSkill, setAddingSkill] = useState(false);
 
   useEffect(() => {
     if (!auth.user) {
@@ -54,12 +59,39 @@ function StudentProfile() {
       linkedin_url: auth.user.linkedin_url || "",
       portfolio_url: auth.user.portfolio_url || "",
       career_objective: auth.user.career_objective || "",
+      skill_names: auth.user.skill_names || [],
       skills_summary: auth.user.skills_summary || "",
       bio: auth.user.bio || "",
     });
     setResumeFile(null);
     setRemoveResume(false);
   }, [auth.user]);
+
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        const response = await api.get("/placements/skills/");
+        setAvailableSkills(response.data || []);
+      } catch (err) {
+        setError(
+          err.response?.data?.detail ||
+            "Failed to load skills. You can still edit the rest of your profile."
+        );
+      } finally {
+        setSkillLoading(false);
+      }
+    };
+
+    if (!loading && auth.user) {
+      fetchSkills();
+    } else if (!loading) {
+      setSkillLoading(false);
+    }
+  }, [loading, auth.user]);
+
+  const selectedSkillsText = formData.skill_names.length
+    ? formData.skill_names.join(", ")
+    : formData.skills_summary;
 
   const profileCompletion = useMemo(() => {
     const fields = [
@@ -73,13 +105,13 @@ function StudentProfile() {
       formData.linkedin_url,
       formData.portfolio_url,
       formData.career_objective,
-      formData.skills_summary,
+      selectedSkillsText,
       formData.bio,
       removeResume ? "" : auth.user?.resume,
     ];
     const completed = fields.filter((value) => `${value}`.trim()).length;
     return Math.round((completed / fields.length) * 100);
-  }, [auth.user?.resume, formData, removeResume]);
+  }, [auth.user?.resume, formData, removeResume, selectedSkillsText]);
 
   const resumeUrl = useMemo(() => {
     const resumePath = auth.user?.resume;
@@ -116,6 +148,83 @@ function StudentProfile() {
     setRemoveResume(true);
   };
 
+  const toggleSkillSelection = (skillName) => {
+    setFormData((prev) => {
+      const exists = prev.skill_names.includes(skillName);
+      const nextSkillNames = exists
+        ? prev.skill_names.filter((item) => item !== skillName)
+        : [...prev.skill_names, skillName];
+
+      return {
+        ...prev,
+        skill_names: nextSkillNames,
+        skills_summary: nextSkillNames.join(", "),
+      };
+    });
+  };
+
+  const removeSelectedSkill = (skillName) => {
+    setFormData((prev) => {
+      const nextSkillNames = prev.skill_names.filter((item) => item !== skillName);
+      return {
+        ...prev,
+        skill_names: nextSkillNames,
+        skills_summary: nextSkillNames.join(", "),
+      };
+    });
+  };
+
+  const handleAddSkill = async (skillName) => {
+    const trimmedName = skillName.trim();
+    if (!trimmedName) {
+      setError("Enter a skill name before adding it.");
+      return false;
+    }
+
+    try {
+      setAddingSkill(true);
+      setError("");
+      setMessage("");
+      const response = await api.post("/placements/skills/", { name: trimmedName });
+      const createdSkill = response.data;
+
+      setAvailableSkills((prev) => {
+        const exists = prev.some(
+          (skill) => skill.name.toLowerCase() === createdSkill.name.toLowerCase()
+        );
+        if (exists) {
+          return prev;
+        }
+        return [...prev, createdSkill].sort((a, b) => a.name.localeCompare(b.name));
+      });
+
+      setFormData((prev) => {
+        const exists = prev.skill_names.some(
+          (selectedSkill) =>
+            selectedSkill.toLowerCase() === createdSkill.name.toLowerCase()
+        );
+        if (exists) {
+          return prev;
+        }
+
+        const nextSkillNames = [...prev.skill_names, createdSkill.name];
+        return {
+          ...prev,
+          skill_names: nextSkillNames,
+          skills_summary: nextSkillNames.join(", "),
+        };
+      });
+
+      setMessage(`Skill "${createdSkill.name}" is ready to use.`);
+      return true;
+    } catch (err) {
+      setError(err.response?.data?.name?.[0] || "Failed to add the skill.");
+      return false;
+    } finally {
+      setAddingSkill(false);
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSaving(true);
@@ -124,11 +233,18 @@ function StudentProfile() {
 
     const payload = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
-      if (key === "registration_no") {
+      if (key === "registration_no" || key === "skill_names" || key === "skills_summary") {
         return;
       }
       payload.append(key, value ?? "");
     });
+    if (formData.skill_names.length > 0) {
+      formData.skill_names.forEach((skillName) => {
+        payload.append("skill_names", skillName);
+      });
+    } else {
+      payload.append("skill_names", "");
+    }
     if (resumeFile) {
       payload.append("resume", resumeFile);
     }
@@ -307,16 +423,21 @@ function StudentProfile() {
               />
             </label>
 
-            <label className="sp-full-width">
-              Skills Summary
-              <textarea
-                name="skills_summary"
-                value={formData.skills_summary}
-                onChange={handleChange}
-                rows="3"
-                placeholder="Example: Java, React, SQL, Machine Learning, Figma"
+            <div className="sp-full-width">
+              <span className="sp-field-title">Skills</span>
+              <SkillPicker
+                availableSkills={availableSkills}
+                selectedSkills={formData.skill_names}
+                onToggleSkill={toggleSkillSelection}
+                onRemoveSkill={removeSelectedSkill}
+                onAddSkill={handleAddSkill}
+                loading={skillLoading}
+                adding={addingSkill}
+                helpText="Search existing skills, select what matches you, or add a new one if it is missing."
+                searchPlaceholder="Search or add a skill"
+                emptyMessage="No skills available yet. Start by adding your first skill."
               />
-            </label>
+            </div>
 
             <label className="sp-full-width">
               Profile Bio
@@ -416,7 +537,7 @@ function StudentProfile() {
                 </div>
                 <div>
                   <span>Skills</span>
-                  <strong>{formData.skills_summary || "Add your key skills"}</strong>
+                  <strong>{selectedSkillsText || "Add your key skills"}</strong>
                 </div>
                 <div>
                   <span>Resume Status</span>
