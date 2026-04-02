@@ -9,7 +9,14 @@ import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import SkillPicker from "../../components/Common/SkillPicker";
 import { useAuth } from "../../contexts/AuthContext";
 import useRecruiterToast from "../../hooks/useRecruiterToast";
-import { FiBriefcase, FiDollarSign, FiEdit2, FiTrash2 } from "react-icons/fi";
+import {
+  FiBriefcase,
+  FiDollarSign,
+  FiEdit2,
+  FiFilter,
+  FiHeadphones,
+  FiTrash2,
+} from "react-icons/fi";
 import api from "../../utils/api";
 
 const emptyForm = {
