@@ -11,6 +11,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import useRecruiterToast from "../../hooks/useRecruiterToast";
 import api from "../../utils/api";
 
+const OFFER_STATUSES = ["offered", "offer_accepted", "offer_declined"];
+
 function RecruiterApplicantsPage() {
   const { auth, loading } = useAuth();
   const navigate = useNavigate();
@@ -28,7 +30,6 @@ function RecruiterApplicantsPage() {
   const [selectedApplication, setSelectedApplication] = useState(null);
   const { toast, showToast } = useRecruiterToast();
   const requestedStatusFilter = location.state?.statusFilter;
-
   useEffect(() => {
     const fetchApplicants = async () => {
       try {
@@ -84,7 +85,10 @@ function RecruiterApplicantsPage() {
         application.job_title?.toLowerCase().includes(query);
 
       const matchesStatus =
-        statusFilter === "all" || application.status === statusFilter;
+        statusFilter === "all" ||
+        (statusFilter === "offers_extended"
+          ? OFFER_STATUSES.includes(application.status)
+          : application.status === statusFilter);
       const matchesJob = jobFilter === "all" || application.job_title === jobFilter;
 
       return matchesQuery && matchesStatus && matchesJob;
@@ -95,6 +99,7 @@ function RecruiterApplicantsPage() {
     const baseOptions = [
       "applied",
       "shortlisted",
+      "offers_extended",
       "offered",
       "offer_accepted",
       "offer_declined",
@@ -112,8 +117,9 @@ function RecruiterApplicantsPage() {
       shortlisted: applications.filter(
         (application) => application.status === "shortlisted"
       ).length,
-      offered: applications.filter((application) => application.status === "offered")
-        .length,
+      offered: applications.filter((application) =>
+        OFFER_STATUSES.includes(application.status)
+      ).length,
       accepted: applications.filter(
         (application) => application.status === "offer_accepted"
       ).length,

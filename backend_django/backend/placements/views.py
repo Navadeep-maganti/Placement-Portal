@@ -175,8 +175,12 @@ class CompanyDashboardSummaryView(generics.GenericAPIView):
                     "shortlisted_students": applications.filter(
                         status__code="shortlisted"
                     ).count(),
-                    "scheduled_interviews": applications.filter(
-                        status__code="interview_scheduled"
+                    "offers_extended": applications.filter(
+                        status__code__in=[
+                            "offered",
+                            "offer_accepted",
+                            "offer_declined",
+                        ]
                     ).count(),
                 },
                 "recent_activity": ActivityLogSerializer(

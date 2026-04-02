@@ -255,6 +255,14 @@ class RecruiterPostingsApiTests(APITestCase):
             code="shortlisted",
             defaults={"name": "Shortlisted", "sort_order": 2},
         )
+        offered_status, _ = ApplicationStatus.objects.get_or_create(
+            code="offered",
+            defaults={"name": "Offered", "sort_order": 3},
+        )
+        accepted_status, _ = ApplicationStatus.objects.get_or_create(
+            code="offer_accepted",
+            defaults={"name": "Offer Accepted", "sort_order": 4},
+        )
         Application.objects.create(
             student=Student.objects.create(
                 user=self.student_user,
@@ -267,14 +275,53 @@ class RecruiterPostingsApiTests(APITestCase):
             job=self.own_placement,
             status=shortlisted_status,
         )
+        second_student_user = User.objects.create_user(
+            email="student2@example.com",
+            password="password123",
+            first_name="Offer",
+            last_name="Holder",
+            role="student",
+        )
+        Application.objects.create(
+            student=Student.objects.create(
+                user=second_student_user,
+                registration_no="2022CSE002",
+                department="CSE",
+                graduation_year=2026,
+                cgpa=8.0,
+                active_backlogs=0,
+            ),
+            job=self.own_placement,
+            status=offered_status,
+        )
+        third_student_user = User.objects.create_user(
+            email="student3@example.com",
+            password="password123",
+            first_name="Accepted",
+            last_name="Candidate",
+            role="student",
+        )
+        Application.objects.create(
+            student=Student.objects.create(
+                user=third_student_user,
+                registration_no="2022CSE003",
+                department="CSE",
+                graduation_year=2026,
+                cgpa=8.4,
+                active_backlogs=0,
+            ),
+            job=self.own_placement,
+            status=accepted_status,
+        )
 
         self.client.force_authenticate(user=self.company_user)
         response = self.client.get("/api/placements/company-dashboard/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["overview"]["active_job_posts"], 1)
-        self.assertEqual(response.data["overview"]["total_applicants"], 1)
+        self.assertEqual(response.data["overview"]["total_applicants"], 3)
         self.assertEqual(response.data["overview"]["shortlisted_students"], 1)
+        self.assertEqual(response.data["overview"]["offers_extended"], 2)
         self.assertIn("recent_activity", response.data)
 
     def test_any_authenticated_user_can_list_skills(self):

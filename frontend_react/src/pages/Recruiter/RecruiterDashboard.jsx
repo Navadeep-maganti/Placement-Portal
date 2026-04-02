@@ -8,7 +8,7 @@ import RecruiterFooter from "../../components/Footer/RecruiterFooter";
 import RecruiterToast from "../../components/Recruiter/RecruiterToast";
 import { useAuth } from "../../contexts/AuthContext";
 import useRecruiterToast from "../../hooks/useRecruiterToast";
-import { FiBriefcase, FiUsers, FiUserCheck, FiCalendar } from "react-icons/fi";
+import { FiAward, FiBriefcase, FiUsers, FiUserCheck } from "react-icons/fi";
 import api from "../../utils/api";
 
 function RecruiterDashboard() {
@@ -20,7 +20,7 @@ function RecruiterDashboard() {
       active_job_posts: 0,
       total_applicants: 0,
       shortlisted_students: 0,
-      scheduled_interviews: 0,
+      offers_extended: 0,
     },
     recent_activity: [],
   });
@@ -232,26 +232,26 @@ function RecruiterDashboard() {
                 {dashboard.overview.shortlisted_students}
               </p>
             </button>
-            <button
-              type="button"
-              className="cd-overview-card cd-overview-button cd-scheduled-interviews"
-              disabled={!isApproved}
-              onClick={() =>
-                handleOverviewNavigation("/Recruiter/ViewApplicants", {
-                  statusFilter: "interview_scheduled",
-                })
-              }
-            >
-              <div className="cd-overview-head">
-                <span className="cd-overview-icon">
-                  <FiCalendar size={18} />
-                </span>
-                <h4 className="cd-overview-title">Scheduled Interviews</h4>
-              </div>
-              <p className="cd-overview-count">
-                {dashboard.overview.scheduled_interviews}
-              </p>
-            </button>
+              <button
+                type="button"
+                className="cd-overview-card cd-overview-button cd-scheduled-interviews"
+                disabled={!isApproved}
+                onClick={() =>
+                  handleOverviewNavigation("/Recruiter/ViewApplicants", {
+                    statusFilter: "offers_extended",
+                  })
+                }
+              >
+                <div className="cd-overview-head">
+                  <span className="cd-overview-icon">
+                    <FiAward size={18} />
+                  </span>
+                  <h4 className="cd-overview-title">Offers Extended</h4>
+                </div>
+                <p className="cd-overview-count">
+                  {dashboard.overview.offers_extended}
+                </p>
+              </button>
           </div>
         </section>
 
