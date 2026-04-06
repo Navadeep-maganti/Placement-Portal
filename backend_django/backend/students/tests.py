@@ -1,10 +1,14 @@
+from datetime import timedelta
+
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from api.models import User
 from placements.models import Skill
-from students.models import Student
+from students.models import PendingStudentRegistration, Student
 
 
 class StudentProfileTests(APITestCase):
@@ -57,12 +61,17 @@ class StudentProfileTests(APITestCase):
         self.assertTrue(self.student.resume.name.endswith(".pdf"))
 
     def test_student_can_remove_resume(self):
-        self.student.resume = SimpleUploadedFile(
+        self.student.resume.save(
             "existing.pdf",
-            b"resume",
-            content_type="application/pdf",
+            SimpleUploadedFile(
+                "existing.pdf",
+                b"resume",
+                content_type="application/pdf",
+            ),
+            save=False,
         )
         self.student.save()
+        self.student.resume.close()
 
         response = self.client.patch(
             "/api/students/me/",
@@ -94,3 +103,124 @@ class StudentProfileTests(APITestCase):
         )
         self.assertEqual(self.student.skills_summary, "React, Go")
         self.assertEqual(response.data["skill_names"], ["Go", "React"])
+
+
+class StudentRegistrationTests(APITestCase):
+    def test_student_can_request_otp_with_allowed_email_domain(self):
+        response = self.client.post(
+            "/api/students/register/request-otp/",
+            {
+                "first_name": "Asha",
+                "last_name": "Reddy",
+                "email": "asha@student.nitandhra.ac.in",
+                "password": "StrongPass123!",
+                "confirm_password": "StrongPass123!",
+                "registration_no": "N23CS001",
+                "department": "CSE",
+                "graduation_year": 2027,
+                "cgpa": 8.5,
+                "active_backlogs": 0,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        pending = PendingStudentRegistration.objects.get(
+            email="asha@student.nitandhra.ac.in"
+        )
+        self.assertEqual(pending.registration_data["registration_no"], "N23CS001")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("expires in 10 minutes", mail.outbox[0].body)
+
+    def test_student_registration_rejects_non_college_email(self):
+        response = self.client.post(
+            "/api/students/register/request-otp/",
+            {
+                "first_name": "Asha",
+                "last_name": "Reddy",
+                "email": "asha@gmail.com",
+                "password": "StrongPass123!",
+                "confirm_password": "StrongPass123!",
+                "registration_no": "N23CS001",
+                "department": "CSE",
+                "graduation_year": 2027,
+                "cgpa": 8.5,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("email", response.data)
+
+    def test_student_can_verify_otp_and_create_account(self):
+        request_response = self.client.post(
+            "/api/students/register/request-otp/",
+            {
+                "first_name": "Asha",
+                "last_name": "Reddy",
+                "email": "asha@student.nitandhra.ac.in",
+                "password": "StrongPass123!",
+                "confirm_password": "StrongPass123!",
+                "registration_no": "N23CS001",
+                "department": "CSE",
+                "graduation_year": 2027,
+                "cgpa": 8.5,
+            },
+            format="json",
+        )
+        self.assertEqual(request_response.status_code, status.HTTP_200_OK)
+
+        otp = "".join(filter(str.isdigit, mail.outbox[0].body.split("is ")[1][:6]))
+        response = self.client.post(
+            "/api/students/register/verify-otp/",
+            {
+                "email": "asha@student.nitandhra.ac.in",
+                "otp": otp,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        user = User.objects.get(email="asha@student.nitandhra.ac.in")
+        student = Student.objects.get(user=user)
+        self.assertEqual(user.role, "student")
+        self.assertEqual(student.registration_no, "N23CS001")
+        self.assertFalse(
+            PendingStudentRegistration.objects.filter(
+                email="asha@student.nitandhra.ac.in"
+            ).exists()
+        )
+
+    def test_student_cannot_verify_expired_otp(self):
+        self.client.post(
+            "/api/students/register/request-otp/",
+            {
+                "first_name": "Asha",
+                "last_name": "Reddy",
+                "email": "asha@student.nitandhra.ac.in",
+                "password": "StrongPass123!",
+                "confirm_password": "StrongPass123!",
+                "registration_no": "N23CS001",
+                "department": "CSE",
+                "graduation_year": 2027,
+                "cgpa": 8.5,
+            },
+            format="json",
+        )
+        pending = PendingStudentRegistration.objects.get(
+            email="asha@student.nitandhra.ac.in"
+        )
+        pending.expires_at = timezone.now() - timedelta(minutes=1)
+        pending.save(update_fields=["expires_at"])
+
+        response = self.client.post(
+            "/api/students/register/verify-otp/",
+            {
+                "email": "asha@student.nitandhra.ac.in",
+                "otp": "123456",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("OTP expired", str(response.data))

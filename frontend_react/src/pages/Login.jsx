@@ -10,11 +10,45 @@ const emptyRegisterForm = {
   email: "",
   password: "",
   confirm_password: "",
+  registration_no: "",
+  department: "",
+  graduation_year: "",
+  cgpa: "",
+  active_backlogs: "0",
   company_name: "",
   location: "",
   industry: "",
   website: "",
   description: "",
+};
+
+const extractErrorMessage = (data) => {
+  if (!data) {
+    return "";
+  }
+
+  if (typeof data === "string") {
+    return data;
+  }
+
+  if (Array.isArray(data)) {
+    return data.find(Boolean) || "";
+  }
+
+  if (typeof data === "object") {
+    if (typeof data.detail === "string") {
+      return data.detail;
+    }
+
+    for (const value of Object.values(data)) {
+      const message = extractErrorMessage(value);
+      if (message) {
+        return message;
+      }
+    }
+  }
+
+  return "";
 };
 
 function Login() {
@@ -32,6 +66,8 @@ function Login() {
   const [authView, setAuthView] = useState(initialView);
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [registerForm, setRegisterForm] = useState(emptyRegisterForm);
+  const [studentOtp, setStudentOtp] = useState("");
+  const [studentOtpRequested, setStudentOtpRequested] = useState(false);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -46,15 +82,17 @@ function Login() {
     setLoginType(nextRole);
     setError("");
     setInfo("");
-    if (nextRole === "student") {
-      setAuthView("login");
-    }
+    setAuthView("login");
+    setStudentOtp("");
+    setStudentOtpRequested(false);
   };
 
   const handleViewChange = (nextView) => {
     setAuthView(nextView);
     setError("");
     setInfo("");
+    setStudentOtp("");
+    setStudentOtpRequested(false);
   };
 
   const handleLoginInputChange = (event) => {
@@ -67,6 +105,12 @@ function Login() {
   const handleRegisterInputChange = (event) => {
     const { name, value } = event.target;
     setRegisterForm((prev) => ({ ...prev, [name]: value }));
+    setError("");
+    setInfo("");
+  };
+
+  const handleStudentOtpChange = (event) => {
+    setStudentOtp(event.target.value);
     setError("");
     setInfo("");
   };
@@ -154,14 +198,36 @@ function Login() {
 
     try {
       setSubmitting(true);
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/companies/register/",
-        {
-          ...registerForm,
-          email: registerForm.email.trim(),
-          website: registerForm.website.trim(),
-        }
-      );
+      if (loginType === "student") {
+        const response = await axios.post(
+          "http://127.0.0.1:8000/api/students/register/request-otp/",
+          {
+            first_name: registerForm.first_name.trim(),
+            last_name: registerForm.last_name.trim(),
+            email: registerForm.email.trim().toLowerCase(),
+            password: registerForm.password,
+            confirm_password: registerForm.confirm_password,
+            registration_no: registerForm.registration_no.trim().toUpperCase(),
+            department: registerForm.department.trim(),
+            graduation_year: Number(registerForm.graduation_year),
+            cgpa: Number(registerForm.cgpa),
+            active_backlogs: Number(registerForm.active_backlogs || 0),
+          }
+        );
+
+        setStudentOtpRequested(true);
+        setInfo(
+          response.data?.detail ||
+            "OTP sent to your college email. Enter it below to finish registration."
+        );
+        return;
+      }
+
+      const response = await axios.post("http://127.0.0.1:8000/api/companies/register/", {
+        ...registerForm,
+        email: registerForm.email.trim(),
+        website: registerForm.website.trim(),
+      });
 
       setInfo(
         response.data?.detail ||
@@ -171,16 +237,56 @@ function Login() {
       setLoginForm({ email: registerForm.email.trim(), password: "" });
       setRegisterForm(emptyRegisterForm);
     } catch (err) {
-      const data = err.response?.data;
-      if (data && typeof data === "object") {
-        const firstError = Object.values(data)
-          .flat()
-          .find(Boolean);
-        setError(firstError || "Unable to create recruiter account.");
+      const firstError = extractErrorMessage(err.response?.data);
+      if (firstError) {
+        setError(firstError);
       } else if (err.message === "Network Error") {
         setError("Network error. Please check your connection and try again.");
       } else {
         setError("Unable to create recruiter account right now. Please try again.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleStudentOtpVerification = async (event) => {
+    event.preventDefault();
+    setError("");
+    setInfo("");
+
+    if (!studentOtpRequested) {
+      setError("Request an OTP first.");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/students/register/verify-otp/",
+        {
+          email: registerForm.email.trim().toLowerCase(),
+          otp: studentOtp.trim(),
+        }
+      );
+
+      setInfo(
+        response.data?.detail ||
+          "Student account created successfully. You can now sign in."
+      );
+      setAuthView("login");
+      setLoginForm({ email: registerForm.email.trim().toLowerCase(), password: "" });
+      setRegisterForm(emptyRegisterForm);
+      setStudentOtp("");
+      setStudentOtpRequested(false);
+    } catch (err) {
+      const firstError = extractErrorMessage(err.response?.data);
+      if (firstError) {
+        setError(firstError);
+      } else if (err.message === "Network Error") {
+        setError("Network error. Please check your connection and try again.");
+      } else {
+        setError("Unable to verify OTP right now. Please try again.");
       }
     } finally {
       setSubmitting(false);
@@ -199,7 +305,9 @@ function Login() {
         <p className="login-eyebrow">Placement Portal</p>
         <h1 className="login-title">
           {loginType === "student"
-            ? "Student Login"
+            ? authView === "register"
+              ? "Student Registration"
+              : "Student Login"
             : authView === "register"
               ? "Recruiter Registration"
               : "Recruiter Login"}
@@ -234,7 +342,7 @@ function Login() {
           </div>
         )}
 
-        {loginType === "student" || authView === "login" ? (
+        {authView === "login" ? (
           <form onSubmit={handleLogin} className="login-form">
             <input
               type="email"
@@ -264,18 +372,16 @@ function Login() {
               {submitting ? "Signing In..." : "Sign In"}
             </button>
 
-            {loginType === "company" && (
-              <div className="login-switch-row">
-                <span>New to this portal?</span>
-                <button
-                  type="button"
-                  className="login-link-btn"
-                  onClick={() => handleViewChange("register")}
-                >
-                  Register
-                </button>
-              </div>
-            )}
+            <div className="login-switch-row">
+              <span>New to this portal?</span>
+              <button
+                type="button"
+                className="login-link-btn"
+                onClick={() => handleViewChange("register")}
+              >
+                Register
+              </button>
+            </div>
           </form>
         ) : (
           <form onSubmit={handleRegister} className="login-form login-form-register">
@@ -283,7 +389,7 @@ function Login() {
               <input
                 type="text"
                 name="first_name"
-                placeholder="Recruiter first name"
+                placeholder={loginType === "student" ? "First name" : "Recruiter first name"}
                 value={registerForm.first_name}
                 onChange={handleRegisterInputChange}
                 required
@@ -291,7 +397,7 @@ function Login() {
               <input
                 type="text"
                 name="last_name"
-                placeholder="Recruiter last name"
+                placeholder={loginType === "student" ? "Last name" : "Recruiter last name"}
                 value={registerForm.last_name}
                 onChange={handleRegisterInputChange}
                 required
@@ -301,7 +407,11 @@ function Login() {
             <input
               type="email"
               name="email"
-              placeholder="Work email address"
+              placeholder={
+                loginType === "student"
+                  ? "College email address"
+                  : "Work email address"
+              }
               value={registerForm.email}
               onChange={handleRegisterInputChange}
               required
@@ -326,53 +436,141 @@ function Login() {
               />
             </div>
 
-            <input
-              type="text"
-              name="company_name"
-              placeholder="Company name"
-              value={registerForm.company_name}
-              onChange={handleRegisterInputChange}
-              required
-            />
+            {loginType === "student" ? (
+              <>
+                <p className="login-hint">
+                  Only emails ending with <strong>@student.nitandhra.ac.in</strong> are
+                  allowed for student signup.
+                </p>
+                <input
+                  type="text"
+                  name="registration_no"
+                  placeholder="Registration number"
+                  value={registerForm.registration_no}
+                  onChange={handleRegisterInputChange}
+                  required
+                />
+                <div className="login-grid">
+                  <input
+                    type="text"
+                    name="department"
+                    placeholder="Department"
+                    value={registerForm.department}
+                    onChange={handleRegisterInputChange}
+                    required
+                  />
+                  <input
+                    type="number"
+                    name="graduation_year"
+                    placeholder="Graduation year"
+                    value={registerForm.graduation_year}
+                    onChange={handleRegisterInputChange}
+                    min="2000"
+                    max="2100"
+                    required
+                  />
+                </div>
+                <div className="login-grid">
+                  <input
+                    type="number"
+                    name="cgpa"
+                    placeholder="CGPA"
+                    value={registerForm.cgpa}
+                    onChange={handleRegisterInputChange}
+                    min="0"
+                    max="10"
+                    step="0.01"
+                    required
+                  />
+                  <input
+                    type="number"
+                    name="active_backlogs"
+                    placeholder="Active backlogs"
+                    value={registerForm.active_backlogs}
+                    onChange={handleRegisterInputChange}
+                    min="0"
+                    required
+                  />
+                </div>
+                {studentOtpRequested && (
+                  <>
+                    <input
+                      type="text"
+                      name="otp"
+                      placeholder="Enter 6-digit OTP"
+                      value={studentOtp}
+                      onChange={handleStudentOtpChange}
+                      maxLength={6}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="login-btn"
+                      onClick={handleStudentOtpVerification}
+                      disabled={submitting}
+                    >
+                      {submitting ? "Verifying..." : "Verify OTP & Create Account"}
+                    </button>
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  name="company_name"
+                  placeholder="Company name"
+                  value={registerForm.company_name}
+                  onChange={handleRegisterInputChange}
+                  required
+                />
 
-            <div className="login-grid">
-              <input
-                type="text"
-                name="location"
-                placeholder="Company location"
-                value={registerForm.location}
-                onChange={handleRegisterInputChange}
-                required
-              />
-              <input
-                type="text"
-                name="industry"
-                placeholder="Industry"
-                value={registerForm.industry}
-                onChange={handleRegisterInputChange}
-                required
-              />
-            </div>
-
-            <input
-              type="url"
-              name="website"
-              placeholder="Company website (optional)"
-              value={registerForm.website}
-              onChange={handleRegisterInputChange}
-            />
-
-            <textarea
-              name="description"
-              placeholder="Briefly describe your company and hiring focus"
-              value={registerForm.description}
-              onChange={handleRegisterInputChange}
-              rows="4"
-              required
-            />
+                <div className="login-grid">
+                  <input
+                    type="text"
+                    name="location"
+                    placeholder="Company location"
+                    value={registerForm.location}
+                    onChange={handleRegisterInputChange}
+                    required
+                  />
+                  <input
+                    type="text"
+                    name="industry"
+                    placeholder="Industry"
+                    value={registerForm.industry}
+                    onChange={handleRegisterInputChange}
+                    required
+                  />
+                </div>
+                <input
+                  type="url"
+                  name="website"
+                  placeholder="Company website (optional)"
+                  value={registerForm.website}
+                  onChange={handleRegisterInputChange}
+                />
+                <textarea
+                  name="description"
+                  placeholder="Briefly describe your company and hiring focus"
+                  value={registerForm.description}
+                  onChange={handleRegisterInputChange}
+                  rows="4"
+                  required
+                />
+              </>
+            )}
 
             <button type="submit" className="login-btn" disabled={submitting}>
-              {submitting ? "Creating Account..." : "Create Recruiter Account"}
+              {submitting
+                ? loginType === "student"
+                  ? "Sending OTP..."
+                  : "Creating Account..."
+                : loginType === "student"
+                  ? studentOtpRequested
+                    ? "Resend OTP"
+                    : "Send OTP"
+                  : "Create Recruiter Account"}
             </button>
 
             <div className="login-switch-row">
