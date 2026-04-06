@@ -1,7 +1,9 @@
 from datetime import timedelta
+from unittest.mock import patch
 
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -185,6 +187,69 @@ class StudentRegistrationTests(APITestCase):
         student = Student.objects.get(user=user)
         self.assertEqual(user.role, "student")
         self.assertEqual(student.registration_no, "N23CS001")
+        self.assertFalse(
+            PendingStudentRegistration.objects.filter(
+                email="asha@student.nitandhra.ac.in"
+            ).exists()
+        )
+
+    @override_settings(
+        EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend",
+        EMAIL_HOST="",
+        EMAIL_HOST_USER="",
+        EMAIL_HOST_PASSWORD="",
+    )
+    def test_student_request_otp_requires_complete_smtp_configuration(self):
+        response = self.client.post(
+            "/api/students/register/request-otp/",
+            {
+                "first_name": "Asha",
+                "last_name": "Reddy",
+                "email": "asha@student.nitandhra.ac.in",
+                "password": "StrongPass123!",
+                "confirm_password": "StrongPass123!",
+                "registration_no": "N23CS001",
+                "department": "CSE",
+                "graduation_year": 2027,
+                "cgpa": 8.5,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
+        self.assertIn("EMAIL_HOST", response.data["detail"])
+        self.assertFalse(
+            PendingStudentRegistration.objects.filter(
+                email="asha@student.nitandhra.ac.in"
+            ).exists()
+        )
+
+    @patch(
+        "students.views.send_transactional_email",
+        side_effect=RuntimeError("SMTP failure"),
+    )
+    def test_student_request_otp_rolls_back_pending_registration_when_email_fails(
+        self,
+        mocked_send_transactional_email,
+    ):
+        response = self.client.post(
+            "/api/students/register/request-otp/",
+            {
+                "first_name": "Asha",
+                "last_name": "Reddy",
+                "email": "asha@student.nitandhra.ac.in",
+                "password": "StrongPass123!",
+                "confirm_password": "StrongPass123!",
+                "registration_no": "N23CS001",
+                "department": "CSE",
+                "graduation_year": 2027,
+                "cgpa": 8.5,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
+        mocked_send_transactional_email.assert_called_once()
         self.assertFalse(
             PendingStudentRegistration.objects.filter(
                 email="asha@student.nitandhra.ac.in"

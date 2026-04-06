@@ -1,8 +1,7 @@
 import random
 
 from django.conf import settings
-from django.core.mail import get_connection
-from django.core.mail import send_mail
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes, permission_classes
@@ -10,6 +9,8 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from api.email_utils import get_otp_email_configuration_error, send_transactional_email
+from api.permissions import IsStudent
 from .models import PendingStudentRegistration, Student
 from .serializers import (
     StudentRegistrationRequestSerializer,
@@ -17,7 +18,6 @@ from .serializers import (
     StudentSerializer,
     build_pending_student_registration,
 )
-from api.permissions import IsStudent
 
 @api_view(["GET"])
 def student_detail(request, registration_no):
@@ -73,37 +73,43 @@ def request_student_registration_otp(request):
     serializer = StudentRegistrationRequestSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
+    configuration_error = get_otp_email_configuration_error()
+    if configuration_error:
+        return Response(
+            {"detail": configuration_error},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
     otp = f"{random.randint(0, 999999):06d}"
     payload = build_pending_student_registration(serializer.validated_data, otp)
 
-    PendingStudentRegistration.objects.update_or_create(
-        email=payload["email"],
-        defaults=payload,
-    )
+    try:
+        with transaction.atomic():
+            PendingStudentRegistration.objects.update_or_create(
+                email=payload["email"],
+                defaults=payload,
+            )
 
-    if settings.EMAIL_BACKEND == "django.core.mail.backends.console.EmailBackend":
+            send_transactional_email(
+                subject="Placement Portal student registration OTP",
+                message=(
+                    f"Your OTP for Placement Portal student registration is {otp}. "
+                    f"It expires in {settings.STUDENT_OTP_EXPIRY_MINUTES} minutes."
+                ),
+                recipient_list=[payload["email"]],
+                fail_silently=False,
+            )
+    except Exception:
         return Response(
             {
                 "detail": (
-                    "OTP email delivery is not configured on the server yet. "
-                    "Set SMTP email settings before requesting OTPs."
+                    "Unable to send the OTP email right now. "
+                    "Check the SMTP host, username, password, and TLS settings in "
+                    "backend_django/backend/.env and try again."
                 )
             },
             status=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
-
-    connection = get_connection(fail_silently=False)
-    send_mail(
-        subject="Placement Portal student registration OTP",
-        message=(
-            f"Your OTP for Placement Portal student registration is {otp}. "
-            f"It expires in {settings.STUDENT_OTP_EXPIRY_MINUTES} minutes."
-        ),
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[payload["email"]],
-        fail_silently=False,
-        connection=connection,
-    )
 
     return Response(
         {

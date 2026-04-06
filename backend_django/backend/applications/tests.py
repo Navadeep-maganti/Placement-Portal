@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 
+from django.core import mail
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -117,6 +118,9 @@ class ApplicationWorkflowTests(APITestCase):
                 action_type=ActivityLog.ActionType.APPLICATION_STATUS_CHANGED,
             ).exists()
         )
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("Shortlisted", mail.outbox[0].subject)
+        self.assertIn("Excellent resume", mail.outbox[0].body)
 
     def test_student_can_accept_offer(self):
         offered_status, _ = ApplicationStatus.objects.get_or_create(

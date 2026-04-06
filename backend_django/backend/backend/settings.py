@@ -190,15 +190,6 @@ STUDENT_EMAIL_DOMAIN = "@student.nitandhra.ac.in"
 STUDENT_OTP_EXPIRY_MINUTES = 10
 STUDENT_OTP_MAX_ATTEMPTS = 5
 
-EMAIL_BACKEND = os.getenv(
-    "DJANGO_EMAIL_BACKEND",
-    (
-        "django.core.mail.backends.smtp.EmailBackend"
-        if os.getenv("EMAIL_HOST")
-        else "django.core.mail.backends.console.EmailBackend"
-    ),
-)
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@placement-portal.local")
 EMAIL_HOST = os.getenv("EMAIL_HOST", "")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
@@ -206,6 +197,18 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "true").lower() == "true"
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "false").lower() == "true"
 EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "20"))
+EMAIL_BACKEND = os.getenv(
+    "DJANGO_EMAIL_BACKEND",
+    (
+        "django.core.mail.backends.smtp.EmailBackend"
+        if EMAIL_HOST
+        else "django.core.mail.backends.console.EmailBackend"
+    ),
+)
+DEFAULT_FROM_EMAIL = os.getenv(
+    "DEFAULT_FROM_EMAIL",
+    EMAIL_HOST_USER or "no-reply@placement-portal.local",
+)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

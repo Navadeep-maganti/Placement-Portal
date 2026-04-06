@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 
+from django.core import mail
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -196,6 +197,36 @@ class RecruiterPostingsApiTests(APITestCase):
         self.assertEqual(response.data[0]["id"], self.own_placement.id)
 
     def test_company_can_create_posting_for_itself(self):
+        eligible_user = User.objects.create_user(
+            email="eligible@student.nitandhra.ac.in",
+            password="password123",
+            first_name="Eligible",
+            last_name="Student",
+            role="student",
+        )
+        Student.objects.create(
+            user=eligible_user,
+            registration_no="2022CSE999",
+            department="CSE",
+            graduation_year=2026,
+            cgpa=8.6,
+            active_backlogs=0,
+        )
+        ineligible_user = User.objects.create_user(
+            email="blocked@student.nitandhra.ac.in",
+            password="password123",
+            first_name="Blocked",
+            last_name="Student",
+            role="student",
+        )
+        Student.objects.create(
+            user=ineligible_user,
+            registration_no="2022ECE999",
+            department="ECE",
+            graduation_year=2026,
+            cgpa=6.0,
+            active_backlogs=2,
+        )
         self.client.force_authenticate(user=self.company_user)
 
         response = self.client.post(
@@ -233,6 +264,9 @@ class RecruiterPostingsApiTests(APITestCase):
             ),
             ["CSE", "IT"],
         )
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ["eligible@student.nitandhra.ac.in"])
+        self.assertIn("Platform Engineer", mail.outbox[0].subject)
 
     def test_company_cannot_access_other_company_posting(self):
         self.client.force_authenticate(user=self.company_user)

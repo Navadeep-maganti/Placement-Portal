@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.utils import timezone
 from rest_framework import generics, permissions, status
 from rest_framework.exceptions import NotFound, PermissionDenied
@@ -6,6 +7,7 @@ from rest_framework.response import Response
 from activitylog.models import ActivityLog
 from activitylog.serializers import ActivityLogSerializer
 from applications.models import Application
+from api.notifications import notify_eligible_students_for_new_placement
 from api.permissions import IsApprovedCompany, IsCompany
 from bookmarks.models import Bookmark
 from companies.views import get_or_create_company_for_user
@@ -92,7 +94,10 @@ class RecruiterPlacementListCreateView(RecruiterPlacementMixin, generics.ListCre
 
     def perform_create(self, serializer):
         company = self.get_company()
-        serializer.save(company=company)
+        placement = serializer.save(company=company)
+        transaction.on_commit(
+            lambda: notify_eligible_students_for_new_placement(placement)
+        )
 
 
 class RecruiterPlacementDetailView(

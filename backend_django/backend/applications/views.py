@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
+from api.notifications import send_application_status_update_email
 from api.permissions import IsApprovedCompany, IsCompany, IsStudent
 from placements.models import Placement
 from students.models import Student
@@ -241,6 +242,7 @@ class UpdateApplicationStatusView(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         new_status = serializer.validated_data["status_id"]
+        previous_status = application.status
         if user.role == "company" and new_status.code in {
             "offer_accepted",
             "offer_declined",
@@ -294,6 +296,12 @@ class UpdateApplicationStatusView(generics.GenericAPIView):
             changed_by=user,
             remarks=serializer.validated_data.get("remarks", ""),
         )
+        application.refresh_from_db()
+        send_application_status_update_email(
+            application,
+            previous_status=previous_status,
+            remarks=serializer.validated_data.get("remarks", ""),
+        )
 
         return Response(ApplicationSerializer(application).data, status=status.HTTP_200_OK)
 
@@ -337,6 +345,7 @@ class OfferDecisionView(generics.GenericAPIView):
             "Offer Accepted" if decision == "accept" else "Offer Declined",
             4 if decision == "accept" else 5,
         )
+        previous_status = application.status
 
         application.update_status(
             target_status,
@@ -346,6 +355,17 @@ class OfferDecisionView(generics.GenericAPIView):
                 if decision == "accept"
                 else "Student declined the offer."
             ),
+        )
+        primary_remarks = remarks or (
+            "Student accepted the offer."
+            if decision == "accept"
+            else "Student declined the offer."
+        )
+        application.refresh_from_db()
+        send_application_status_update_email(
+            application,
+            previous_status=previous_status,
+            remarks=primary_remarks,
         )
 
         if decision == "accept":
@@ -360,14 +380,21 @@ class OfferDecisionView(generics.GenericAPIView):
             for other_application in other_applications:
                 if other_application.status.code in Application.get_terminal_status_codes():
                     continue
+                other_previous_status = other_application.status
+                closure_remarks = (
+                    f"Closed automatically because the student accepted an offer from "
+                    f"{application.job.company.company_name}."
+                )
                 other_application.update_status(
                     closed_status,
                     changed_by=request.user,
-                    remarks=(
-                        f"Closed automatically because the student accepted an offer from "
-                        f"{application.job.company.company_name}."
-                    ),
+                    remarks=closure_remarks,
+                )
+                other_application.refresh_from_db()
+                send_application_status_update_email(
+                    other_application,
+                    previous_status=other_previous_status,
+                    remarks=closure_remarks,
                 )
 
-        application.refresh_from_db()
         return Response(ApplicationSerializer(application).data, status=status.HTTP_200_OK)

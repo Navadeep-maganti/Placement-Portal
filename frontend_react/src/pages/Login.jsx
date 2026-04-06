@@ -28,6 +28,14 @@ const extractErrorMessage = (data) => {
   }
 
   if (typeof data === "string") {
+    const trimmed = data.trim();
+    if (
+      trimmed.startsWith("<!DOCTYPE html") ||
+      trimmed.startsWith("<html") ||
+      trimmed.includes("<title>Page not found")
+    ) {
+      return "";
+    }
     return data;
   }
 
@@ -198,44 +206,47 @@ function Login() {
 
     try {
       setSubmitting(true);
-      if (loginType === "student") {
-        const response = await axios.post(
-          "http://127.0.0.1:8000/api/students/register/request-otp/",
-          {
-            first_name: registerForm.first_name.trim(),
-            last_name: registerForm.last_name.trim(),
-            email: registerForm.email.trim().toLowerCase(),
-            password: registerForm.password,
-            confirm_password: registerForm.confirm_password,
-            registration_no: registerForm.registration_no.trim().toUpperCase(),
-            department: registerForm.department.trim(),
-            graduation_year: Number(registerForm.graduation_year),
-            cgpa: Number(registerForm.cgpa),
-            active_backlogs: Number(registerForm.active_backlogs || 0),
-          }
-        );
+      const endpoint =
+        loginType === "student"
+          ? "http://127.0.0.1:8000/api/students/register/request-otp/"
+          : "http://127.0.0.1:8000/api/companies/register/request-otp/";
 
-        setStudentOtpRequested(true);
-        setInfo(
-          response.data?.detail ||
-            "OTP sent to your college email. Enter it below to finish registration."
-        );
-        return;
-      }
+      const payload =
+        loginType === "student"
+          ? {
+              first_name: registerForm.first_name.trim(),
+              last_name: registerForm.last_name.trim(),
+              email: registerForm.email.trim().toLowerCase(),
+              password: registerForm.password,
+              confirm_password: registerForm.confirm_password,
+              registration_no: registerForm.registration_no.trim().toUpperCase(),
+              department: registerForm.department.trim(),
+              graduation_year: Number(registerForm.graduation_year),
+              cgpa: Number(registerForm.cgpa),
+              active_backlogs: Number(registerForm.active_backlogs || 0),
+            }
+          : {
+              ...registerForm,
+              first_name: registerForm.first_name.trim(),
+              last_name: registerForm.last_name.trim(),
+              email: registerForm.email.trim().toLowerCase(),
+              website: registerForm.website.trim(),
+              company_name: registerForm.company_name.trim(),
+              location: registerForm.location.trim(),
+              industry: registerForm.industry.trim(),
+              description: registerForm.description.trim(),
+            };
 
-      const response = await axios.post("http://127.0.0.1:8000/api/companies/register/", {
-        ...registerForm,
-        email: registerForm.email.trim(),
-        website: registerForm.website.trim(),
-      });
+      const response = await axios.post(endpoint, payload);
 
+      setStudentOtpRequested(true);
       setInfo(
         response.data?.detail ||
-          "Recruiter account created successfully. Admin approval is pending."
+          (loginType === "student"
+            ? "OTP sent to your college email. Enter it below to finish registration."
+            : "OTP sent to your work email. Enter it below to finish registration.")
       );
-      setAuthView("login");
-      setLoginForm({ email: registerForm.email.trim(), password: "" });
-      setRegisterForm(emptyRegisterForm);
+      return;
     } catch (err) {
       const firstError = extractErrorMessage(err.response?.data);
       if (firstError) {
@@ -243,7 +254,7 @@ function Login() {
       } else if (err.message === "Network Error") {
         setError("Network error. Please check your connection and try again.");
       } else {
-        setError("Unable to create recruiter account right now. Please try again.");
+        setError("Unable to send OTP right now. Please try again.");
       }
     } finally {
       setSubmitting(false);
@@ -260,10 +271,17 @@ function Login() {
       return;
     }
 
+    if (!studentOtp.trim()) {
+      setError("Enter the 6-digit OTP sent to your email.");
+      return;
+    }
+
     try {
       setSubmitting(true);
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/students/register/verify-otp/",
+        loginType === "student"
+          ? "http://127.0.0.1:8000/api/students/register/verify-otp/"
+          : "http://127.0.0.1:8000/api/companies/register/verify-otp/",
         {
           email: registerForm.email.trim().toLowerCase(),
           otp: studentOtp.trim(),
@@ -272,10 +290,15 @@ function Login() {
 
       setInfo(
         response.data?.detail ||
-          "Student account created successfully. You can now sign in."
+          (loginType === "student"
+            ? "Student account created successfully. You can now sign in."
+            : "Recruiter account created successfully. Admin approval is pending.")
       );
       setAuthView("login");
-      setLoginForm({ email: registerForm.email.trim().toLowerCase(), password: "" });
+      setLoginForm({
+        email: registerForm.email.trim().toLowerCase(),
+        password: registerForm.password,
+      });
       setRegisterForm(emptyRegisterForm);
       setStudentOtp("");
       setStudentOtpRequested(false);
@@ -384,7 +407,12 @@ function Login() {
             </div>
           </form>
         ) : (
-          <form onSubmit={handleRegister} className="login-form login-form-register">
+          <form
+            onSubmit={
+              studentOtpRequested ? handleStudentOtpVerification : handleRegister
+            }
+            className="login-form login-form-register"
+          >
             <div className="login-grid">
               <input
                 type="text"
@@ -492,27 +520,6 @@ function Login() {
                     required
                   />
                 </div>
-                {studentOtpRequested && (
-                  <>
-                    <input
-                      type="text"
-                      name="otp"
-                      placeholder="Enter 6-digit OTP"
-                      value={studentOtp}
-                      onChange={handleStudentOtpChange}
-                      maxLength={6}
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="login-btn"
-                      onClick={handleStudentOtpVerification}
-                      disabled={submitting}
-                    >
-                      {submitting ? "Verifying..." : "Verify OTP & Create Account"}
-                    </button>
-                  </>
-                )}
               </>
             ) : (
               <>
@@ -561,17 +568,35 @@ function Login() {
               </>
             )}
 
-            <button type="submit" className="login-btn" disabled={submitting}>
-              {submitting
-                ? loginType === "student"
-                  ? "Sending OTP..."
-                  : "Creating Account..."
-                : loginType === "student"
-                  ? studentOtpRequested
-                    ? "Resend OTP"
-                    : "Send OTP"
-                  : "Create Recruiter Account"}
-            </button>
+            {studentOtpRequested && (
+              <>
+                <input
+                  type="text"
+                  name="otp"
+                  placeholder="Enter 6-digit OTP"
+                  value={studentOtp}
+                  onChange={handleStudentOtpChange}
+                  maxLength={6}
+                />
+                <button type="submit" className="login-btn" disabled={submitting}>
+                  {submitting ? "Verifying..." : "Verify OTP & Create Account"}
+                </button>
+                <button
+                  type="button"
+                  className="login-link-btn"
+                  onClick={handleRegister}
+                  disabled={submitting}
+                >
+                  Resend OTP
+                </button>
+              </>
+            )}
+
+            {!studentOtpRequested && (
+              <button type="submit" className="login-btn" disabled={submitting}>
+                {submitting ? "Sending OTP..." : "Send OTP"}
+              </button>
+            )}
 
             <div className="login-switch-row">
               <span>Already have an account?</span>
