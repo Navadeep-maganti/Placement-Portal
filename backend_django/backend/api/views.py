@@ -1,5 +1,5 @@
 from rest_framework_simplejwt.views import TokenObtainPairView
-from api.serializers import LoginSerializer
+from api.serializers import ChangePasswordSerializer, LoginSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -19,10 +19,25 @@ def auth_me(request):
     """Get current user info"""
     return Response({
         "user_id": request.user.id,
-        "username": request.user.username,
+        "username": request.user.email,
         "email": request.user.email,
         "first_name": request.user.first_name,
         "last_name": request.user.last_name,
         "role": request.user.role,
         "is_authenticated": True,
     })
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def change_password(request):
+    serializer = ChangePasswordSerializer(
+        data=request.data,
+        context={"request": request},
+    )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(
+        {"detail": "Password updated successfully."},
+        status=status.HTTP_200_OK,
+    )

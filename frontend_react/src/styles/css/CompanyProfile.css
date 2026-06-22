@@ -1,0 +1,172 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+
+.cp-page {
+  margin-top: 80px;
+  min-height: 100vh;
+  padding: clamp(20px, 3vw, 40px);
+  font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top left, #fbfcff 0%, #f6f8fc 40%, #f3f5f8 100%);
+}
+
+.cp-container {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.cp-hero,
+.cp-card {
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 12px 30px rgba(27, 22, 39, 0.08);
+}
+
+.cp-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: center;
+  padding: clamp(20px, 3vw, 32px);
+  margin-bottom: 24px;
+}
+
+.cp-hero h1 {
+  margin: 0 0 0.5rem;
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+  font-size: clamp(28px, 3.2vw, 40px);
+}
+
+.cp-status-badge {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+.cp-card {
+  padding: clamp(20px, 3vw, 28px);
+}
+
+.cp-card h2 {
+  margin: 0 0 0.5rem;
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+}
+
+.cp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.cp-field {
+  margin-bottom: 16px;
+}
+
+.cp-card label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #4b5063;
+  font-weight: 600;
+}
+
+.cp-card input,
+.cp-card textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e1e5f0;
+  background: #fcfcff;
+  border-radius: 13px;
+  padding: 12px 14px;
+  font-size: 14px;
+}
+
+.cp-card textarea {
+  resize: vertical;
+}
+
+.cp-card input:focus,
+.cp-card textarea:focus {
+  outline: none;
+  border-color: #5d4eff;
+  box-shadow: 0 0 0 3px rgba(93, 78, 255, 0.16);
+}
+
+.cp-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cp-primary-btn,
+.cp-secondary-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cp-primary-btn {
+  background: linear-gradient(120deg, #2563eb, #5fa0ff);
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.24);
+}
+
+.cp-secondary-btn {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.cp-primary-btn:hover,
+.cp-secondary-btn:hover {
+  transform: translateY(-1px);
+}
+
+.cp-inline-message {
+  margin-top: 0.85rem;
+}
+
+.cp-error {
+  color: #b91c1c;
+}
+
+.cp-success {
+  color: #166534;
+}
+
+.cp-security-card {
+  margin-top: 24px;
+}
+
+.cp-security-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.cp-security-head p {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+@media (max-width: 720px) {
+  .cp-page {
+    padding: 24px 14px 36px;
+  }
+
+  .cp-hero,
+  .cp-grid {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .cp-security-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

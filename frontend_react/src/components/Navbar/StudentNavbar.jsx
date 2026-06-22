@@ -2,7 +2,6 @@ import { Link, Navigate, NavLink } from "react-router-dom";
 import "../../styles/css/StudentNavbar.css";
 import { FaUserCircle } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
-import api from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
 function StudentNavbar({ student }) {
   const { logout } = useAuth();

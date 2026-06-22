@@ -1,0 +1,306 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+
+:root {
+  --va-ink: #14121a;
+  --va-muted: #5a5563;
+  --va-accent: #2563eb;
+  --va-accent-dark: #1d4ed8;
+  --va-teal: #0fa3b1;
+  --va-card: #ffffff;
+  --va-border: rgba(20, 18, 26, 0.08);
+  --va-shadow: 0 18px 40px rgba(25, 20, 39, 0.12);
+  --va-shadow-soft: 0 12px 30px rgba(27, 22, 39, 0.08);
+}
+
+.va-page {
+  margin-top: 80px;
+  min-height: 100vh;
+  padding: clamp(20px, 3vw, 40px);
+  font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--va-ink);
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at top left, #fbfcff 0%, transparent 28%),
+    linear-gradient(180deg, #fbfcff 0%, #f6f8fc 45%, #f3f5f8 100%);
+}
+
+.va-container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.va-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: clamp(20px, 4vw, 48px);
+  padding: clamp(20px, 3vw, 32px);
+  border-radius: 24px;
+  background: var(--va-card);
+  box-shadow: var(--va-shadow-soft);
+  margin-bottom: clamp(20px, 4vw, 36px);
+}
+
+.va-hero h1 {
+  margin: 0 0 0.5rem;
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+  font-size: clamp(28px, 3.2vw, 40px);
+  color: var(--va-ink);
+}
+
+.va-hero p {
+  margin: 0;
+  color: var(--va-muted);
+  line-height: 1.6;
+  max-width: 560px;
+}
+
+.va-primary-btn {
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(120deg, var(--va-accent), #5fa0ff);
+  color: #fff;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.24);
+}
+
+.va-primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 28px rgba(37, 99, 235, 0.32);
+}
+
+.va-inline-message {
+  margin-top: 0.85rem;
+  font-size: 0.95rem;
+}
+
+.va-error {
+  color: #b91c1c;
+}
+
+.va-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: clamp(20px, 4vw, 36px);
+}
+
+.va-stat-card {
+  background: var(--va-card);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: var(--va-shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  border: 1px solid transparent;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.va-stat-card:hover {
+  transform: translateY(-4px);
+}
+
+.va-stat-card strong {
+  font-size: 28px;
+  color: var(--va-ink);
+}
+
+.va-stat-label,
+.va-field-label {
+  color: var(--va-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.va-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: clamp(20px, 4vw, 36px);
+}
+
+.va-search,
+.va-select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e1e5f0;
+  border-radius: 13px;
+  padding: 12px 14px;
+  background: #fcfcff;
+  color: #21253a;
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.va-search:focus,
+.va-select:focus {
+  outline: none;
+  border-color: #5d4eff;
+  box-shadow: 0 0 0 3px rgba(93, 78, 255, 0.16);
+}
+
+.va-list {
+  display: grid;
+  gap: 18px;
+}
+
+.va-card {
+  background: var(--va-card);
+  border-radius: 24px;
+  padding: clamp(20px, 3vw, 28px);
+  box-shadow: var(--va-shadow-soft);
+}
+
+.va-card-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.va-card-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.va-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1.2rem;
+}
+
+.va-card-header h2 {
+  margin: 0;
+  color: var(--va-ink);
+  font-size: 1.35rem;
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+}
+
+.va-subtitle {
+  margin: 0.35rem 0 0;
+  color: var(--va-muted);
+}
+
+.va-status {
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.va-status-applied {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.va-status-shortlisted {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.va-status-offered,
+.va-status-offer_accepted {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.va-status-offer_declined,
+.va-status-rejected,
+.va-status-closed_after_offer_acceptance {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.va-info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.va-info-grid p,
+.va-section p {
+  margin: 0.25rem 0 0;
+  color: var(--va-ink);
+  line-height: 1.5;
+}
+
+.va-section {
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 1rem;
+}
+
+.va-link {
+  color: var(--va-accent-dark);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.va-link:hover {
+  text-decoration: underline;
+}
+
+.va-empty {
+  background: var(--va-card);
+  border-radius: 24px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: var(--va-shadow-soft);
+}
+
+.va-empty h2 {
+  margin: 0 0 0.5rem;
+  color: var(--va-ink);
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+}
+
+.va-empty p {
+  margin: 0;
+  color: var(--va-muted);
+}
+
+@media (max-width: 960px) {
+  .va-stats-grid,
+  .va-info-grid,
+  .va-toolbar {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .va-hero,
+  .va-card-header,
+  .va-card-compact,
+  .va-card-summary {
+    flex-direction: column;
+  }
+
+  .va-stats-grid,
+  .va-info-grid,
+  .va-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .va-container {
+    padding: 0;
+  }
+
+  .va-page {
+    padding: 24px 14px 36px;
+  }
+}

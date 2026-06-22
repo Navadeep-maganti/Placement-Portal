@@ -1,0 +1,54 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+
+.rap-page {
+  margin-top: 80px;
+  min-height: 100vh;
+  padding: clamp(20px, 3vw, 40px);
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at top left, #fbfcff 0%, transparent 28%),
+    linear-gradient(180deg, #fbfcff 0%, #f6f8fc 45%, #f3f5f8 100%);
+  font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.rap-card {
+  width: 100%;
+  margin: clamp(56px, 8vw, 96px) auto 0;
+  padding: clamp(48px, 6vw, 72px) clamp(24px, 4vw, 48px);
+  border-radius: 34px;
+  background: #ffffff;
+  box-shadow: 0 18px 45px rgba(36, 53, 97, 0.12);
+  text-align: center;
+}
+
+.rap-card h1 {
+  margin: 0;
+  color: #1f1f27;
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+  font-size: clamp(32px, 3.2vw, 52px);
+  line-height: 1.15;
+}
+
+.rap-card p {
+  margin: 28px auto 0;
+  max-width: 900px;
+  color: #5f6474;
+  font-size: clamp(18px, 1.6vw, 26px);
+  line-height: 1.6;
+}
+
+@media (max-width: 720px) {
+  .rap-page {
+    padding: 24px 14px 36px;
+  }
+
+  .rap-card {
+    margin-top: 32px;
+    border-radius: 24px;
+    padding: 32px 18px;
+  }
+
+  .rap-card p {
+    margin-top: 18px;
+  }
+}

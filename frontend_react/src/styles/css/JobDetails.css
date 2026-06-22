@@ -1,0 +1,448 @@
+.job-details-page {
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+.job-details-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: calc(var(--student-page-top) + 12px) 24px 40px;
+}
+
+.jd-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  gap: 20px;
+  padding: clamp(24px, 3vw, 34px);
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 28%),
+    linear-gradient(135deg, #0f172a, #1d4ed8 58%, #0f766e 120%);
+  color: #ffffff;
+  box-shadow: var(--student-shadow-strong);
+}
+
+.jd-hero-topline,
+.jd-hero-actions,
+.jd-sidebar-meta,
+.jd-facts-grid,
+.jd-skill-wrap,
+.jd-eligibility-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.jd-hero-pill,
+.jd-status-chip,
+.jd-apply-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.jd-hero-pill {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.jd-status-chip.eligible,
+.jd-apply-status.eligible {
+  background: rgba(16, 185, 129, 0.16);
+  color: #d1fae5;
+}
+
+.jd-status-chip.blocked,
+.jd-apply-status.blocked {
+  background: rgba(248, 113, 113, 0.18);
+  color: #fee2e2;
+}
+
+.jd-status-chip.applied,
+.jd-apply-status.applied {
+  background: rgba(255, 255, 255, 0.16);
+  color: #eff6ff;
+}
+
+.jd-title-row {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.jd-company-mark {
+  width: 82px;
+  height: 82px;
+  border-radius: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 34px;
+  font-weight: 800;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.jd-title-copy h1 {
+  margin: 0;
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+  font-size: clamp(32px, 4vw, 46px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.jd-title-copy p {
+  margin: 8px 0 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.jd-hero-summary {
+  max-width: 720px;
+  margin: 18px 0 0;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.75;
+  font-size: 15px;
+}
+
+.jd-hero-actions {
+  margin-top: 22px;
+}
+
+.jd-bookmark-btn,
+.jd-site-link,
+.jd-apply-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.jd-bookmark-btn:hover,
+.jd-site-link:hover,
+.jd-apply-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.jd-bookmark-btn {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.jd-bookmark-btn.active {
+  background: #f59e0b;
+  color: #111827;
+  box-shadow: 0 12px 24px rgba(245, 158, 11, 0.28);
+}
+
+.jd-site-link {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.16);
+}
+
+.jd-facts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-content: start;
+}
+
+.jd-fact-card {
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+}
+
+.jd-fact-card span {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.jd-fact-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+.jd-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 22px;
+  margin-top: 24px;
+  align-items: start;
+}
+
+.jd-main {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.jd-section,
+.jd-apply-card {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid var(--student-border);
+  box-shadow: var(--student-shadow);
+  border-radius: 28px;
+}
+
+.jd-section {
+  padding: 24px;
+}
+
+.jd-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.jd-section-head h2 {
+  margin: 0;
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+  color: var(--student-text);
+  font-size: 24px;
+}
+
+.jd-section-head span {
+  color: var(--student-text-soft);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.jd-copy-card,
+.jd-company-card {
+  padding: 18px 20px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.jd-copy-card p,
+.jd-company-card p {
+  margin: 0;
+  color: var(--student-text-muted);
+  line-height: 1.8;
+}
+
+.jd-skill-wrap {
+  gap: 10px;
+}
+
+.jd-skill-pill {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--student-accent-strong);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.jd-eligibility-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.jd-eligibility-card {
+  padding: 18px;
+  border-radius: 22px;
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.jd-eligibility-card span {
+  display: block;
+  color: var(--student-text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.jd-eligibility-card strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--student-text);
+  line-height: 1.55;
+}
+
+.jd-warning-panel {
+  margin-top: 16px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.14);
+}
+
+.jd-warning-panel h3 {
+  margin: 0 0 12px;
+  color: #991b1b;
+  font-size: 16px;
+}
+
+.jd-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #7f1d1d;
+  line-height: 1.7;
+}
+
+.jd-company-link {
+  margin-top: 14px !important;
+}
+
+.jd-company-link a,
+.jd-inline-note a {
+  color: var(--student-accent-strong);
+  font-weight: 700;
+}
+
+.jd-sidebar {
+  position: sticky;
+  top: calc(var(--student-page-top) + 12px);
+}
+
+.jd-apply-card {
+  padding: 22px;
+}
+
+.jd-apply-card h3 {
+  margin: 14px 0 8px;
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+  color: var(--student-text);
+  font-size: 26px;
+}
+
+.jd-apply-card p {
+  margin: 0;
+  color: var(--student-text-muted);
+  line-height: 1.7;
+}
+
+.jd-apply-btn {
+  width: 100%;
+  margin-top: 18px;
+  background: linear-gradient(120deg, var(--student-accent), #4f8cff);
+  color: #ffffff;
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.24);
+}
+
+.jd-apply-btn.applied {
+  background: linear-gradient(120deg, #059669, #10b981);
+}
+
+.jd-apply-btn:disabled {
+  background: #cbd5e1;
+  color: #475569;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.jd-inline-note {
+  margin-top: 14px !important;
+  color: #92400e !important;
+  background: rgba(245, 158, 11, 0.12);
+  border-radius: 18px;
+  padding: 12px 14px;
+}
+
+.jd-sidebar-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.jd-sidebar-meta div {
+  padding: 14px;
+  border-radius: 18px;
+  background: #f8fbff;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.jd-sidebar-meta span {
+  display: block;
+  color: var(--student-text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.jd-sidebar-meta strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--student-text);
+  line-height: 1.5;
+}
+
+@media (max-width: 1024px) {
+  .jd-hero,
+  .jd-layout,
+  .jd-facts-grid,
+  .jd-eligibility-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .jd-sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 720px) {
+  .job-details-container {
+    padding: calc(var(--student-page-top) + 18px) 16px 28px;
+  }
+
+  .jd-hero,
+  .jd-section,
+  .jd-apply-card {
+    border-radius: 24px;
+  }
+
+  .jd-title-row {
+    align-items: flex-start;
+  }
+
+  .jd-company-mark {
+    width: 68px;
+    height: 68px;
+    border-radius: 20px;
+    font-size: 28px;
+  }
+
+  .jd-title-copy h1 {
+    font-size: 30px;
+  }
+
+  .jd-section-head {
+    flex-direction: column;
+  }
+
+  .jd-sidebar-meta {
+    grid-template-columns: 1fr;
+  }
+}
