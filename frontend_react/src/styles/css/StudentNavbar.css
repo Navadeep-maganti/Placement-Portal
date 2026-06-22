@@ -1,150 +1,127 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
-
 :root {
-  --nav-bg: rgba(255, 255, 255, 0.92);
-  --nav-ink: #18171c;
-  --nav-muted: #6b7280;
-  --nav-accent: #2563eb;
-  --nav-border: rgba(24, 23, 28, 0.1);
-  --nav-surface: rgba(255, 255, 255, 0.8);
-  --nav-shadow: 0 12px 28px rgba(16, 24, 40, 0.1);
+  /* ================= PRIMARY ================= */
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-soft: #eaf0ff;
+
+  /* ================= BACKGROUND ================= */
+  --bg-page: #f9fafb;
+  --bg-card: #ffffff;
+  --bg-hover: #f3f4f6;
+
+  /* ================= NAVBAR ================= */
+  --navbar-bg: #ffffff;
+  --navbar-div-bg: rgba(255, 255, 255, 1);
+  --navbar-border: #c4c4c6;
+  --navbar-text: #272a30;
+  --navbar-text-active: #1646ae;
+  --navbar-hover-bg: #ffffff;
+
+  /* ================= TEXT ================= */
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --text-placeholder: #9ca3af;
+
+  /* ================= BORDERS ================= */
+  --border: #e5e7eb;
+  --border-light: #f1f5f9;
+
+  /* ================= STATUS ================= */
+  --success: #16a34a;
+  --warning: #d97706;
+  --error: #dc2626;
+
+  /* ================= FOCUS ================= */
+  --focus-ring: rgba(37, 99, 235, 0.15);
 }
 
 .student-navbar {
-  background-color: var(--nav-bg);
-  padding: 10px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  border-bottom: 1px solid var(--nav-border);
-  box-shadow: var(--nav-shadow);
-  position: fixed;
-  top: 0;
-  width: 100%;
-  box-sizing: border-box;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
+    background-color: var(--navbar-bg);
+    padding: 10px 20px;
+    
+    display: flex;
+    height: 60px;
+    justify-content: space-between;
+    align-items: center;
+
+    /* border-radius: 25px; */
+    border-bottom: 1px solid var(--navbar-border);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
+
+    position: fixed;
+    top: 0;
+    margin-top: 1px;
+    width: 98%;
+    z-index: 1000;
 }
 
 .nav-title {
-  font-size: 20px !important;
-  font-weight: 700 !important;
-  color: var(--nav-ink) !important;
-  font-family: "Space Grotesk", "Manrope", sans-serif !important;
-  text-decoration: none;
-  letter-spacing: 0.01em;
-}
-
-.nav-subtitle {
-  font-size: 11px;
-  color: var(--nav-muted);
-  letter-spacing: 0.2em;
+    font-size: 24px !important;
+    font-weight: 600 !important;
+    color: var(--color-text-main) !important;
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+    text-decoration: none;
+    box-shadow: none !important;
 }
 
 .left-nav,
 .right-nav {
-  background-color: transparent;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+    background-color: var(--navbar-div-bg);
+    display: flex;
+    gap: 15px;
 }
 
 .center-nav {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  align-items: center;
-  background-color: var(--nav-surface);
-  padding: 8px 18px;
-  border-radius: 999px;
-  box-shadow: inset 0 0 0 1px rgba(24, 23, 28, 0.06);
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    align-items: center;
+
+    background-color: #f2f1f1;
+    /* subtle blue tint */
+    padding: 8px 26px;
+    border-radius: 25px;
+
+    box-shadow: inset 0 0 0 1px var(--border-light);
 }
 
 .nav-link {
-  padding: 8px 14px;
-  border-radius: 999px;
-  text-decoration: none;
-  color: var(--nav-ink);
-  font-size: 14px;
-  font-weight: 600;
-  font-family: "Manrope", sans-serif;
-  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    padding: 8px 14px;
+    border-radius: 999px;
+
+    text-decoration: none;
+    color: var(--navbar-text);
+    font-size: 15px;
+    font-weight: 500;
+
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .nav-link:hover {
-  background-color: #ffffff;
-  box-shadow: 0 4px 10px rgba(24, 23, 28, 0.08);
-  transform: translateY(-1px);
+    background-color: var(--navbar-hover-bg);
+    /* color: var(--primary); */
+    box-shadow: 0 0.6px 0.6px rgba(0, 0, 0, 0.08);
+
 }
 
 .nav-link.active {
-  background: linear-gradient(120deg, rgba(37, 99, 235, 0.18), rgba(37, 99, 235, 0.04));
-  color: #1d4ed8;
-  font-weight: 700;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.16);
+    background-color: #ffffff;
+    color: var(--navbar-text-active);
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.profile {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: "Manrope", sans-serif;
-  color: var(--nav-ink);
-  background-color: #ffffff;
-  padding: 6px 12px;
-  border-radius: 999px;
-  box-shadow: inset 0 0 0 1px rgba(24, 23, 28, 0.08);
-  text-decoration: none;
+.nav-link:active {
+    transform: scale(0.98);
 }
-
-.logout-button {
-  border: none;
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 8px 10px;
-  cursor: pointer;
-  box-shadow: inset 0 0 0 1px rgba(24, 23, 28, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.logout-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(24, 23, 28, 0.12);
-}
-
-@media (max-width: 960px) {
-  .student-navbar {
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 12px 16px;
-  }
-
-  .center-nav {
-    order: 3;
-    width: 100%;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-}
-
-@media (max-width: 640px) {
-  .student-navbar {
+.profile{
+    display: flex;
+    align-items: center;
     gap: 10px;
-  }
-
-  .nav-title {
-    font-size: 18px !important;
-  }
-
-  .center-nav {
-    background: transparent;
-    box-shadow: none;
-    padding: 0;
-  }
-
-  .nav-link {
-    background: #ffffff;
-  }
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--navbar-text);
+    background-color:#e5e7eb;
+    padding: 6px 12px;
+    border-radius: 25px;
 }
