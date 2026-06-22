@@ -107,15 +107,28 @@ Use the following pre-configured credentials to log in and test the portal:
 * Node.js `18` or higher
 * PostgreSQL installed and running
 
-### 1. Database Configuration
-Create a PostgreSQL database and user. In your PostgreSQL terminal:
-```sql
-CREATE DATABASE placement_portal;
-CREATE USER placement_user WITH PASSWORD 'Madhu@5148';
-GRANT ALL PRIVILEGES ON DATABASE placement_portal TO placement_user;
-ALTER USER placement_user CREATEDB;
-```
-Ensure connection settings in `backend_django/backend/backend/settings.py` match your PostgreSQL credentials (default settings already reflect the username `placement_user` and password `Madhu@5148`).
+### 1. Environment and Database Configuration
+1. Copy the `.env.example` file to `.env` inside `backend_django/backend`:
+   ```bash
+   cp backend_django/backend/.env.example backend_django/backend/.env
+   ```
+2. Create a PostgreSQL database and user. In your PostgreSQL terminal:
+   ```sql
+   CREATE DATABASE placement_portal;
+   CREATE USER placement_user WITH PASSWORD 'your_password';
+   GRANT ALL PRIVILEGES ON DATABASE placement_portal TO placement_user;
+   ALTER USER placement_user CREATEDB;
+   ```
+3. Open your newly created `.env` file and update the database configuration:
+   ```env
+   DB_NAME=placement_portal
+   DB_USER=placement_user
+   DB_PASSWORD=your_password
+   DB_HOST=localhost
+   DB_PORT=5432
+   ```
+   *Note: If these database environment variables are not provided in your `.env` file, the application falls back to the local defaults (`placement_user` / `Madhu@5148`) defined in `settings.py`.*
+
 
 ---
 

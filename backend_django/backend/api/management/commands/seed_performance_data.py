@@ -256,7 +256,19 @@ class Command(BaseCommand):
             if not append:
                 self._clear_generated_data()
 
+            # Ensure default Admin (Faculty) user exists
+            admin_email = "admin@gmail.com"
+            if not User.objects.filter(email=admin_email).exists():
+                User.objects.create_superuser(
+                    email=admin_email,
+                    password="Admin@123",
+                    first_name="Portal",
+                    last_name="Admin",
+                )
+                self.stdout.write(f"Default admin created: {admin_email} / Admin@123")
+
             statuses = self._ensure_statuses()
+
             skills = self._ensure_skills()
             recruiters = self._create_recruiters(recruiters_count, shared_password, rng)
             students = self._create_students(students_count, shared_password, rng)
