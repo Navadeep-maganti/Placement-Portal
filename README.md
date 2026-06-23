@@ -127,7 +127,7 @@ Use the following pre-configured credentials to log in and test the portal:
    DB_HOST=localhost
    DB_PORT=5432
    ```
-   *Note: If these database environment variables are not provided in your `.env` file, the application falls back to the local defaults (`placement_user` / `Madhu@5148`) defined in `settings.py`.*
+   *Note: If these database environment variables are not provided in your `.env` file, the application falls back to the local defaults defined in `settings.py`.*
 
 
 ---
